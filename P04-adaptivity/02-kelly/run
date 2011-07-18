@@ -1,0 +1,4 @@
+rm *~ 
+./P04-02-kelly
+python plot_graph.py &
+
