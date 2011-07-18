@@ -1,7 +1,8 @@
-# Hidden and backup files
+# Hidden, backup, log files
 .*
 *.*~
 *~
+*.log
 
 # CMake related
 CMake.vars
@@ -21,11 +22,12 @@ config_real.cmake
 *.so
 *.gz
 
-# Pictures
+# Pictures and data files
 *.eps
 *.gp
 *.bmp
 *.png
+*.dat
 
 # Windows / Visual Studio
 *vcxproj*
