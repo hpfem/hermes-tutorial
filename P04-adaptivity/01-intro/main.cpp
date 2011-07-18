@@ -31,7 +31,7 @@ using namespace RefinementSelectors;
 // The following parameters can be changed:
 
 const bool HERMES_VISUALIZATION = true;           // Set to "false" to suppress Hermes OpenGL visualization. 
-const bool VTK_VISUALIZATION = true;              // Set to "true" to enable VTK output.
+const bool VTK_VISUALIZATION = false;             // Set to "true" to enable VTK output.
 const int P_INIT = 2;                             // Initial polynomial degree of all mesh elements.
 const double THRESHOLD = 0.2;                     // This is a quantitative parameter of the adapt(...) function and
                                                   // it has different meanings for various adaptive strategies (see below).
@@ -135,9 +135,6 @@ int main(int argc, char* argv[])
       // Translate the resulting coefficient vector into the instance of Solution.
       Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
     
-    // Translate the resulting coefficient vector into the Solution sln.
-    Solution<double>::vector_to_solution(coeff_vec, ref_space, &ref_sln);
-
     // Project the fine mesh solution onto the coarse mesh.
     info("Projecting reference solution on coarse mesh.");
     OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver_type);
