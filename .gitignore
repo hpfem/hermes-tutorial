@@ -1,0 +1,55 @@
+# Hidden and backup files
+.*
+*.*~
+*~
+
+# CMake related
+CMake.vars
+CMakeCache.txt
+CMakeFiles/
+CPackConfig.cmake
+CPackSourceConfig.cmake
+CTestTestfile.cmake
+Makefile
+cmake_install.cmake
+config_real.cmake
+
+# Linux object files
+*.o
+*.o.*
+*.a
+*.so
+*.gz
+
+# Pictures
+*.eps
+*.gp
+*.bmp
+*.png
+
+# Windows / Visual Studio
+*vcxproj*
+*tlog
+*.obj
+*.sln
+*.dll
+*.ilk
+*.pdb
+*.lib
+*.ncb
+*.suo
+Debug/
+*.sdf
+
+# Documentation generated
+*.html
+*.eps
+*.js
+*.tex
+*.ps
+*.pdf
+*.aux
+*.css
+*.tag
+*.sty
+*.dvi
