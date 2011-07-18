@@ -28,6 +28,7 @@ config_real.cmake
 *.bmp
 *.png
 *.dat
+*.vtk
 
 # Windows / Visual Studio
 *vcxproj*
@@ -42,6 +43,9 @@ config_real.cmake
 *.suo
 Debug/
 *.sdf
+
+# KDevelop
+*.kdev*
 
 # Documentation generated
 *.html
