@@ -12,9 +12,9 @@ CustomWeakFormPoisson::CustomWeakFormPoisson(const std::string& mat_motor, doubl
   add_vector_form(new WeakFormsH1::DefaultResidualDiffusion<double>(0, mat_air, new HermesFunction<double>(eps_air)));
 }
 
-double ResidualErrorForm::residual_estimator(int n, double* wt, 
-                                             Func< double >* u_ext[], Func< double >* u, 
-                                             Geom< double >* e, ExtData< double >* ext) const
+double ResidualErrorForm::value(int n, double* wt, 
+                                Func< double >* u_ext[], Func< double >* u, 
+                                Geom< double >* e, ExtData< double >* ext) const
 {
 #ifdef H2D_SECOND_DERIVATIVES_ENABLED
   double result = 0.;
@@ -23,9 +23,6 @@ double ResidualErrorForm::residual_estimator(int n, double* wt,
   for (int i = 0; i < n; i++)
     result += wt[i] * Hermes::sqr( 0.0 + eps * u->laplace[i] );
 
-  // Multiply by square of element diameter. The constant coefficient derived for the estimator by Kelly et al.
-  // will be added automatically by BasicKellyAdapt (you may use KellyTypeAdapt instead to have a full control
-  // over the expression).
   return result * Hermes::sqr(e->diam) / 24.;
 #else
   error("Define H2D_SECOND_DERIVATIVES_ENABLED in hermes2d_common_defs.h"
@@ -33,12 +30,12 @@ double ResidualErrorForm::residual_estimator(int n, double* wt,
 #endif
 }
 
-Hermes::Ord ResidualErrorForm::residual_estimator(int n, double* wt, 
-                                                  Func< Hermes::Ord >* u_ext[], Func< Hermes::Ord >* u, 
-                                                  Geom< Hermes::Ord >* e, ExtData< Hermes::Ord >* ext) const
+Hermes::Ord ResidualErrorForm::ord(int n, double* wt, 
+                                   Func< Hermes::Ord >* u_ext[], Func< Hermes::Ord >* u, 
+                                   Geom< Hermes::Ord >* e, ExtData< Hermes::Ord >* ext) const
 {
 #ifdef H2D_SECOND_DERIVATIVES_ENABLED
-  return sqr(u->laplace[0]);
+  return Hermes::sqr(u->laplace[0]);
 #else
   error("Define H2D_SECOND_DERIVATIVES_ENABLED in hermes2d_common_defs.h"
         "if you want to use second derivatives in weak forms.");
