@@ -7,9 +7,9 @@ project(hermes_examples)
 	# --- OPTIONS
 	#
 	# Where to look for the static libraries (may be overriden by CMake.vars).
-	set(HERMES_DIRECTORY "/usr/lib")
-	set(HERMES_INCLUDE_PATH "/usr/include")
-	set(DEP_INCLUDE_PATHS "/usr/include")
+	set(HERMES_DIRECTORY "/usr/local/lib")
+	set(HERMES_INCLUDE_PATH "/usr/local/include")
+	set(DEP_INCLUDE_PATHS "/usr/local/include")
 
 	# Trilinos
 	# Enable support for Trilinos solvers.
@@ -49,11 +49,11 @@ project(hermes_examples)
 		endif(NOT MPI_INCLUDE_PATH)
 		include_directories(${MPI_INCLUDE_PATH})
 	endif(WITH_MPI)
-
-	find_package(HERMES_COMMON REQUIRED)
 	
 	set(HERMES2D_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes2d)
 	set(HERMES_COMMON_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes_common)
+	
+	find_package(HERMES_COMMON REQUIRED)
 
 	include_directories(${HERMES_COMMON_INCLUDE_PATH})
 	include_directories(${HERMES2D_INCLUDE_PATH})
