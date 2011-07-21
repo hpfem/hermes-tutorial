@@ -1,7 +1,7 @@
 # Adaptivity.
 add_subdirectory(01-intro)
 add_subdirectory(02-kelly)
-#add_subdirectory(03-system)
+add_subdirectory(03-system)
 #add_subdirectory(04-complex)
 #add_subdirectory(05-hcurl)
 #add_subdirectory(06-exact)
