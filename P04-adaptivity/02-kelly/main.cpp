@@ -47,14 +47,16 @@ const int STRATEGY = 0;                           // Adaptive strategy:
                                                   //   than THRESHOLD times maximum element error.
                                                   // STRATEGY = 2 ... refine all elements whose error is larger
                                                   //   than THRESHOLD.
-const bool USE_RESIDUAL_ESTIMATOR = true;         // Add also the norm of the residual to the error estimate of each element.
+const bool USE_RESIDUAL_ESTIMATOR = false;          // Add also the norm of residual to the error estimate of each element.
+const bool USE_EPS_IN_INTERFACE_ESTIMATOR = true;   // If true, the interface estimator is defined by jumps of fluxes; otherwise
+                                                    // jumps of normal derivatives are used.
 const int MESH_REGULARITY = -1;                   // Maximum allowed level of hanging nodes:
                                                   // MESH_REGULARITY = -1 ... arbitrary level hangning nodes (default),
                                                   // MESH_REGULARITY = 1 ... at most one-level hanging nodes,
                                                   // MESH_REGULARITY = 2 ... at most two-level hanging nodes, etc.
                                                   // Note that regular meshes are not supported, this is due to
                                                   // their notoriously bad performance.
-const double ERR_STOP = 1;                        // Stopping criterion for adaptivity (rel. error tolerance between the
+const double ERR_STOP = 5e-6;                        // Stopping criterion for adaptivity (rel. error tolerance between the
                                                   // reference mesh and coarse mesh solution in percent).
 const int NDOF_STOP = 60000;                      // Adaptivity process stops when the number of degrees of freedom grows
                                                   // over this limit. This is to prevent h-adaptivity to go on forever.
@@ -161,8 +163,12 @@ int main(int argc, char* argv[])
     // Calculate element errors and total error estimate.
     info("Calculating error estimate.");
     bool ignore_visited_segments = true;
-    KellyTypeAdapt<double> adaptivity(&space, ignore_visited_segments,
-                                      new CustomInterfaceEstimatorScalingFunction("Motor", EPS_MOTOR, "Air", EPS_AIR));
+    KellyTypeAdapt<double> adaptivity(&space, ignore_visited_segments, 
+                                      USE_EPS_IN_INTERFACE_ESTIMATOR 
+                                        ? 
+                                          new CustomInterfaceEstimatorScalingFunction("Motor", EPS_MOTOR, "Air", EPS_AIR)
+                                        :
+                                          new CustomInterfaceEstimatorScalingFunction);
     
     adaptivity.add_error_estimator_surf(new BasicKellyAdapt<double>::ErrorEstimatorFormKelly);
     
@@ -171,6 +177,10 @@ int main(int argc, char* argv[])
       adaptivity.add_error_estimator_vol(new ResidualErrorFormMotor("Motor", EPS_MOTOR));
       adaptivity.add_error_estimator_vol(new ResidualErrorFormAir("Air", EPS_AIR));
     }
+    
+    if (USE_EPS_IN_INTERFACE_ESTIMATOR)
+      // Use normalization by energy norm.
+      adaptivity.set_error_form(new EnergyErrorForm(&wf));
     
     // Note that there is only one solution (the only one available) passed to BasicKellyAdapt::calc_err_est
     // and there is also no "solutions_for_adapt" parameter. The last parameter, "error_flags", is left 
