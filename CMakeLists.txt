@@ -69,7 +69,7 @@ project(hermes_tutorial)
   # --- SUBFOLDERS WITH TUTORIAL TOPICS
   #
   # Linear problems.
-  #add_subdirectory(P01-linear)
+  add_subdirectory(P01-linear)
 
   # Nonlinear problems.
   #add_subdirectory(P02-nonlinear)
