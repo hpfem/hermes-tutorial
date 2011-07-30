@@ -16,9 +16,10 @@ Ord CustomNonlinearity::value(Ord u) const
   return Ord(10);
 }
 
-CustomWeakFormPicard::CustomWeakFormPicard(Solution<double>* prev_iter_sln, HermesFunction<double>* lambda, 
+CustomWeakFormPicard::CustomWeakFormPicard(Solution<double>* prev_iter_sln, 
+                                           HermesFunction<double>* lambda, 
                                            HermesFunction<double>* f) 
-                    : WeakForm(1)
+  : WeakForm(1)
 {
   // Jacobian.
   CustomJacobian* matrix_form = new CustomJacobian(0, 0, lambda);
@@ -31,8 +32,9 @@ CustomWeakFormPicard::CustomWeakFormPicard(Solution<double>* prev_iter_sln, Herm
   add_vector_form(vector_form);
 }
 
-double CustomWeakFormPicard::CustomJacobian::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
-                                                   Func<double> *v, Geom<double> *e, ExtData<double> *ext) const
+double CustomWeakFormPicard::CustomJacobian::value(int n, double *wt, Func<double> *u_ext[], 
+                                                   Func<double> *u, Func<double> *v, 
+                                                   Geom<double> *e, ExtData<double> *ext) const
 {
   double result = 0;
   for (int i = 0; i < n; i++) 
@@ -43,7 +45,8 @@ double CustomWeakFormPicard::CustomJacobian::value(int n, double *wt, Func<doubl
   return result;
 }
 
-Ord CustomWeakFormPicard::CustomJacobian::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v,
+Ord CustomWeakFormPicard::CustomJacobian::ord(int n, double *wt, Func<Ord> *u_ext[], 
+                                              Func<Ord> *u, Func<Ord> *v,
                                               Geom<Ord> *e, ExtData<Ord> *ext) const 
 {
   Ord result = 0;
