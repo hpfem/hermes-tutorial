@@ -72,7 +72,7 @@ project(hermes_tutorial)
   add_subdirectory(P01-linear)
 
   # Nonlinear problems.
-  #add_subdirectory(P02-nonlinear)
+  add_subdirectory(P02-nonlinear)
 
   # Time-dependent problems.
   #add_subdirectory(P03-transient)
