@@ -98,7 +98,7 @@ public:
   virtual double value(int n, double *wt, 
                        Func<double> *u_ext[], Func<double> *u, Func<double> *v, 
                        Geom<double> *e, ExtData<double> *ext) const;
-  inline virtual Hermes::Ord ord(int n, double *wt, 
+  virtual Hermes::Ord ord(int n, double *wt, 
                                  Func<Hermes::Ord> *u_ext[], Func<Hermes::Ord> *u, Func<Hermes::Ord> *v,
                                  Geom<Hermes::Ord> *e, ExtData<Hermes::Ord> *ext) const;
 private:
