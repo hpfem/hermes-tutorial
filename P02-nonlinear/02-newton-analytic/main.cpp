@@ -20,7 +20,7 @@ using namespace RefinementSelectors;
 //  The following parameters can be changed:
 
 const int P_INIT = 2;                             // Initial polynomial degree.
-const double NEWTON_TOL = 1e-6;                   // Stopping criterion for the Newton's method.
+const double NEWTON_TOL = 1e-8;                   // Stopping criterion for the Newton's method.
 const int NEWTON_MAX_ITER = 100;                  // Maximum allowed number of Newton iterations.
 const int INIT_GLOB_REF_NUM = 3;                  // Number of initial uniform mesh refinements.
 const int INIT_BDY_REF_NUM = 4;                   // Number of initial refinements towards boundary.
@@ -72,7 +72,8 @@ int main(int argc, char* argv[])
   NewtonSolver<double> newton(&dp, matrix_solver);
 
   // Perform Newton's iteration.
-  if (!newton.solve(coeff_vec)) 
+  bool freeze_jacobian = false;
+  if (!newton.solve(coeff_vec, NEWTON_TOL, NEWTON_MAX_ITER, freeze_jacobian)) 
     error("Newton's iteration failed.");
 
   // Translate the resulting coefficient vector into a Solution.
