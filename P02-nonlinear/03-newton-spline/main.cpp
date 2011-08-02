@@ -3,15 +3,13 @@
 #include "definitions.h"
 #include "function/function.h"
 
-using namespace RefinementSelectors;
-
 //  This example is the same as the previous one except that the 
 //  nonlinearity is given via a cubic spline.
 //
 //  PDE: Stationary heat transfer equation with nonlinear thermal
 //       conductivity, - div[lambda(u) grad u] + src(x, y) = 0.
 //
-//  Nonlinearity: cubic spline approximating 1 + pow(u, alpha).
+//  Nonlinearity: cubic spline approximating 1 + Hermes::pow(u, alpha).
 //
 //  Domain: square (-10, 10)^2.
 //

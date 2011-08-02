@@ -19,7 +19,7 @@ Ord CustomNonlinearity::value_ord(Ord u) const
 CustomWeakFormPicard::CustomWeakFormPicard(Solution<double>* prev_iter_sln, 
                                            Hermes1DFunction<double>* lambda, 
                                            Hermes2DFunction<double>* f) 
-  : WeakForm(1)
+  : WeakForm<double>(1)
 {
   // Jacobian.
   CustomJacobian* matrix_form = new CustomJacobian(0, 0, lambda);
@@ -86,7 +86,7 @@ Ord CustomWeakFormPicard::CustomResidual::ord(int n, double *wt, Func<Ord> *u_ex
 
 EssentialBoundaryCondition<double>::EssentialBCValueType CustomEssentialBCNonConst::get_value_type() const
 {
-  return EssentialBoundaryCondition::BC_FUNCTION; 
+  return EssentialBoundaryCondition<double>::BC_FUNCTION; 
 }
 
 double CustomEssentialBCNonConst::value(double x, double y, double n_x, double n_y, 

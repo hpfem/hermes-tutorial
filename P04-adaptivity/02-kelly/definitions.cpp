@@ -5,15 +5,15 @@ CustomWeakFormPoisson::CustomWeakFormPoisson(const std::string& mat_motor, doubl
   : WeakForm<double>(1), mat_motor(mat_motor), eps_motor(eps_motor), mat_air(mat_air), eps_air(eps_air)
 {
   // Jacobian.
-  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(0, 0, mat_motor, new Hermes::Hermes1DFunction<double>(eps_motor)));
-  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(0, 0, mat_air, new Hermes::Hermes1DFunction<double>(eps_air)));
+  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(0, 0, mat_motor, new Hermes1DFunction<double>(eps_motor)));
+  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(0, 0, mat_air, new Hermes1DFunction<double>(eps_air)));
 
   // Residual.
-  add_vector_form(new WeakFormsH1::DefaultResidualDiffusion<double>(0, mat_motor, new Hermes::Hermes1DFunction<double>(eps_motor)));
-  add_vector_form(new WeakFormsH1::DefaultResidualDiffusion<double>(0, mat_air, new Hermes::Hermes1DFunction<double>(eps_air)));
+  add_vector_form(new WeakFormsH1::DefaultResidualDiffusion<double>(0, mat_motor, new Hermes1DFunction<double>(eps_motor)));
+  add_vector_form(new WeakFormsH1::DefaultResidualDiffusion<double>(0, mat_air, new Hermes1DFunction<double>(eps_air)));
 }
 
-double CustomWeakFormPoisson::get_element_eps(Hermes::Hermes2D::Geom< double >* e)
+double CustomWeakFormPoisson::get_element_eps(Hermes2D::Geom< double >* e)
 {
   std::string marker = this->get_element_markers_conversion()->get_user_marker(e->elem_marker);
     
@@ -36,21 +36,21 @@ double ResidualErrorForm::value(int n, double* wt,
 
   // Calculate the integral of squared residual: (f + eps*laplace u)^2.
   for (int i = 0; i < n; i++)
-    result += wt[i] * Hermes::sqr( 0.0 + eps * u->laplace[i] );
+    result += wt[i] * sqr( 0.0 + eps * u->laplace[i] );
 
-  return result * Hermes::sqr(e->diam) / 24.;
+  return result * sqr(e->diam) / 24.;
 #else
   error("Define H2D_SECOND_DERIVATIVES_ENABLED in hermes2d_common_defs.h"
         "if you want to use second derivatives in weak forms.");
 #endif
 }
 
-Hermes::Ord ResidualErrorForm::ord(int n, double* wt, 
-                                   Func< Hermes::Ord >* u_ext[], Func< Hermes::Ord >* u, 
-                                   Geom< Hermes::Ord >* e, ExtData< Hermes::Ord >* ext) const
+Ord ResidualErrorForm::ord(int n, double* wt, 
+                                   Func< Ord >* u_ext[], Func< Ord >* u, 
+                                   Geom< Ord >* e, ExtData< Ord >* ext) const
 {
 #ifdef H2D_SECOND_DERIVATIVES_ENABLED
-  return Hermes::sqr(u->laplace[0]);
+  return sqr(u->laplace[0]);
 #else
   error("Define H2D_SECOND_DERIVATIVES_ENABLED in hermes2d_common_defs.h"
         "if you want to use second derivatives in weak forms.");
@@ -68,9 +68,9 @@ double EnergyErrorForm::value(int n, double* wt,
   return result;
 }
 
-Hermes::Ord EnergyErrorForm::ord(int n, double* wt, 
-                                 Func< Hermes::Ord >* u_ext[], Func< Hermes::Ord >* u, Func< Hermes::Ord >* v,
-                                 Geom< Hermes::Ord >* e, ExtData< Hermes::Ord >* ext) const
+Ord EnergyErrorForm::ord(int n, double* wt, 
+                                 Func< Ord >* u_ext[], Func< Ord >* u, Func< Ord >* v,
+                                 Geom< Ord >* e, ExtData< Ord >* ext) const
 {
   return u->dx[0] * v->dx[0] + u->dy[0] * v->dy[0];
 }

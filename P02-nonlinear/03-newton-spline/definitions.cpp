@@ -5,7 +5,7 @@ double CustomInitialCondition::value(double x, double y) const
   return (x+10) * (y+10) / 100. + 2;
 }
 
-void CustomInitialCondition::derivatives (double x, double y, double& dx, double& dy) const 
+void CustomInitialCondition::derivatives(double x, double y, double& dx, double& dy) const 
 {   
   dx = (y+10) / 100.;
   dy = (x+10) / 100.;
@@ -18,7 +18,7 @@ Ord CustomInitialCondition::ord(Ord x, Ord y) const
 
 EssentialBoundaryCondition<double>::EssentialBCValueType CustomEssentialBCNonConst::get_value_type() const 
 { 
-  return EssentialBoundaryCondition::BC_FUNCTION; 
+  return EssentialBoundaryCondition<double>::BC_FUNCTION; 
 }
 
 double CustomEssentialBCNonConst::value(double x, double y, double n_x, double n_y, 

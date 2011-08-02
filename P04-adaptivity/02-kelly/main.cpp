@@ -60,7 +60,7 @@ const double ERR_STOP = 5e-6;                        // Stopping criterion for a
                                                   // reference mesh and coarse mesh solution in percent).
 const int NDOF_STOP = 60000;                      // Adaptivity process stops when the number of degrees of freedom grows
                                                   // over this limit. This is to prevent h-adaptivity to go on forever.
-Hermes::MatrixSolverType matrix_solver_type = Hermes::SOLVER_UMFPACK; // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+MatrixSolverType matrix_solver_type = SOLVER_UMFPACK; // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
                                                                       // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
                                                   
 // Problem parameters.
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
   SimpleGraph graph_dof, graph_cpu;
 
   // Time measurement.
-  Hermes::TimePeriod cpu_time;
+  TimePeriod cpu_time;
 
   // Adaptivity loop:
   int as = 1; bool done = false;
@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
     }
 
     // Skip visualization time.
-    cpu_time.tick(Hermes::HERMES_SKIP);
+    cpu_time.tick(HERMES_SKIP);
     
     // Calculate element errors and total error estimate.
     info("Calculating error estimate.");
@@ -200,7 +200,7 @@ int main(int argc, char* argv[])
     graph_dof.save("conv_dof_est.dat");
     
     // Skip the time spent to save the convergence graphs.
-    cpu_time.tick(Hermes::HERMES_SKIP);
+    cpu_time.tick(HERMES_SKIP);
 
     // If err_est too large, adapt the mesh.
     if (err_est_rel < ERR_STOP) 

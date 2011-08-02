@@ -11,7 +11,7 @@ using namespace RefinementSelectors;
 //  PDE: Stationary heat transfer equation with nonlinear thermal
 //       conductivity, - div[lambda(u) grad u] + src(x, y) = 0.
 //
-//  Nonlinearity: lambda(u) = 1 + pow(u, alpha).
+//  Nonlinearity: lambda(u) = 1 + Hermes::pow(u, alpha).
 //
 //  Domain: square (-10, 10)^2.
 //

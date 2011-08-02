@@ -1,6 +1,9 @@
 #include "hermes2d.h"
 
+using namespace Hermes;
 using namespace Hermes::Hermes2D;
+using namespace Hermes::Hermes2D::WeakFormsH1;
+using namespace Hermes::Hermes2D::Views;
 
 class CustomWeakFormPoisson : public WeakForm<double>
 {
@@ -32,9 +35,9 @@ class CustomInterfaceEstimatorScalingFunction : public InterfaceEstimatorScaling
       if (use_eps)
       {
         if (e_marker == mat_motor)
-          return Hermes::sqr(eps_motor) * e_diam / 24.;
+          return sqr(eps_motor) * e_diam / 24.;
         else if (e_marker == mat_air)
-          return Hermes::sqr(eps_air) * e_diam / 24.;
+          return sqr(eps_air) * e_diam / 24.;
       }
       else
         return e_diam/24.;
@@ -63,8 +66,8 @@ class ResidualErrorForm : public KellyTypeAdapt<double>::ErrorEstimatorForm
                          Func<double> *u_ext[], Func<double> *u, 
                          Geom<double> *e, ExtData<double> *ext) const;
 
-    virtual Hermes::Ord ord(int n, double *wt, Func<Hermes::Ord> *u_ext[], Func<Hermes::Ord> *u, 
-                            Geom<Hermes::Ord> *e, ExtData<Hermes::Ord> *ext) const;
+    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, 
+                            Geom<Ord> *e, ExtData<Ord> *ext) const;
 
   protected:
     double eps;
@@ -98,9 +101,9 @@ public:
   virtual double value(int n, double *wt, 
                        Func<double> *u_ext[], Func<double> *u, Func<double> *v, 
                        Geom<double> *e, ExtData<double> *ext) const;
-  virtual Hermes::Ord ord(int n, double *wt, 
-                                 Func<Hermes::Ord> *u_ext[], Func<Hermes::Ord> *u, Func<Hermes::Ord> *v,
-                                 Geom<Hermes::Ord> *e, ExtData<Hermes::Ord> *ext) const;
+  virtual Ord ord(int n, double *wt, 
+                                 Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v,
+                                 Geom<Ord> *e, ExtData<Ord> *ext) const;
 private:
   CustomWeakFormPoisson *wf;
 };

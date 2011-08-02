@@ -2,8 +2,6 @@
 #define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
 
-using namespace RefinementSelectors;
-
 // This example explains how to use the multimesh adaptive hp-FEM,
 // where different physical fields (or solution components) can be
 // approximated using different meshes and equipped with mutually
@@ -26,7 +24,7 @@ using namespace RefinementSelectors;
 //
 // Exact solution: The functions g1 and g2 were calculated so that
 //                 the exact solution is:
-//        u(x,y) = U(x)*U(y) where U(t) = cos(M_PI*t/2)
+//        u(x,y) = U(x)*U(y) where U(t) = Hermes::cos(M_PI*t/2)
 //        v(x,y) = V(x)V(y) where V(t) = 1 - (exp(K*t)+exp(-K*t))/(exp(K) + exp(-K))
 // Note: V(t) is the exact solution of the 1D singularly perturbed equation
 //       -u'' + K*K*u = K*K in (-1, 1) with zero Dirichlet BC.
@@ -71,7 +69,7 @@ const double ERR_STOP = 0.1;                      // Stopping criterion for adap
                                                   // fine mesh and coarse mesh solution in percent).
 const int NDOF_STOP = 60000;                      // Adaptivity process stops when the number of degrees of freedom grows over
                                                   // this limit. This is mainly to prevent h-adaptivity to go on forever.
- Hermes::MatrixSolverType matrix_solver = Hermes::SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+ MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
                                                   // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
 // Problem parameters.
@@ -85,7 +83,7 @@ const double K = 100.;
 int main(int argc, char* argv[])
 {
   // Time measurement.
-  Hermes::TimePeriod cpu_time;
+  TimePeriod cpu_time;
   cpu_time.tick();
 
   // Load the mesh.

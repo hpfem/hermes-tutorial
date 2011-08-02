@@ -9,7 +9,7 @@ using namespace Hermes::Hermes2D;
 using namespace Hermes::Hermes2D::WeakFormsH1;
 using namespace Hermes::Hermes2D::Views;
 
-/* Nonlinearity lambda(u) = pow(u, alpha) */
+/* Nonlinearity lambda(u) = Hermes::pow(u, alpha) */
 
 class CustomNonlinearity : public Hermes1DFunction<double>
 {
@@ -33,7 +33,7 @@ protected:
 class CustomInitialCondition : public ExactSolutionScalar<double>
 {
 public:
-  CustomInitialCondition(Mesh* mesh) : ExactSolutionScalar(mesh) 
+  CustomInitialCondition(Mesh* mesh) : ExactSolutionScalar<double>(mesh) 
   {
   };
 
@@ -50,7 +50,7 @@ class CustomEssentialBCNonConst : public EssentialBoundaryCondition<double>
 {
 public:
   CustomEssentialBCNonConst(std::string marker) 
-           : EssentialBoundaryCondition(Hermes::vector<std::string>()) 
+           : EssentialBoundaryCondition<double>(Hermes::vector<std::string>()) 
   {
     this->markers.push_back(marker);
   }

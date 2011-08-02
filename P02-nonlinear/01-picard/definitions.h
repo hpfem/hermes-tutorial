@@ -5,7 +5,7 @@ using namespace Hermes::Hermes2D;
 using namespace Hermes::Hermes2D::WeakFormsH1;
 using namespace Hermes::Hermes2D::Views;
 
-/* Nonlinearity lambda(u) = pow(u, alpha) */
+/* Nonlinearity lambda(u) = Hermes::pow(u, alpha) */
 
 class CustomNonlinearity : public Hermes1DFunction<double>
 {
@@ -34,7 +34,7 @@ private:
   class CustomJacobian : public MatrixFormVol<double>
   {
   public:
-    CustomJacobian(int i, int j, Hermes1DFunction<double>* lambda) : MatrixFormVol(i, j), lambda(lambda) {};
+    CustomJacobian(int i, int j, Hermes1DFunction<double>* lambda) : MatrixFormVol<double>(i, j), lambda(lambda) {};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
                          Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
@@ -72,7 +72,7 @@ class CustomEssentialBCNonConst : public EssentialBoundaryCondition<double>
 {
 public:
   CustomEssentialBCNonConst(std::string marker) 
-           : EssentialBoundaryCondition(Hermes::vector<std::string>()) 
+           : EssentialBoundaryCondition<double>(Hermes::vector<std::string>()) 
   {
     this->markers.push_back(marker);
   };
