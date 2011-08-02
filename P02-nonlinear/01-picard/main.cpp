@@ -23,7 +23,7 @@ using namespace RefinementSelectors;
 const int P_INIT = 2;                             // Initial polynomial degree.
 const int INIT_GLOB_REF_NUM = 3;                  // Number of initial uniform mesh refinements.
 const int INIT_BDY_REF_NUM = 5;                   // Number of initial refinements towards boundary.
-const double PICARD_TOL = 1e-6;                   // Stopping criterion for the Picard's method.
+const double PICARD_TOL = 1e-2;                   // Stopping criterion for the Picard's method.
 const int PICARD_MAX_ITER = 1000;                 // Maximum allowed number of Picard's iterations.
 const double INIT_COND_CONST = 3.0;               // Constant initial condition.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
