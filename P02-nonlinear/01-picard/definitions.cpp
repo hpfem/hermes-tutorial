@@ -1,6 +1,6 @@
 #include "definitions.h"
 
-CustomNonlinearity::CustomNonlinearity(double alpha): HermesFunction()
+CustomNonlinearity::CustomNonlinearity(double alpha): Hermes1DFunction<double>()
 {
   this->is_const = false;
   this->alpha = alpha;
@@ -11,14 +11,14 @@ double CustomNonlinearity::value(double u) const
   return 1 + Hermes::pow(u, alpha);
 }
 
-Ord CustomNonlinearity::value(Ord u) const
+Ord CustomNonlinearity::value_ord(Ord u) const
 {
   return Ord(10);
 }
 
 CustomWeakFormPicard::CustomWeakFormPicard(Solution<double>* prev_iter_sln, 
-                                           HermesFunction<double>* lambda, 
-                                           HermesFunction<double>* f) 
+                                           Hermes1DFunction<double>* lambda, 
+                                           Hermes2DFunction<double>* f) 
   : WeakForm(1)
 {
   // Jacobian.

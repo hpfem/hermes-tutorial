@@ -7,14 +7,14 @@ using namespace Hermes::Hermes2D::Views;
 
 /* Nonlinearity lambda(u) = pow(u, alpha) */
 
-class CustomNonlinearity : public HermesFunction<double>
+class CustomNonlinearity : public Hermes1DFunction<double>
 {
 public:
   CustomNonlinearity(double alpha);
 
   virtual double value(double u) const;
 
-  virtual Ord value(Ord u) const;
+  virtual Ord value_ord(Ord u) const;
 
   protected:
     double alpha;
@@ -28,13 +28,13 @@ public:
 class CustomWeakFormPicard : public WeakForm<double>
 {
 public:
-  CustomWeakFormPicard(Solution<double>* prev_iter_sln, HermesFunction<double>* lambda, HermesFunction<double>* f);
+  CustomWeakFormPicard(Solution<double>* prev_iter_sln, Hermes1DFunction<double>* lambda, Hermes2DFunction<double>* f);
 
 private:
   class CustomJacobian : public MatrixFormVol<double>
   {
   public:
-    CustomJacobian(int i, int j, HermesFunction<double>* lambda) : MatrixFormVol(i, j), lambda(lambda) {};
+    CustomJacobian(int i, int j, Hermes1DFunction<double>* lambda) : MatrixFormVol(i, j), lambda(lambda) {};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
                          Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
@@ -43,13 +43,13 @@ private:
                     Geom<Ord> *e, ExtData<Ord> *ext) const;
     
     protected:
-      HermesFunction<double>* lambda;
+      Hermes1DFunction<double>* lambda;
   };
 
   class CustomResidual : public VectorFormVol<double>
   {
   public:
-    CustomResidual(int i, HermesFunction<double>* lambda, HermesFunction<double>* f) 
+    CustomResidual(int i, Hermes1DFunction<double>* lambda, Hermes2DFunction<double>* f) 
       : VectorFormVol<double>(i), lambda(lambda), f(f) 
     {
     }
@@ -61,8 +61,8 @@ private:
                     Geom<Ord> *e, ExtData<Ord> *ext) const;
 
     private:
-      HermesFunction<double>* lambda;
-      HermesFunction<double>* f;
+      Hermes1DFunction<double>* lambda;
+      Hermes2DFunction<double>* f;
   };
 };
 

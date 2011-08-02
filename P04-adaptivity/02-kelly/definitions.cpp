@@ -5,12 +5,12 @@ CustomWeakFormPoisson::CustomWeakFormPoisson(const std::string& mat_motor, doubl
   : WeakForm<double>(1), mat_motor(mat_motor), eps_motor(eps_motor), mat_air(mat_air), eps_air(eps_air)
 {
   // Jacobian.
-  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(0, 0, mat_motor, new HermesFunction<double>(eps_motor)));
-  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(0, 0, mat_air, new HermesFunction<double>(eps_air)));
+  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(0, 0, mat_motor, new Hermes::Hermes1DFunction<double>(eps_motor)));
+  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(0, 0, mat_air, new Hermes::Hermes1DFunction<double>(eps_air)));
 
   // Residual.
-  add_vector_form(new WeakFormsH1::DefaultResidualDiffusion<double>(0, mat_motor, new HermesFunction<double>(eps_motor)));
-  add_vector_form(new WeakFormsH1::DefaultResidualDiffusion<double>(0, mat_air, new HermesFunction<double>(eps_air)));
+  add_vector_form(new WeakFormsH1::DefaultResidualDiffusion<double>(0, mat_motor, new Hermes::Hermes1DFunction<double>(eps_motor)));
+  add_vector_form(new WeakFormsH1::DefaultResidualDiffusion<double>(0, mat_air, new Hermes::Hermes1DFunction<double>(eps_air)));
 }
 
 double CustomWeakFormPoisson::get_element_eps(Hermes::Hermes2D::Geom< double >* e)

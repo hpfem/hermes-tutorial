@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation
   CustomNonlinearity lambda(alpha);
-  HermesFunction<double> src(-heat_src);
+  Hermes2DFunction<double> src(-heat_src);
   DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &src);
 
   // Initialize the FE problem.

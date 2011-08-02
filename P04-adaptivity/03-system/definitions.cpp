@@ -33,7 +33,7 @@ double CustomExactFunction2::ddxx(double x)
 
 
 CustomRightHandSide1::CustomRightHandSide1(double K, double d_u, double sigma)
-  : HermesFunction<double>(), d_u(d_u), sigma(sigma) 
+  : Hermes::Hermes2DFunction<double>(), d_u(d_u), sigma(sigma) 
 {
   cef1 = new CustomExactFunction1();
   cef2 = new CustomExactFunction2(K);
@@ -48,7 +48,7 @@ double CustomRightHandSide1::value(double x, double y) const
   return -d_u * d_u * Laplace_u - u + sigma * v;
 }
 
-Hermes::Ord CustomRightHandSide1::ord(Hermes::Ord x, Hermes::Ord y) const 
+Hermes::Ord CustomRightHandSide1::value_ord(Hermes::Ord x, Hermes::Ord y) const 
 {
   return Hermes::Ord(10);
 }
@@ -60,7 +60,7 @@ CustomRightHandSide1::~CustomRightHandSide1()
 }
 
 CustomRightHandSide2::CustomRightHandSide2(double K, double d_v)
-      : HermesFunction<double>(), d_v(d_v) 
+      : Hermes2DFunction<double>(), d_v(d_v) 
 {
   cef1 = new CustomExactFunction1();
   cef2 = new CustomExactFunction2(K);
@@ -75,7 +75,7 @@ double CustomRightHandSide2::value(double x, double y) const
   return -d_v*d_v * Laplace_v - u + v;
 }
 
-Hermes::Ord CustomRightHandSide2::ord(Hermes::Ord x, Hermes::Ord y) const 
+Hermes::Ord CustomRightHandSide2::value_ord(Hermes::Ord x, Hermes::Ord y) const 
 {
   return Hermes::Ord(10);
 }
@@ -166,7 +166,7 @@ Hermes::Ord CustomResidual1::ord(int n, double *wt, Func<Hermes::Ord> *u_ext[], 
      result += wt[i] * (    d_u*d_u * (u_ext[0]->dx[i]*v->dx[i] + u_ext[0]->dy[i]*v->dy[i]) 
                           - u_ext[0]->val[i]*v->val[i] 
                           + sigma*u_ext[1]->val[i]*v->val[i]
-                          - g1->ord(e->x[i], e->y[i])*v->val[i]
+                          - g1->value_ord(e->x[i], e->y[i])*v->val[i]
                         );
    }
 
@@ -203,7 +203,7 @@ Hermes::Ord CustomResidual2::ord(int n, double *wt, Func<Hermes::Ord> *u_ext[], 
      result += wt[i] * (    d_v*d_v * (u_ext[1]->dx[i]*v->dx[i] + u_ext[1]->dy[i]*v->dy[i]) 
                           - u_ext[0]->val[i]*v->val[i] 
                           + u_ext[1]->val[i]*v->val[i]
-                          - g2->ord(e->x[i], e->y[i])*v->val[i]
+                          - g2->value_ord(e->x[i], e->y[i])*v->val[i]
                         );
    }
 
@@ -218,12 +218,12 @@ VectorFormVol<double>* CustomResidual2::clone()
 CustomWeakForm::CustomWeakForm(CustomRightHandSide1* g1, CustomRightHandSide2* g2) : WeakForm(2) 
 {
   // Jacobian.
-  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(0, 0, Hermes::HERMES_ANY, new HermesFunction<double>(g1->d_u * g1->d_u)));
-  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(0, 0, Hermes::HERMES_ANY, new HermesFunction<double>(-1.0)));
-  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(0, 1, Hermes::HERMES_ANY, new HermesFunction<double>(g1->sigma), HERMES_NONSYM));
-  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(1, 0, Hermes::HERMES_ANY, new HermesFunction<double>(-1.0), HERMES_NONSYM));
-  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(1, 1, Hermes::HERMES_ANY, new HermesFunction<double>(g2->d_v * g2->d_v)));
-  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(1, 1, Hermes::HERMES_ANY, new HermesFunction<double>(1.0)));
+  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(0, 0, Hermes::HERMES_ANY, new Hermes::Hermes1DFunction<double>(g1->d_u * g1->d_u)));
+  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(0, 0, Hermes::HERMES_ANY, new Hermes::Hermes2DFunction<double>(-1.0)));
+  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(0, 1, Hermes::HERMES_ANY, new Hermes::Hermes2DFunction<double>(g1->sigma), HERMES_NONSYM));
+  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(1, 0, Hermes::HERMES_ANY, new Hermes::Hermes2DFunction<double>(-1.0), HERMES_NONSYM));
+  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(1, 1, Hermes::HERMES_ANY, new Hermes::Hermes1DFunction<double>(g2->d_v * g2->d_v)));
+  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(1, 1, Hermes::HERMES_ANY, new Hermes::Hermes2DFunction<double>(1.0)));
 
   // Residual.
   add_vector_form(new CustomResidual1(g1->d_u, g1->sigma, g1));

@@ -57,22 +57,18 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation.
   CustomNonlinearity lambda(alpha);
-  HermesFunction<double> src(-heat_src);
+  Hermes2DFunction<double> src(-heat_src);
   CustomWeakFormPicard wf(&sln_prev_iter, &lambda, &src);
 
   // Initialize the FE problem.
   DiscreteProblem<double> dp(&wf, &space);
 
-  // Initial coefficient vector for the Newton's method.  
-  double* coeff_vec = new double[ndof];
-  memset(coeff_vec, 0, ndof*sizeof(double));
-
   // Initialize the Picard solver.
-  PicardSolver<double> picard(&dp, matrix_solver);
+  PicardSolver<double> picard(&dp, &sln_prev_iter, matrix_solver);
 
   // Perform the Picard's iteration.
   Solution<double> sln;
-  if (!picard.solve(coeff_vec, PICARD_TOL, PICARD_MAX_ITER)) 
+  if (!picard.solve(PICARD_TOL, PICARD_MAX_ITER)) 
     error("Picard's iteration failed.");
   else
     Solution<double>::vector_to_solution(picard.get_sln_vector(), &space, &sln);
@@ -83,9 +79,6 @@ int main(int argc, char* argv[])
   s_view.show(&sln_prev_iter);
   OrderView<double> o_view("Mesh", new WinGeom(450, 0, 420, 350));
   o_view.show(&space);
-
-  // Clean up.
-  delete [] coeff_vec;
 
   // Wait for all views to be closed.
   View::wait();

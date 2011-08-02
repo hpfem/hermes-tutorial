@@ -11,7 +11,7 @@ using namespace Hermes::Hermes2D::Views;
 
 /* Nonlinearity lambda(u) = pow(u, alpha) */
 
-class CustomNonlinearity : public HermesFunction<double>
+class CustomNonlinearity : public Hermes1DFunction<double>
 {
 public:
   CustomNonlinearity(double alpha);

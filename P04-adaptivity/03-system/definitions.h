@@ -32,14 +32,14 @@ public:
 
 /* Right-hand side */
 
-class CustomRightHandSide1: public HermesFunction<double>
+class CustomRightHandSide1: public Hermes::Hermes2DFunction<double>
 {
 public:
   CustomRightHandSide1(double K, double d_u, double sigma);
 
   virtual double value(double x, double y) const;
 
-  virtual Hermes::Ord ord(Hermes::Ord x, Hermes::Ord y) const;
+  virtual Hermes::Ord value_ord(Hermes::Ord x, Hermes::Ord y) const;
 
   ~CustomRightHandSide1();
 
@@ -48,14 +48,14 @@ public:
   double d_u, sigma;
 };
 
-class CustomRightHandSide2: public HermesFunction<double>
+class CustomRightHandSide2: public Hermes::Hermes2DFunction<double>
 {
 public:
   CustomRightHandSide2(double K, double d_v);
 
   virtual double value(double x, double y) const;
 
-  virtual Hermes::Ord ord(Hermes::Ord x, Hermes::Ord y) const;
+  virtual Hermes::Ord value_ord(Hermes::Ord x, Hermes::Ord y) const;
 
   ~CustomRightHandSide2();
 
