@@ -38,7 +38,8 @@ int main(int argc, char* argv[])
 #define lambda_macro(x) (1 + Hermes::pow(x, 4))
   Hermes::vector<double> lambda_pts(-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0);
   Hermes::vector<double> lambda_val;
-  for (unsigned int i = 0; i < lambda_pts.size(); i++) lambda_val.push_back(lambda_macro(lambda_pts[i]));
+  for (unsigned int i = 0; i < lambda_pts.size(); i++) 
+    lambda_val.push_back(lambda_macro(lambda_pts[i]));
   // Step 2: Create the cubic spline (and plot it for visual control). 
   double bc_left = 0.0;
   double bc_right = 0.0;
