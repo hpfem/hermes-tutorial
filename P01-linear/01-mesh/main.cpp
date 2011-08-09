@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 {
   // Load the mesh.
   Mesh mesh;
-  H2DReader mloader;
+  MeshReaderH2D mloader;
   mloader.load("domain.mesh", &mesh);
 
   // Optional rescaling of mesh (all vertex x- and y-coordinates are 
