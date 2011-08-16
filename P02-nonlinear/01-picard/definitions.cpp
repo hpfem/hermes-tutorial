@@ -16,6 +16,22 @@ Ord CustomNonlinearity::value_ord(Ord u) const
   return Ord(10);
 }
 
+double CustomInitialCondition::value(double x, double y) const 
+{
+  return const_value;
+}
+
+void CustomInitialCondition::derivatives(double x, double y, double& dx, double& dy) const 
+{   
+  dx = 0;
+  dy = 0;
+}
+
+Ord CustomInitialCondition::ord(Ord x, Ord y) const 
+{
+  return Ord(0);
+}
+
 CustomWeakFormPicard::CustomWeakFormPicard(Solution<double>* prev_iter_sln, 
                                            Hermes1DFunction<double>* lambda, 
                                            Hermes2DFunction<double>* f) 

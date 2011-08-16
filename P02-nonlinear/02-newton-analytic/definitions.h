@@ -28,7 +28,7 @@ protected:
   double alpha;
 };
 
-/* Initial condition for the Newton's method */
+/* Initial condition */
 
 class CustomInitialCondition : public ExactSolutionScalar<double>
 {

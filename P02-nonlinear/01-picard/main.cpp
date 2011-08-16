@@ -25,7 +25,7 @@ const int INIT_GLOB_REF_NUM = 3;                  // Number of initial uniform m
 const int INIT_BDY_REF_NUM = 5;                   // Number of initial refinements towards boundary.
 const double PICARD_TOL = 1e-2;                   // Stopping criterion for the Picard's method.
 const int PICARD_MAX_ITER = 1000;                 // Maximum allowed number of Picard's iterations.
-const double INIT_COND_CONST = 3.0;               // Constant initial condition.
+const double INIT_COND_CONST = 3.0;               // Value for custom constant initial condition.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
                                                   // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
@@ -53,7 +53,19 @@ int main(int argc, char* argv[])
   int ndof = space.get_num_dofs();
 
   // Initialize previous iteration solution for the Picard's method.
-  Solution<double> sln_prev_iter(&space, INIT_COND_CONST);
+  CustomInitialCondition init_sln(&mesh, INIT_COND_CONST);
+
+  // Project the initial condition on the FE space to obtain initial 
+  // coefficient vector for the Picard's method.
+  // NOTE: If you want to start from the zero vector, just define 
+  // coeff_vec to be a vector of ndof zeros (no projection is needed).
+  info("Projecting to obtain initial vector for the Picard's method.");
+  double* coeff_vec = new double[ndof];
+  OGProjection<double>::project_global(&space, &init_sln, coeff_vec, matrix_solver); 
+
+  // FIXME - converting the coefficient vector back to a Solution.
+  Solution<double> sln_prev_iter;
+  Solution<double>::vector_to_solution(coeff_vec, &space, &sln_prev_iter);
 
   // Initialize the weak formulation.
   CustomNonlinearity lambda(alpha);
