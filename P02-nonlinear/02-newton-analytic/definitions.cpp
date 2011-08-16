@@ -11,7 +11,7 @@ double CustomNonlinearity::value(double u) const
   return 1 + Hermes::pow(u, alpha);
 }
 
-Ord CustomNonlinearity::value(Ord u) const
+Ord CustomNonlinearity::value_ord(Ord u) const
 {
   return Ord(10);
 }
@@ -21,7 +21,7 @@ double CustomNonlinearity::derivative(double u) const
   return alpha * Hermes::pow(u, alpha - 1.0);
 }
 
-Ord CustomNonlinearity::derivative(Ord u) const
+Ord CustomNonlinearity::derivative_ord(Ord u) const
 {
   // Same comment as above applies.
   return Ord(10);
