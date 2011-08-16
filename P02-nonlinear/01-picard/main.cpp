@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
   int ndof = space.get_num_dofs();
 
   // Initialize previous iteration solution for the Picard's method.
-  Solution<double> sln_prev_iter(&mesh, INIT_COND_CONST);
+  Solution<double> sln_prev_iter(&space, INIT_COND_CONST);
 
   // Initialize the weak formulation.
   CustomNonlinearity lambda(alpha);
