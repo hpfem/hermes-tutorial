@@ -80,7 +80,9 @@ int main(int argc, char* argv[])
 
   // Perform the Picard's iteration.
   Solution<double> sln;
-  if (!picard.solve(PICARD_TOL, PICARD_MAX_ITER)) 
+  int number_of_last_iterations_used = 4;
+  double anderson_beta = 1.0;
+    if (!picard.solve(PICARD_TOL, PICARD_MAX_ITER, number_of_last_iterations_used, anderson_beta)) 
     error("Picard's iteration failed.");
   else
     Solution<double>::vector_to_solution(picard.get_sln_vector(), &space, &sln);
