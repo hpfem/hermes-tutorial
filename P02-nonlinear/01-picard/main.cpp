@@ -53,19 +53,7 @@ int main(int argc, char* argv[])
   int ndof = space.get_num_dofs();
 
   // Initialize previous iteration solution for the Picard's method.
-  CustomInitialCondition init_sln(&mesh, INIT_COND_CONST);
-
-  // Project the initial condition on the FE space to obtain initial 
-  // coefficient vector for the Picard's method.
-  // NOTE: If you want to start from the zero vector, just define 
-  // coeff_vec to be a vector of ndof zeros (no projection is needed).
-  info("Projecting to obtain initial vector for the Picard's method.");
-  double* coeff_vec = new double[ndof];
-  OGProjection<double>::project_global(&space, &init_sln, coeff_vec, matrix_solver); 
-
-  // FIXME - converting the coefficient vector back to a Solution.
-  Solution<double> sln_prev_iter;
-  Solution<double>::vector_to_solution(coeff_vec, &space, &sln_prev_iter);
+  CustomInitialCondition sln_prev_iter(&mesh, INIT_COND_CONST);
 
   // Initialize the weak formulation.
   CustomNonlinearity lambda(alpha);
@@ -78,14 +66,12 @@ int main(int argc, char* argv[])
   // Initialize the Picard solver.
   PicardSolver<double> picard(&dp, &sln_prev_iter, matrix_solver);
 
-  // Perform the Picard's iteration.
+  // Perform the Picard's iteration (Anderson acceleration on by default).
+  if (!picard.solve(PICARD_TOL, PICARD_MAX_ITER)) error("Picard's iteration failed.");
+
+  // Translate the coefficient vector into a Solution. 
   Solution<double> sln;
-  int number_of_last_iterations_used = 4;
-  double anderson_beta = 1.0;
-    if (!picard.solve(PICARD_TOL, PICARD_MAX_ITER, number_of_last_iterations_used, anderson_beta)) 
-    error("Picard's iteration failed.");
-  else
-    Solution<double>::vector_to_solution(picard.get_sln_vector(), &space, &sln);
+  Solution<double>::vector_to_solution(picard.get_sln_vector(), &space, &sln);
   
   // Visualise the solution and mesh.
   ScalarView<double> s_view("Solution", new WinGeom(0, 0, 440, 350));
