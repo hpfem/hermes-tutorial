@@ -14,7 +14,7 @@ public:
 
   virtual double value(double u) const;
 
-  virtual Ord value_ord(Ord u) const;
+  virtual Ord value(Ord u) const;
 
   protected:
     double alpha;

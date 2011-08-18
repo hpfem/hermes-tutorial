@@ -48,7 +48,7 @@ double CustomRightHandSide1::value(double x, double y) const
   return -d_u * d_u * Laplace_u - u + sigma * v;
 }
 
-Ord CustomRightHandSide1::value_ord(Ord x, Ord y) const 
+Ord CustomRightHandSide1::value(Ord x, Ord y) const 
 {
   return Ord(10);
 }
@@ -75,7 +75,7 @@ double CustomRightHandSide2::value(double x, double y) const
   return -d_v*d_v * Laplace_v - u + v;
 }
 
-Ord CustomRightHandSide2::value_ord(Ord x, Ord y) const 
+Ord CustomRightHandSide2::value(Ord x, Ord y) const 
 {
   return Ord(10);
 }
@@ -160,13 +160,13 @@ double CustomResidual1::value(int n, double *wt, Func<double> *u_ext[], Func<dou
 Ord CustomResidual1::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
                          Geom<Ord> *e, ExtData<Ord> *ext) const 
 {
-   Ord result = 0;
+   Ord result = Ord(0);
    for (int i = 0; i < n; i++) 
    {
      result += wt[i] * (    d_u*d_u * (u_ext[0]->dx[i]*v->dx[i] + u_ext[0]->dy[i]*v->dy[i]) 
                           - u_ext[0]->val[i]*v->val[i] 
                           + sigma*u_ext[1]->val[i]*v->val[i]
-                          - g1->value_ord(e->x[i], e->y[i])*v->val[i]
+                          - g1->value(e->x[i], e->y[i])*v->val[i]
                         );
    }
 
@@ -197,13 +197,13 @@ double CustomResidual2::value(int n, double *wt, Func<double> *u_ext[], Func<dou
 Ord CustomResidual2::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
                                  Geom<Ord> *e, ExtData<Ord> *ext) const 
 {
-   Ord result = 0;
+   Ord result = Ord(0);
    for (int i = 0; i < n; i++) 
    {
      result += wt[i] * (    d_v*d_v * (u_ext[1]->dx[i]*v->dx[i] + u_ext[1]->dy[i]*v->dy[i]) 
                           - u_ext[0]->val[i]*v->val[i] 
                           + u_ext[1]->val[i]*v->val[i]
-                          - g2->value_ord(e->x[i], e->y[i])*v->val[i]
+                          - g2->value(e->x[i], e->y[i])*v->val[i]
                         );
    }
 

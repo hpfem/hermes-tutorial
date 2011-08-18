@@ -11,7 +11,7 @@ double CustomNonlinearity::value(double u) const
   return 1 + Hermes::pow(u, alpha);
 }
 
-Ord CustomNonlinearity::value_ord(Ord u) const
+Ord CustomNonlinearity::value(Ord u) const
 {
   return Ord(10);
 }
@@ -65,10 +65,10 @@ Ord CustomWeakFormPicard::CustomJacobian::ord(int n, double *wt, Func<Ord> *u_ex
                                               Func<Ord> *u, Func<Ord> *v,
                                               Geom<Ord> *e, ExtData<Ord> *ext) const 
 {
-  Ord result = 0;
+  Ord result = Ord(0);
   for (int i = 0; i < n; i++) 
   {
-    result += wt[i] * lambda->value_ord(ext->fn[0]->val[i]) 
+    result += wt[i] * lambda->value(ext->fn[0]->val[i]) 
                     * (u->dx[i] * v->dx[i] + u->dy[i] * v->dy[i]);
   }
   return result;
@@ -90,12 +90,12 @@ double CustomWeakFormPicard::CustomResidual::value(int n, double *wt, Func<doubl
 Ord CustomWeakFormPicard::CustomResidual::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
                                               Geom<Ord> *e, ExtData<Ord> *ext) const 
 {
-  Ord result = 0;
+  Ord result = Ord(0);
   for (int i = 0; i < n; i++) 
   {
-    result += wt[i] * lambda->value_ord(ext->fn[0]->val[i]) * (u_ext[0]->dx[i] 
+    result += wt[i] * lambda->value(ext->fn[0]->val[i]) * (u_ext[0]->dx[i] 
                     * v->dx[i] + u_ext[0]->dy[i] * v->dy[i]);
-    result += wt[i] * f->value_ord(e->x[i], e->y[i]) * v->val[i];
+    result += wt[i] * f->value(e->x[i], e->y[i]) * v->val[i];
   }
   return result;
 }

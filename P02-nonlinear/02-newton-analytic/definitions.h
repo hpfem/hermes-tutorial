@@ -14,11 +14,11 @@ public:
 
   virtual double value(double u) const;
 
-  virtual Ord value_ord(Ord u) const;
+  virtual Ord value(Ord u) const;
 
   virtual double derivative(double u) const;
 
-  virtual Ord derivative_ord(Ord u) const;
+  virtual Ord derivative(Ord u) const;
 
 protected:
   double alpha;
