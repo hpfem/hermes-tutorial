@@ -6,6 +6,8 @@
 using namespace RefinementSelectors;
 
 //  This example uses the Picard's method to solve a nonlinear problem.
+//  Try to run this example with PICARD_NUM_LAST_ITER_USED = 1 for 
+//  comparison (Anderson acceleration turned off).)
 //
 //  PDE: Stationary heat transfer equation with nonlinear thermal
 //  conductivity, -div[lambda(u) grad u] + src(x, y) = 0.
@@ -23,11 +25,14 @@ using namespace RefinementSelectors;
 const int P_INIT = 2;                             // Initial polynomial degree.
 const int INIT_GLOB_REF_NUM = 3;                  // Number of initial uniform mesh refinements.
 const int INIT_BDY_REF_NUM = 5;                   // Number of initial refinements towards boundary.
-const double PICARD_TOL = 1e-2;                   // Stopping criterion for the Picard's method.
-const int PICARD_MAX_ITER = 1000;                 // Maximum allowed number of Picard's iterations.
 const double INIT_COND_CONST = 3.0;               // Value for custom constant initial condition.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
                                                   // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+// Picard's method.
+const int PICARD_NUM_LAST_ITER_USED = 3;          // Number of last iterations used.
+const double PICARD_ANDERSON_BETA = 1.0;          // Parameter for the Anderson acceleration. 
+const double PICARD_TOL = 1e-3;                   // Stopping criterion for the Picard's method.
+const int PICARD_MAX_ITER = 100;                  // Maximum allowed number of Picard iterations.
 
 // Problem parameters.
 double heat_src = 1.0;
@@ -67,7 +72,8 @@ int main(int argc, char* argv[])
   PicardSolver<double> picard(&dp, &sln_prev_iter, matrix_solver);
 
   // Perform the Picard's iteration (Anderson acceleration on by default).
-  if (!picard.solve(PICARD_TOL, PICARD_MAX_ITER)) error("Picard's iteration failed.");
+  if (!picard.solve(PICARD_TOL, PICARD_MAX_ITER, PICARD_NUM_LAST_ITER_USED, 
+                      PICARD_ANDERSON_BETA)) error("Picard's iteration failed.");
 
   // Translate the coefficient vector into a Solution. 
   Solution<double> sln;
