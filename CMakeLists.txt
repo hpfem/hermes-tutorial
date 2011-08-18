@@ -26,7 +26,7 @@ project(hermes_tutorial)
 		# set(MPI_INCLUDE_PATH      /usr/include/openmpi
 		
   # Tests.
-	set(WITH_TESTS              NO)
+	set(WITH_TESTS              YES)
 	
 	# Include debugging symbols.
 	set(DEBUG_VERSION           YES)
