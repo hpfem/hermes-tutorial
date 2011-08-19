@@ -90,5 +90,5 @@ project(hermes_tutorial)
   #add_subdirectory(P07-trilinos)
 
   # Miscellaneous techniques.
-  add_subdirectory(P08-miscellaneous)
+  #add_subdirectory(P08-miscellaneous)
 
