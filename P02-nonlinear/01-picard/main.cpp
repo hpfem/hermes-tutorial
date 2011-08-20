@@ -29,8 +29,8 @@ const double INIT_COND_CONST = 3.0;               // Value for custom constant i
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
                                                   // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 // Picard's method.
-const int PICARD_NUM_LAST_ITER_USED = 5;          // Number of last iterations used.
-const double PICARD_ANDERSON_BETA = 1.0;          // Parameter for the Anderson acceleration. 
+const int PICARD_NUM_LAST_ITER_USED = 4;          // Number of last iterations used.
+const double PICARD_ANDERSON_BETA = 0.2;          // 0 <= beta <= 1, parameter for the Anderson acceleration. 
 const double PICARD_TOL = 1e-3;                   // Stopping criterion for the Picard's method.
 const int PICARD_MAX_ITER = 100;                  // Maximum allowed number of Picard iterations.
 
