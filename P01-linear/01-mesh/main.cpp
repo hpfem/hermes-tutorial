@@ -33,12 +33,14 @@ int main(int argc, char* argv[])
   Mesh mesh;
   if (USE_XML_FORMAT == true)
   {
-    MeshReaderH2DXML mloader;
+    MeshReaderH2DXML mloader;  
+    info("Reading mesh in XML format.");
     mloader.load("domain.xml", &mesh);
   }
   else 
   {
     MeshReaderH2D mloader;
+    info("Reading mesh in original format.");
     mloader.load("domain.mesh", &mesh);
   }
 
@@ -46,14 +48,10 @@ int main(int argc, char* argv[])
   // divided by x_ref and y_ref, respectively). Mesh with curved edges 
   // cannot be rescaled. So to try this feature, comment out the "curves" 
   // section in the mesh file.
-  /* THIS METHOD WAS IN HERMES BUT IS NOT IN HERMES-DEV ?
   double x_ref = 2.0, y_ref = 3.0;
-  if(!mesh.rescale(x_ref, y_ref)) info("Mesh was not rescaled.");
-  else {
-    info("Mesh scaled by the factors of %g and %g in the x- and y- direction, respectively.", 
+  info("Rescaling mesh by the factors of %g and %g in the x- and y- direction, respectively.", 
          x_ref, y_ref);
-  }
-  */
+  if(!mesh.rescale(x_ref, y_ref)) info("Mesh could not be rescaled.");
 
   // Conversion between triangular and quadrilateral meshes (optional). 
   //mesh.convert_quads_to_triangles();
