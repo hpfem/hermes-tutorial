@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
   Solution<double>::vector_to_solution(picard.get_sln_vector(), &space, &sln);
   
   // Visualise the solution and mesh.
-  ScalarView<double> s_view("Solution", new WinGeom(0, 0, 440, 350));
+  ScalarView s_view("Solution", new WinGeom(0, 0, 440, 350));
   s_view.show_mesh(false);
   s_view.show(&sln_prev_iter);
   OrderView<double> o_view("Mesh", new WinGeom(450, 0, 420, 350));

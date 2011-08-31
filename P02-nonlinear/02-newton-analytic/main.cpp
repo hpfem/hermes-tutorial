@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
   delete [] coeff_vec;
 
   // Visualise the solution and mesh.
-  ScalarView<double> s_view("Solution", new WinGeom(0, 0, 440, 350));
+  ScalarView s_view("Solution", new WinGeom(0, 0, 440, 350));
   s_view.show_mesh(false);
   s_view.show(&sln);
   OrderView<double> o_view("Mesh", new WinGeom(450, 0, 400, 350));

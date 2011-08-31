@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
     Hermes::Hermes2D::Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);
   
   // Visualize the solution.
-  Views::ScalarView<double> view("Solution", new Views::WinGeom(0, 0, 800, 350));
+  Views::ScalarView view("Solution", new Views::WinGeom(0, 0, 800, 350));
   view.show(&sln);
 
   // Wait for the view to be closed.

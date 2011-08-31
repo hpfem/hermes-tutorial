@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
   Solution<double> sln;
 
   // Initialize views.
-  Views::ScalarView<double> sview("Solution", new Views::WinGeom(0, 0, 410, 600));
+  Views::ScalarView sview("Solution", new Views::WinGeom(0, 0, 410, 600));
   sview.fix_scale_width(50);
   sview.show_mesh(false);
   Views::OrderView<double>  oview("Polynomial orders", new Views::WinGeom(420, 0, 400, 600));
@@ -137,10 +137,10 @@ int main(int argc, char* argv[])
     if (VTK_VISUALIZATION) 
     {
       // Output solution in VTK format.
-      Views::Linearizer<double> lin;
+      Views::Linearizer lin(&sln);
       char* title = new char[100];
       sprintf(title, "sln-%d.vtk", as);
-      lin.save_solution_vtk(&sln, title, "Potential", false);
+      lin.save_solution_vtk(title, "Potential", false);
       info("Solution in VTK format saved to file %s.", title);
 
       // Output mesh and element orders in VTK format.
