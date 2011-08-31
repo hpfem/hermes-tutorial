@@ -8,7 +8,10 @@ using namespace Hermes::Hermes2D::Views;
 // This example shows how to load a mesh, perform various types
 // of initial refinements, and use keyboard and mouse controls.
 //
-// Geometry: L-Shape domain (see file domain.mesh).
+// Geometry: L-Shape domain (see file domain.mesh and domain.xml).
+
+// Select whether you want to read the original or XML mesh file.
+bool USE_XML_FORMAT = true;
 
 static char text[] = "\
 Click into the image window and:\n\
@@ -28,8 +31,16 @@ int main(int argc, char* argv[])
 {
   // Load the mesh.
   Mesh mesh;
-  MeshReaderH2D mloader;
-  mloader.load("domain.mesh", &mesh);
+  if (USE_XML_FORMAT == true)
+  {
+    MeshReaderH2DXML mloader;
+    mloader.load("domain.xml", &mesh);
+  }
+  else 
+  {
+    MeshReaderH2D mloader;
+    mloader.load("domain.mesh", &mesh);
+  }
 
   // Optional rescaling of mesh (all vertex x- and y-coordinates are 
   // divided by x_ref and y_ref, respectively). Mesh with curved edges 
