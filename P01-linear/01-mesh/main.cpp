@@ -10,8 +10,8 @@ using namespace Hermes::Hermes2D::Views;
 //
 // Geometry: L-Shape domain (see file domain.mesh and domain.xml).
 
-// Select whether you want to read the original or XML mesh file.
-bool USE_XML_FORMAT = true;
+const bool USE_XML_FORMAT = true;     // Select whether you want to read 
+                                      // the original or XML mesh file.
 
 static char text[] = "\
 Click into the image window and:\n\

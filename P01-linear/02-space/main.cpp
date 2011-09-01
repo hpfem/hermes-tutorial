@@ -1,3 +1,4 @@
+#define HERMES_REPORT_ALL
 #include "hermes2d.h"
 
 using namespace Hermes;
@@ -21,7 +22,10 @@ using namespace Hermes::Hermes2D::Views;
 //           with "ref_square.mesh" and "ref_triangle.mesh" to visualize 
 //           reference element shape functions. 
 
-const int P_INIT = 3;
+const bool USE_XML_FORMAT = true;     // Select whether you want to read 
+                                      // the original or XML mesh file.
+const int P_INIT = 3;                 // Initial polynomial degree of mesh elements.
+
 
 static char text[] = "\
 Click into the image window and:\n\
@@ -43,8 +47,18 @@ int main(int argc, char* argv[])
 {
   // Load the mesh.
   Mesh mesh;
-  MeshReaderH2D mloader;
-  mloader.load("domain.mesh", &mesh);            // L-shape domain,
+  if (USE_XML_FORMAT == true)
+  {
+    MeshReaderH2DXML mloader;  
+    info("Reading mesh in XML format.");
+    mloader.load("domain.xml", &mesh);
+  }
+  else 
+  {
+    MeshReaderH2D mloader;
+    info("Reading mesh in original format.");
+    mloader.load("domain.mesh", &mesh);
+  }
 
   // The following can be used to view higher-order shape functions
   // on reference domains (disable uniform mesh refinememts for that).

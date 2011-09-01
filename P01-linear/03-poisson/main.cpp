@@ -25,6 +25,8 @@
 //
 // The following parameters can be changed:
 
+const bool USE_XML_FORMAT = true;                 // Select whether you want to read 
+                                                  // the original or XML mesh file.
 const bool HERMES_VISUALIZATION = true;           // Set to "false" to suppress Hermes OpenGL visualization. 
 const bool VTK_VISUALIZATION = true;              // Set to "true" to enable VTK output.
 const int P_INIT = 5;                             // Uniform polynomial degree of mesh elements.
@@ -42,8 +44,18 @@ int main(int argc, char* argv[])
 {
   // Load the mesh.
   Mesh mesh;
-  MeshReaderH2D mloader;
-  mloader.load("domain.mesh", &mesh);
+  if (USE_XML_FORMAT == true)
+  {
+    MeshReaderH2DXML mloader;  
+    info("Reading mesh in XML format.");
+    mloader.load("domain.xml", &mesh);
+  }
+  else 
+  {
+    MeshReaderH2D mloader;
+    info("Reading mesh in original format.");
+    mloader.load("domain.mesh", &mesh);
+  }
 
   // Perform initial mesh refinements (optional).
   for (int i = 0; i < INIT_REF_NUM; i++) 
