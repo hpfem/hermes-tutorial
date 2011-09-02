@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
   ScalarView s_view("Solution", new WinGeom(0, 0, 440, 350));
   s_view.show_mesh(false);
   s_view.show(&sln);
-  OrderView<double> o_view("Mesh", new WinGeom(450, 0, 400, 350));
+  OrderView o_view("Mesh", new WinGeom(450, 0, 400, 350));
   o_view.show(&space);
 
   // Wait for all views to be closed.
