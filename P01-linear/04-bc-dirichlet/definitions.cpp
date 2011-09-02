@@ -20,13 +20,13 @@ CustomWeakFormPoissonDirichlet::CustomWeakFormPoissonDirichlet(std::string mat_a
 
 CustomDirichletCondition::CustomDirichletCondition(Hermes::vector<std::string> markers, 
                                                    double A, double B, double C)
-  : EssentialBoundaryCondition(markers), A(A), B(B), C(C) 
+  : EssentialBoundaryCondition<double>(markers), A(A), B(B), C(C) 
 { 
 }
 
 EssentialBoundaryCondition<double>::EssentialBCValueType CustomDirichletCondition::get_value_type() const
 { 
-  return EssentialBoundaryCondition::BC_FUNCTION; 
+  return EssentialBoundaryCondition<double>::BC_FUNCTION; 
 }
 
 double CustomDirichletCondition::value(double x, double y, double n_x, double n_y, 
