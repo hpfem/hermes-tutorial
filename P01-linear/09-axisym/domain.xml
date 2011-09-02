@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mesh:mesh xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:mesh="XMLMesh"
+  xmlns:element="XMLMesh"
+  xsi:schemaLocation="XMLMesh ../../xml_schemas/mesh_h2d_xml.xsd">
+
+  <variables>
+    <variable name="R0" value="0.05" />  <!-- inner radius -->
+    <variable name="a" value="0.2" />    <!-- wall thickness -->
+    <variable name="b" value="0.4" />    <!-- height -->
+    <variable name="Ra" value="0.25" />  <!-- R0 + a --> 
+  </variables>
+
+  <vertices>
+    <vertex x="R0" y="0" i="0"/>
+    <vertex x="Ra" y="0" i="1"/>
+    <vertex x="Ra" y="b" i="2"/>
+    <vertex x="R0" y="b" i="3"/>
+  </vertices>
+
+  <elements>
+    <element:quad v1="0" v2="1" v3="2" v4="3" marker="Copper" />
+  </elements>
+
+  <edges>
+    <edge v1="0" v2="1" marker="Bottom" />
+    <edge v1="1" v2="2" marker="Heat_flux" />
+    <edge v1="2" v2="3" marker="Heat_flux" />
+    <edge v1="3" v2="0" marker="Heat_flux" />
+  </edges>
+
+</mesh:mesh>
