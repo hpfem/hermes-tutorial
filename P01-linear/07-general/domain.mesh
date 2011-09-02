@@ -1,0 +1,18 @@
+vertices = [
+  [ -1, -1 ],
+  [ 1, -1 ],
+  [ 1, 1 ],
+  [ -1, 1 ]
+]
+
+elements = [
+  [ 0, 1, 2, 3, "Mat" ]
+]
+
+boundaries = [
+  [ 0, 1, "Horizontal" ],
+  [ 1, 2, "Vertical" ],
+  [ 2, 3, "Horizontal" ],
+  [ 3, 0, "Vertical" ]
+]
+
