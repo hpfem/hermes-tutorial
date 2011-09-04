@@ -87,7 +87,9 @@ project(hermes_tutorial)
   #add_subdirectory(P06-fvm-and-dg)
 
   # Using Trilinos.
-  #add_subdirectory(P07-trilinos)
+  if(WITH_TRILINOS)
+    add_subdirectory(P07-trilinos)
+  endif(WITH_TRILINOS)
 
   # Miscellaneous techniques.
   add_subdirectory(P08-miscellaneous)
