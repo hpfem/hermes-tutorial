@@ -122,7 +122,7 @@ int main(int argc, char **argv)
   delete(solver);
     
   // View the solution and mesh.
-  ScalarView sview("Solution", new WinGeom(0, 0, 440, 350));
+  ScalarView<double> sview("Solution", new WinGeom(0, 0, 440, 350));
   sview.show(&sln1);
   //OrderView  oview("Polynomial orders", new WinGeom(450, 0, 400, 350));
   //oview.show(&space);
@@ -143,16 +143,24 @@ int main(int argc, char **argv)
   // Set initial vector for NOX.
   // NOTE: Using zero vector was causing convergence problems.
   info("Projecting to obtain initial vector for the Newton's method.");
-  ZeroSolution init_sln(&mesh);
+  Views::MeshView::ZeroSolution init_sln(&mesh);
 
   // Initialize the NOX solver with the vector "coeff_vec".
   info("Initializing NOX.");
-  // "" stands for preconditioning that is set later.
-  NoxSolver<double> nox_solver(&dp2, message_type, iterative_method, "Newton", ls_tolerance, "", 
-                       flag_absresid, abs_resid, flag_relresid, rel_resid, max_iters);
+  NoxSolver<double> nox_solver(&dp2);
+  nox_solver.set_output_flags(message_type);
+
+  nox_solver.set_ls_type(iterative_method);
+  nox_solver.set_ls_tolerance(ls_tolerance);
+
+  nox_solver.set_conv_iters(max_iters);
+  if (flag_absresid)
+    nox_solver.set_conv_abs_resid(abs_resid);
+  if (flag_relresid)
+    nox_solver.set_conv_rel_resid(rel_resid);
 
   // Choose preconditioning.
-  MlPrecond<double>* pc = new MlPrecond<double>("sa");
+  MlPrecond<double> pc("sa");
   if (PRECOND)
   {
     if (TRILINOS_JFNK) nox_solver.set_precond(pc);
@@ -164,7 +172,7 @@ int main(int argc, char **argv)
   OGProjection<double>::project_global(&space, &init_sln, coeff_vec);
   if (nox_solver.solve(coeff_vec))
   {
-    Solution<double>::vector_to_solution(nox_solver.get_solution(), &space, &sln2);
+    Solution<double>::vector_to_solution(nox_solver.get_sln_vector(), &space, &sln2);
 
     info("Number of nonlin iterations: %d (norm of residual: %g)", 
       nox_solver.get_num_iters(), nox_solver.get_residual());
@@ -177,7 +185,7 @@ int main(int argc, char **argv)
   time = cpu_time.tick().last();
 
   // Show the NOX solution.
-  ScalarView view2("Solution<double> 2", new WinGeom(450, 0, 460, 350));
+  ScalarView<double> view2("Solution<double> 2", new WinGeom(450, 0, 460, 350));
   view2.show(&sln2);
   //view2.show(&exact);
 
