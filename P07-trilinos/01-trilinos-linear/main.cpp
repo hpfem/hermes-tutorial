@@ -123,7 +123,7 @@ int main(int argc, char **argv)
   delete(solver);
     
   // View the solution and mesh.
-  ScalarView<double> sview("Solution", new WinGeom(0, 0, 440, 350));
+  ScalarView sview("Solution", new WinGeom(0, 0, 440, 350));
   sview.show(&sln1);
   //OrderView  oview("Polynomial orders", new WinGeom(450, 0, 400, 350));
   //oview.show(&space);
@@ -144,7 +144,7 @@ int main(int argc, char **argv)
   // Set initial vector for NOX.
   // NOTE: Using zero vector was causing convergence problems.
   info("Projecting to obtain initial vector for the Newton's method.");
-  Views::MeshView::ZeroSolution init_sln(&mesh);
+  ZeroSolution init_sln(&mesh);
 
   // Initialize the NOX solver with the vector "coeff_vec".
   info("Initializing NOX.");
@@ -186,7 +186,7 @@ int main(int argc, char **argv)
   time = cpu_time.tick().last();
 
   // Show the NOX solution.
-  ScalarView<double> view2("Solution<double> 2", new WinGeom(450, 0, 460, 350));
+  ScalarView view2("Solution<double> 2", new WinGeom(450, 0, 460, 350));
   view2.show(&sln2);
   //view2.show(&exact);
 
