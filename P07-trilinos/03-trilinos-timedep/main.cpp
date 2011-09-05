@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
   NoxSolver<double> solver(&dp);
 
   // Select preconditioner.
-  MlPrecond<double>* pc = new MlPrecond<double>("sa");
+  MlPrecond<double> pc("sa");
   if (PRECOND)
   {
     if (JFNK) solver.set_precond(pc);
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 
     info("Assembling by DiscreteProblem, solving by NOX.");
     if (solver.solve(coeff_vec))
-      Solution<double>::vector_to_solution(solver.get_solution(), &space, &t_prev_time);
+      Solution<double>::vector_to_solution(solver.get_sln_vector(), &space, &t_prev_time);
     else
       error("NOX failed.");
 
