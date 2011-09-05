@@ -28,10 +28,11 @@ MatrixSolverType matrix_solver_type = SOLVER_UMFPACK;  // Possibilities: SOLVER_
 const char* iterative_method = "GMRES";              // Name of the iterative method employed by AztecOO (ignored
                                                   // by the other solvers). 
                                                   // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
-const char* preconditioner = "JACOBI";            // Name of the preconditioner employed by AztecOO (ignored by
-                                                  // other solvers).
-                                                  // Possibilities: none, jacobi, neumann, least-squares, or a
-                                                  // preconditioner from IFPACK (see solver/aztecoo.h)
+const char* preconditioner = "AztecOO";            // Name of the preconditioner employed by AztecOO 
+                                                  // Possibilities: None" - No preconditioning. 
+                                                  // "AztecOO" - AztecOO internal preconditioner.
+                                                  // "New Ifpack" - Ifpack internal preconditioner.
+                                                  // "ML" - Multi level preconditione
 // NOX parameters.
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
                                                   // NOX error messages, see NOX_Utils.h.
