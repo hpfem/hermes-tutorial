@@ -138,11 +138,19 @@ int main(int argc, char* argv[])
     memset(coeff_vec, 0, ndof_ref * sizeof(double));
 
     // Initialize NOX solver.
-    NoxSolver<double> solver(&dp, message_type, "GMRES", "Newton", ls_tolerance, "", flag_absresid, abs_resid, 
-                     flag_relresid, rel_resid, max_iters);
+    NoxSolver<double> solver(&dp);
+    solver.set_output_flags(message_type);
+
+    solver.set_ls_tolerance(ls_tolerance);
+
+    solver.set_conv_iters(max_iters);
+    if (flag_absresid)
+      solver.set_conv_abs_resid(abs_resid);
+    if (flag_relresid)
+      solver.set_conv_rel_resid(rel_resid);
 
     // Select preconditioner.
-    MlPrecond<double>* pc = new MlPrecond<double>("sa");
+    MlPrecond<double> pc("sa");
     if (PRECOND)
     {
       if (JFNK) solver.set_precond(pc);
@@ -156,7 +164,7 @@ int main(int argc, char* argv[])
 
     info("Assembling by DiscreteProblem, solving by NOX.");
     if (solver.solve(coeff_vec)) {
-      Solution<double>::vector_to_solution(solver.get_solution(), ref_space, &ref_sln);
+      Solution<double>::vector_to_solution(solver.get_sln_vector(), ref_space, &ref_sln);
       info("Number of nonlin iterations: %d (norm of residual: %g)", 
         solver.get_num_iters(), solver.get_residual());
       info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
