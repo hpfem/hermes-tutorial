@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
   // View the solution and mesh.
   ScalarView sview("Solution", new WinGeom(0, 0, 440, 350));
   sview.show(&sln);
-  OrderView<double> oview("Polynomial orders", new WinGeom(450, 0, 405, 350));
+  OrderView oview("Polynomial orders", new WinGeom(450, 0, 405, 350));
   oview.show(&space);
 
   // Skip visualization time.

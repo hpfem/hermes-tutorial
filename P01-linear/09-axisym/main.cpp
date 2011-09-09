@@ -30,9 +30,6 @@ const double T0 = 0.0;        // Outer temperature.
 const double LAMBDA = 386;    // Thermal conductivity.
 const double ALPHA = 20.0;    // Heat_flux coefficient on Gamma_heat_flux.
 
-// Weak forms.
-#include "definitions.h"
-
 int main(int argc, char* argv[])
 {
   // Load the mesh.
@@ -87,9 +84,9 @@ int main(int argc, char* argv[])
   if (VTK_VISUALIZATION) 
   {
     // Output solution in VTK format.
-    Linearizer lin(&sln);
+    Linearizer lin;
     bool mode_3D = true;
-    lin.save_solution_vtk("sln.vtk", "Temperature", mode_3D);
+    lin.save_solution_vtk(&sln, "sln.vtk", "Temperature", mode_3D);
     info("Solution in VTK format saved to file %s.", "sln.vtk");
 
     // Output mesh and element orders in VTK format.

@@ -146,10 +146,10 @@ int main(int argc, char* argv[])
     if (VTK_VISUALIZATION) 
     {
       // Output solution in VTK format.
-      Views::Linearizer lin(&sln);
+      Views::Linearizer lin;
       char* title = new char[100];
       sprintf(title, "sln-%d.vtk", as);
-      lin.save_solution_vtk(title, "Potential", false);
+      lin.save_solution_vtk(&sln, title, "Potential", false);
       info("Solution in VTK format saved to file %s.", title);
 
       // Output mesh and element orders in VTK format.

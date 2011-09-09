@@ -35,9 +35,6 @@ const double g1 = -9.81;                                   // Gravitational acce
 const double f0  = 0;                                      // Surface force in x-direction.
 const double f1  = 8e4;                                    // Surface force in y-direction.
 
-// Weak forms.
-#include "definitions.h"
-
 int main(int argc, char* argv[])
 {
   // Load the mesh.
