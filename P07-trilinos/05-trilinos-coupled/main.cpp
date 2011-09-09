@@ -2,10 +2,6 @@
 #define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
 
-using namespace Hermes;
-using namespace Hermes::Hermes2D;
-using namespace Hermes::Hermes2D::Views;
-
 //  The purpose of this example is to show how to use Trilinos for nonlinear time-dependent coupled PDE systems.
 //  Solved by NOX solver via Newton or JFNK, with or without preconditioning.
 //
@@ -14,7 +10,6 @@ using namespace Hermes::Hermes2D::Views;
 //  Domain: Same as in tutorial example 19-newton-timedep-flame.
 //
 //  The following parameters can be changed:
-
 
 const int INIT_REF_NUM = 2;         // Number of initial uniform mesh refinements.
 const int P_INIT = 2;               // Initial polynomial degree of all mesh elements.
@@ -35,16 +30,6 @@ const double beta  = 10.0;
 const double kappa = 0.1;
 const double x1    = 9.0;
 
-// Initial conditions.
-double temp_ic(double x, double y, double& dx, double& dy)
-  { return (x <= x1) ? 1.0 : exp(x1 - x); }
-
-double conc_ic(double x, double y, double& dx, double& dy)
-  { return (x <= x1) ? 0.0 : 1.0 - exp(Le*(x1 - x)); }
-
-// Weak forms. 
-# include "definitions.cpp"
-
 int main(int argc, char* argv[])
 {
   // Time measurement.
@@ -60,80 +45,54 @@ int main(int argc, char* argv[])
   for (int i=0; i < INIT_REF_NUM; i++)  mesh.refine_all_elements();
 
   // Initialize boundary conditions.
-  BCTypes bc_types;
-  bc_types.add_bc_dirichlet("Left");
-  bc_types.add_bc_neumann("Neumann");
-  bc_types.add_bc_newton("Cooled");
+  DefaultEssentialBCConst<double> left_t("Left", 1.0);
+  EssentialBCs<double> bcs_t(&left_t);
 
-  // Enter Dirichlet boundary values.
-  BCValues bc_values_t;
-  bc_values_t.add_const("Left", 1.0);
-
-  BCValues bc_values_c;
-  bc_values_c.add_zero("Left");
+  DefaultEssentialBCConst<double> left_c("Left", 0.0);
+  EssentialBCs<double> bcs_c(&left_c);
 
   // Create H1 spaces with default shapesets.
-  H1Space* t_space = new H1Space(&mesh, &bc_types, &bc_values_t, P_INIT);
-  H1Space* c_space = new H1Space(&mesh, &bc_types, &bc_values_c, P_INIT);
-  int ndof = Space<double>::get_num_dofs(Hermes::vector<Space *>(t_space, c_space));
+  H1Space<double>* t_space = new H1Space<double>(&mesh, &bcs_t, P_INIT);
+  H1Space<double>* c_space = new H1Space<double>(&mesh, &bcs_c, P_INIT);
+  int ndof = Space<double>::get_num_dofs(Hermes::vector<Space<double>*>(t_space, c_space));
   info("ndof = %d.", ndof);
 
   // Define initial conditions.
-  Solution t_prev_time_1, c_prev_time_1, t_prev_time_2, 
-           c_prev_time_2, t_iter, c_iter, t_prev_newton, c_prev_newton;
-  t_prev_time_1.set_exact(&mesh, temp_ic);  
-  c_prev_time_1.set_exact(&mesh, conc_ic);
-  t_prev_time_2.set_exact(&mesh, temp_ic);  
-  c_prev_time_2.set_exact(&mesh, conc_ic);
-  t_iter.set_exact(&mesh, temp_ic);   
-  c_iter.set_exact(&mesh, conc_ic);
+  InitialSolutionTemperature t_prev_time_1(&mesh, x1);
+  InitialSolutionConcentration c_prev_time_1(&mesh, x1, Le);
+  InitialSolutionTemperature t_prev_time_2(&mesh, x1);
+  InitialSolutionConcentration c_prev_time_2(&mesh, x1, Le);
+  Solution<double> t_prev_newton;
+  Solution<double> c_prev_newton;
 
   // Filters for the reaction rate omega and its derivatives.
-  DXDYFilter omega(omega_fn, Hermes::vector<MeshFunction*>(&t_prev_time_1, &c_prev_time_1));
-  DXDYFilter omega_dt(omega_dt_fn, Hermes::vector<MeshFunction*>(&t_prev_time_1, &c_prev_time_1));
-  DXDYFilter omega_dc(omega_dc_fn, Hermes::vector<MeshFunction*>(&t_prev_time_1, &c_prev_time_1));
+  CustomFilter omega(Hermes::vector<Solution<double>*>(&t_prev_time_1, &c_prev_time_1), Le, alpha, beta, kappa, x1, TAU);
+  CustomFilterDt omega_dt(Hermes::vector<Solution<double>*>(&t_prev_time_1, &c_prev_time_1), Le, alpha, beta, kappa, x1, TAU);
+  CustomFilterDc omega_dc(Hermes::vector<Solution<double>*>(&t_prev_time_1, &c_prev_time_1), Le, alpha, beta, kappa, x1, TAU);
 
   // Initialize visualization.
   ScalarView rview("Reaction rate", new WinGeom(0, 0, 800, 230));
 
   // Initialize weak formulation.
-  WeakForm wf(2, JFNK ? true : false);
-  if (!JFNK || (JFNK && PRECOND == 1))
-  {
-    wf.add_matrix_form(0, 0, callback(newton_bilinear_form_0_0), HERMES_NONSYM, HERMES_ANY, &omega_dt);
-    wf.add_matrix_form_surf(0, 0, callback(newton_bilinear_form_0_0_surf), 3);
-    wf.add_matrix_form(1, 1, callback(newton_bilinear_form_1_1), HERMES_NONSYM, HERMES_ANY, &omega_dc);
-    wf.add_matrix_form(0, 1, callback(newton_bilinear_form_0_1), HERMES_NONSYM, HERMES_ANY, &omega_dc);
-    wf.add_matrix_form(1, 0, callback(newton_bilinear_form_1_0), HERMES_NONSYM, HERMES_ANY, &omega_dt);
-  }
-  else if (PRECOND == 2)
-  {
-    wf.add_matrix_form(0, 0, callback(precond_0_0));
-    wf.add_matrix_form(1, 1, callback(precond_1_1));
-  }
-  wf.add_vector_form(0, callback(newton_linear_form_0), HERMES_ANY, 
-                     Hermes::vector<MeshFunction*>(&t_prev_time_1, &t_prev_time_2, &omega));
-  wf.add_vector_form_surf(0, callback(newton_linear_form_0_surf), 3);
-  wf.add_vector_form(1, callback(newton_linear_form_1), HERMES_ANY, 
-                     Hermes::vector<MeshFunction*>(&c_prev_time_1, &c_prev_time_2, &omega));
+  CustomWeakForm wf(Le, alpha, beta, kappa, x1, TAU, JFNK, PRECOND, &omega, &omega_dt, &omega_dc, &t_prev_time_1, &c_prev_time_1, &t_prev_time_2, &c_prev_time_2);
 
   // Project the functions "t_prev_time_1" and "c_prev_time_1" on the FE space 
   // in order to obtain initial vector for NOX. 
   info("Projecting initial solutions on the FE meshes.");
   double* coeff_vec = new double[ndof];
-  OGProjection::project_global(Hermes::vector<Space *>(t_space, c_space), 
-                                       Hermes::vector<MeshFunction*>(&t_prev_time_1, &c_prev_time_1),
+  OGProjection<double>::project_global(Hermes::vector<Space<double> *>(t_space, c_space), 
+                                       Hermes::vector<MeshFunction<double>*>(&t_prev_time_1, &c_prev_time_1),
                                        coeff_vec);
 
   // Measure the projection time.
   double proj_time = cpu_time.tick().last();
 
   // Initialize finite element problem.
-  DiscreteProblem<double> dp(&wf, Hermes::vector<Space*>(t_space, c_space));
+  DiscreteProblem<double> dp(&wf, Hermes::vector<Space<double>*>(t_space, c_space));
 
   // Initialize NOX solver and preconditioner.
-  NoxSolver solver(&dp);
-  RCP<Precond> pc = rcp(new MlPrecond("sa"));
+  NoxSolver<double> solver(&dp);
+  MlPrecond<double> pc("sa");
   if (PRECOND)
   {
     if (JFNK) solver.set_precond(pc);
@@ -152,11 +111,10 @@ int main(int argc, char* argv[])
     info("---- Time step %d, t = %g s", ts, total_time + TAU);
 
     cpu_time.tick(HERMES_SKIP);
-    solver.set_init_sln(coeff_vec);
-    if (solver.solve())
+    if (solver.solve(coeff_vec))
     {
-      Solution::vector_to_solutions(solver.get_solution(), Hermes::vector<Space *>(t_space, c_space), 
-                Hermes::vector<Solution *>(&t_prev_newton, &c_prev_newton));
+      Solution<double>::vector_to_solutions(solver.get_sln_vector(), Hermes::vector<Space<double> *>(t_space, c_space), 
+                Hermes::vector<Solution<double> *>(&t_prev_newton, &c_prev_newton));
 
       cpu_time.tick();
       info("Number of nonlin iterations: %d (norm of residual: %g)",
@@ -167,11 +125,6 @@ int main(int argc, char* argv[])
       // Time measurement.
       cpu_time.tick(HERMES_SKIP);
 
-      // Visualization.
-      DXDYFilter omega_view(omega_fn, Hermes::vector<MeshFunction*>(&t_prev_newton, &c_prev_newton));
-      rview.set_min_max_range(0.0,2.0);
-      rview.show(&omega_view);
-      cpu_time.tick(HERMES_SKIP);
 			
       // Skip visualization time.
       cpu_time.tick(HERMES_SKIP);
@@ -180,10 +133,19 @@ int main(int argc, char* argv[])
       total_time += TAU;
 
       // Saving solutions for the next time step.
-      t_prev_time_2.copy(&t_prev_time_1);
-      c_prev_time_2.copy(&c_prev_time_1);
-      t_prev_time_1 = t_prev_newton;
-      c_prev_time_1 = c_prev_newton;
+      if(ts > 1)
+      {
+        t_prev_time_2.copy(&t_prev_time_1);
+        c_prev_time_2.copy(&c_prev_time_1);
+      }
+
+      t_prev_time_1.copy(&t_prev_newton);
+      c_prev_time_1.copy(&c_prev_newton);
+      
+      // Visualization.
+      rview.set_min_max_range(0.0,2.0);
+      rview.show(&omega);
+      cpu_time.tick(HERMES_SKIP);
     }
     else
       error("NOX failed.");
