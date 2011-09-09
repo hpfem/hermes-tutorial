@@ -28,10 +28,11 @@ MatrixSolverType matrix_solver_type = SOLVER_UMFPACK;  // Possibilities: SOLVER_
 const char* iterative_method = "GMRES";              // Name of the iterative method employed by AztecOO (ignored
                                                   // by the other solvers). 
                                                   // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
-const char* preconditioner = "JACOBI";            // Name of the preconditioner employed by AztecOO (ignored by
-                                                  // other solvers).
-                                                  // Possibilities: none, jacobi, neumann, least-squares, or a
-                                                  // preconditioner from IFPACK (see solver/aztecoo.h)
+const char* preconditioner = "AztecOO";            // Name of the preconditioner employed by AztecOO 
+                                                  // Possibilities: None" - No preconditioning. 
+                                                  // "AztecOO" - AztecOO internal preconditioner.
+                                                  // "New Ifpack" - Ifpack internal preconditioner.
+                                                  // "ML" - Multi level preconditione
 // NOX parameters.
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
                                                   // NOX error messages, see NOX_Utils.h.
@@ -147,12 +148,20 @@ int main(int argc, char **argv)
 
   // Initialize the NOX solver with the vector "coeff_vec".
   info("Initializing NOX.");
-  // "" stands for preconditioning that is set later.
-  NoxSolver<double> nox_solver(&dp2, message_type, iterative_method, "Newton", ls_tolerance, "", 
-                       flag_absresid, abs_resid, flag_relresid, rel_resid, max_iters);
+  NoxSolver<double> nox_solver(&dp2);
+  nox_solver.set_output_flags(message_type);
+
+  nox_solver.set_ls_type(iterative_method);
+  nox_solver.set_ls_tolerance(ls_tolerance);
+
+  nox_solver.set_conv_iters(max_iters);
+  if (flag_absresid)
+    nox_solver.set_conv_abs_resid(abs_resid);
+  if (flag_relresid)
+    nox_solver.set_conv_rel_resid(rel_resid);
 
   // Choose preconditioning.
-  MlPrecond<double>* pc = new MlPrecond<double>("sa");
+  MlPrecond<double> pc("sa");
   if (PRECOND)
   {
     if (TRILINOS_JFNK) nox_solver.set_precond(pc);
@@ -164,7 +173,7 @@ int main(int argc, char **argv)
   OGProjection<double>::project_global(&space, &init_sln, coeff_vec);
   if (nox_solver.solve(coeff_vec))
   {
-    Solution<double>::vector_to_solution(nox_solver.get_solution(), &space, &sln2);
+    Solution<double>::vector_to_solution(nox_solver.get_sln_vector(), &space, &sln2);
 
     info("Number of nonlin iterations: %d (norm of residual: %g)", 
       nox_solver.get_num_iters(), nox_solver.get_residual());
