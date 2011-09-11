@@ -106,23 +106,31 @@ int main(int argc, char* argv[])
     info("Solving on reference mesh.");
     DiscreteProblem<double> dp(&wf, ref_space);
     
-    NewtonSolverNOX<double> newton(&dp);
-    newton.set_verbose_output(false);
+    NewtonSolverNOX<double> newton_nox(&dp);
+    newton_nox.set_verbose_output(false);
 
-    // Initial coefficient vector for the Newton's method.  
+    // Allocate initial coefficient vector for the Newton's method
+    // on the (new) fine mesh.
     double* coeff_vec = new double[ndof_ref];
-    memset(coeff_vec, 0, ndof_ref * sizeof(double));
+
+    // In the first step it is set to zero, in the following steps
+    // one takes the OG projection of the previous fine mesh solution.
+    if (as == 1) memset(coeff_vec, 0, ndof_ref * sizeof(double));
+    else 
+    {
+      OGProjectionNOX<double>::project_global(ref_space, &ref_sln, coeff_vec);
+    }
 
     // Perform Newton's iteration.
-    if (!newton.solve(coeff_vec)) 
+    if (!newton_nox.solve(coeff_vec)) 
       error("Newton's iteration failed.");
     else
       // Translate the resulting coefficient vector into the instance of Solution.
-      Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
+      Solution<double>::vector_to_solution(newton_nox.get_sln_vector(), ref_space, &ref_sln);
     
-    // Project the fine mesh solution onto the coarse mesh.
+    // Project the fine mesh solution on the coarse mesh.
     info("Projecting reference solution on coarse mesh.");
-    OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver_type);
+    OGProjectionNOX<double>::project_global(&space, &ref_sln, &sln);
 
     // Time measurement.
     cpu_time.tick();
@@ -165,8 +173,7 @@ int main(int argc, char* argv[])
     // absolute or relative. Its default value is error_flags = HERMES_TOTAL_ERROR_REL | HERMES_ELEMENT_ERROR_REL.
     // In subsequent examples and benchmarks, these two parameters will be often used with
     // their default values, and thus they will not be present in the code explicitly.
-    double err_est_rel = adaptivity.calc_err_est(&sln, &ref_sln, solutions_for_adapt,
-                         HERMES_TOTAL_ERROR_REL | HERMES_ELEMENT_ERROR_REL) * 100;
+    double err_est_rel = adaptivity.calc_err_est(&sln, &ref_sln, solutions_for_adapt) * 100;
 
     // Report results.
     info("ndof_coarse: %d, ndof_fine: %d, err_est_rel: %g%%",
@@ -199,10 +206,9 @@ int main(int argc, char* argv[])
 
     // Clean up.
     delete [] coeff_vec;
-    // Keep the mesh from final step to allow further working with the final reference solution.
-    if(done == false) 
-      delete ref_space->get_mesh(); 
-    delete ref_space;
+
+    // FIXME: Memory leak (no meshes, spaces or solutions are deleted 
+    // during adaptivity.
   }
   while (done == false);
 
