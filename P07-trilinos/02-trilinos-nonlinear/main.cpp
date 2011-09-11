@@ -163,35 +163,35 @@ int main(int argc, char* argv[])
 
   // Initialize the NOX solver with the vector "coeff_vec".
   info("Initializing NOX.");
-  NoxSolver<double> nox_solver(&dp2);
-  nox_solver.set_output_flags(message_type);
+  NewtonSolverNOX<double> solver_nox(&dp2);
+  solver_nox.set_output_flags(message_type);
 
-  nox_solver.set_ls_tolerance(ls_tolerance);
+  solver_nox.set_ls_tolerance(ls_tolerance);
 
-  nox_solver.set_conv_iters(max_iters);
+  solver_nox.set_conv_iters(max_iters);
   if (flag_absresid)
-    nox_solver.set_conv_abs_resid(abs_resid);
+    solver_nox.set_conv_abs_resid(abs_resid);
   if (flag_relresid)
-    nox_solver.set_conv_rel_resid(rel_resid);
+    solver_nox.set_conv_rel_resid(rel_resid);
 
   // Choose preconditioning.
   MlPrecond<double> pc("sa");
   if (PRECOND)
   {
-    if (JFNK) nox_solver.set_precond(pc);
-    else nox_solver.set_precond("ML");
+    if (JFNK) solver_nox.set_precond(pc);
+    else solver_nox.set_precond("ML");
   }
 
   // Solve the nonlinear problem using NOX.
   info("Assembling by DiscreteProblem, solving by NOX.");
   Solution<double> sln2;
-  if (nox_solver.solve(coeff_vec))
+  if (solver_nox.solve(coeff_vec))
   {
-    Solution<double>::vector_to_solution(nox_solver.get_sln_vector(), &space, &sln2);
+    Solution<double>::vector_to_solution(solver_nox.get_sln_vector(), &space, &sln2);
     info("Number of nonlin iterations: %d (norm of residual: %g)", 
-         nox_solver.get_num_iters(), nox_solver.get_residual());
+         solver_nox.get_num_iters(), solver_nox.get_residual());
     info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
-         nox_solver.get_num_lin_iters(), nox_solver.get_achieved_tol());
+         solver_nox.get_num_lin_iters(), solver_nox.get_achieved_tol());
   }
   else
     error("NOX failed.");

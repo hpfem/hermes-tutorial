@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
   OGProjection<double>::project_global(&space, &t_prev_time, coeff_vec);
 
   // Initialize NOX solver.
-  NoxSolver<double> solver(&dp);
+  NewtonSolverNOX<double> solver(&dp);
 
   // Select preconditioner.
   MlPrecond<double> pc("sa");

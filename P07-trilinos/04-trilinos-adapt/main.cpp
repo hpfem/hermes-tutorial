@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
     memset(coeff_vec, 0, ndof_ref * sizeof(double));
 
     // Initialize NOX solver.
-    NoxSolver<double> solver(&dp);
+    NewtonSolverNOX<double> solver(&dp);
     solver.set_output_flags(message_type);
 
     solver.set_ls_tolerance(ls_tolerance);

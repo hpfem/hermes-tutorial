@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
   DiscreteProblem<double> dp(&wf, Hermes::vector<Space<double>*>(t_space, c_space));
 
   // Initialize NOX solver and preconditioner.
-  NoxSolver<double> solver(&dp);
+  NewtonSolverNOX<double> solver(&dp);
   MlPrecond<double> pc("sa");
   if (PRECOND)
   {
