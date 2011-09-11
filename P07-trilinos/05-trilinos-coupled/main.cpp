@@ -13,15 +13,8 @@
 
 const int INIT_REF_NUM = 2;         // Number of initial uniform mesh refinements.
 const int P_INIT = 2;               // Initial polynomial degree of all mesh elements.
-const bool JFNK = true;             // true = jacobian-free method,
-                                    // false = Newton
-const int PRECOND = 2;              // Preconditioning by jacobian (1) (less GMRES iterations, more time to create precond)
-                                    // or by approximation of jacobian (2) (less time for precond creation, more GMRES iters).
-                                    // in case of jfnk,
-                                    // default Ifpack proconditioner in case of Newton.
 const double TAU = 0.05;            // Time step.
 const double T_FINAL = 60.0;        // Time interval length.
-const bool TRILINOS_OUTPUT = true;  // Display more details about nonlinear and linear solvers.
 
 // Problem parameters.
 const double Le    = 1.0;
@@ -29,6 +22,32 @@ const double alpha = 0.8;
 const double beta  = 10.0;
 const double kappa = 0.1;
 const double x1    = 9.0;
+
+// NOX parameters.
+const bool TRILINOS_OUTPUT = true;                // Display more details about nonlinear and linear solvers.
+const bool TRILINOS_JFNK = true;                  // true = Jacobian-free method (for NOX),
+                                                  // false = Newton (for NOX).
+const int PRECOND = 2;                            // Preconditioning by jacobian (1) (less GMRES iterations, more time to create precond)
+                                                  // or by approximation of jacobian (2) (less time for precond creation, more GMRES iters).
+                                                  // in case of jfnk,
+                                                  // default Ifpack proconditioner in case of Newton.
+const char* iterative_method = "GMRES";           // Name of the iterative method employed by AztecOO (ignored
+                                                  // by the other solvers). 
+                                                  // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
+const char* preconditioner = "AztecOO";           // Name of the preconditioner employed by AztecOO 
+                                                  // Possibilities: None" - No preconditioning. 
+                                                  // "AztecOO" - AztecOO internal preconditioner.
+                                                  // "New Ifpack" - Ifpack internal preconditioner.
+                                                  // "ML" - Multi level preconditione
+unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
+                                                  // NOX error messages, see NOX_Utils.h.
+double ls_tolerance = 1e-5;                       // Tolerance for linear system.
+unsigned flag_absresid = 0;                       // Flag for absolute value of the residuum.
+double abs_resid = 1.0e-3;                        // Tolerance for absolute value of the residuum.
+unsigned flag_relresid = 1;                       // Flag for relative value of the residuum.
+double rel_resid = 1.0e-2;                        // Tolerance for relative value of the residuum.
+int max_iters = 100;                              // Max number of iterations.
+
 
 int main(int argc, char* argv[])
 {
@@ -74,7 +93,8 @@ int main(int argc, char* argv[])
   ScalarView rview("Reaction rate", new WinGeom(0, 0, 800, 230));
 
   // Initialize weak formulation.
-  CustomWeakForm wf(Le, alpha, beta, kappa, x1, TAU, JFNK, PRECOND, &omega, &omega_dt, &omega_dc, &t_prev_time_1, &c_prev_time_1, &t_prev_time_2, &c_prev_time_2);
+  CustomWeakForm wf(Le, alpha, beta, kappa, x1, TAU, TRILINOS_JFNK, PRECOND, &omega, &omega_dt, 
+                    &omega_dc, &t_prev_time_1, &c_prev_time_1, &t_prev_time_2, &c_prev_time_2);
 
   // Project the functions "t_prev_time_1" and "c_prev_time_1" on the FE space 
   // in order to obtain initial vector for NOX. 
@@ -95,7 +115,7 @@ int main(int argc, char* argv[])
   MlPrecond<double> pc("sa");
   if (PRECOND)
   {
-    if (JFNK) solver.set_precond(pc);
+    if (TRILINOS_JFNK) solver.set_precond(pc);
     else solver.set_precond("Ifpack");
   }
   if (TRILINOS_OUTPUT)
@@ -124,7 +144,6 @@ int main(int argc, char* argv[])
 
       // Time measurement.
       cpu_time.tick(HERMES_SKIP);
-
 			
       // Skip visualization time.
       cpu_time.tick(HERMES_SKIP);

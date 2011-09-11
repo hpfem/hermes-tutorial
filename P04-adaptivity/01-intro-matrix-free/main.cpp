@@ -66,7 +66,6 @@ const char* preconditioner = "AztecOO";           // Name of the preconditioner 
                                                   // "ML" - Multi level preconditione
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
                                                   // NOX error messages, see NOX_Utils.h.
-
 double ls_tolerance = 1e-5;                       // Tolerance for linear system.
 unsigned flag_absresid = 0;                       // Flag for absolute value of the residuum.
 double abs_resid = 1.0e-3;                        // Tolerance for absolute value of the residuum.

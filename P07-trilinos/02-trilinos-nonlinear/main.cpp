@@ -29,14 +29,15 @@ const int P_INIT = 3;                             // Initial polynomial degree o
 const double NEWTON_TOL = 1e-6;                   // Stopping criterion for the Newton's method.
 const int NEWTON_MAX_ITER = 100;                  // Maximum allowed number of Newton iterations.
 
-const bool JFNK = false;                          // true = jacobian-free method,
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+
+// NOX parameters.
+const bool TRILINOS_JFNK = false;                 // true = jacobian-free method,
                                                   // false = Newton.
 const int PRECOND = 2;                            // Preconditioning by jacobian (1) or approximation of jacobian (2)
                                                   // in case of JFNK,
                                                   // Default ML proconditioner in case of Newton.
-MatrixSolverType matrix_solver_type = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-
 const char* iterative_method = "bicgstab";        // Name of the iterative method employed by AztecOO (ignored
                                                   // by the other solvers). 
                                                   // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
@@ -44,10 +45,8 @@ const char* preconditioner = "least-squares";     // Name of the preconditioner 
                                                   // the other solvers).
                                                   // Possibilities: none, jacobi, neumann, least-squares, or a
                                                   //  preconditioner from IFPACK (see solver/aztecoo.h)
-// NOX parameters.
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
                                                   // NOX error messages, see NOX_Utils.h.
-
 double ls_tolerance = 1e-5;                       // Tolerance for linear system.
 unsigned flag_absresid = 0;                       // Flag for absolute value of the residuum.
 double abs_resid = 1.0e-8;                        // Tolerance for absolute value of the residuum.
@@ -90,12 +89,12 @@ int main(int argc, char* argv[])
   DiscreteProblem<double> dp1(&wf1, &space);
   
   // Set up the solver, matrix, and rhs for the coarse mesh according to the solver selection.
-  SparseMatrix<double>* matrix = create_matrix<double>(matrix_solver_type);
-  Vector<double>* rhs = create_vector<double>(matrix_solver_type);
-  LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver_type, matrix, rhs);
+  SparseMatrix<double>* matrix = create_matrix<double>(matrix_solver);
+  Vector<double>* rhs = create_vector<double>(matrix_solver);
+  LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver, matrix, rhs);
 
   #ifdef HAVE_AZTECOO
-    if (matrix_solver_type == SOLVER_AZTECOO) 
+    if (matrix_solver == SOLVER_AZTECOO) 
     {
       (dynamic_cast<AztecOOSolver<double>*>(solver))->set_solver(iterative_method);
       (dynamic_cast<AztecOOSolver<double>*>(solver))->set_precond(preconditioner);
@@ -112,10 +111,10 @@ int main(int argc, char* argv[])
   // coefficient vector.
   //info("Projecting to obtain initial vector for the Newton's method.");
   //CustomInitialSolution sln_tmp(&mesh);
-  //OGProjection<double>::project_global(&space, &sln_tmp, coeff_vec, matrix_solver_type);
+  //OGProjection<double>::project_global(&space, &sln_tmp, coeff_vec, matrix_solver);
 
   // Initialize the Newton solver.
-  Hermes::Hermes2D::NewtonSolver<double> newton(&dp1, matrix_solver_type);
+  Hermes::Hermes2D::NewtonSolver<double> newton(&dp1, matrix_solver);
 
   // Perform Newton's iteration and translate the resulting coefficient vector into a Solution.
   Hermes::Hermes2D::Solution<double> sln1;
@@ -142,7 +141,7 @@ int main(int argc, char* argv[])
   // Calculate error.
   CustomExactSolution ex(&mesh);
   double rel_err_1 = Global<double>::calc_rel_error(&sln1, &ex, HERMES_H1_NORM) * 100;
-  info("Solution<double> 1 (%s):  exact H1 error: %g%% (time %g s)", MatrixSolverNames[matrix_solver_type].c_str(), rel_err_1, time1);
+  info("Solution<double> 1 (%s):  exact H1 error: %g%% (time %g s)", MatrixSolverNames[matrix_solver].c_str(), rel_err_1, time1);
 
   // TRILINOS PART:
 
@@ -150,13 +149,13 @@ int main(int argc, char* argv[])
   // coefficient vector.
   info("Projecting to obtain initial vector for the Newton's method.");
   CustomInitialSolution sln_tmp(&mesh);
-  OGProjection<double>::project_global(&space, &sln_tmp, coeff_vec, matrix_solver_type);
+  OGProjection<double>::project_global(&space, &sln_tmp, coeff_vec, matrix_solver);
 
   // Measure the projection time.
   double proj_time = cpu_time.tick().last();
 
   // Initialize the weak formulation for Trilinos.
-  CustomWeakForm wf2(JFNK, PRECOND == 1, PRECOND == 2);
+  CustomWeakForm wf2(TRILINOS_JFNK, PRECOND == 1, PRECOND == 2);
 
   // Initialize DiscreteProblem.
   DiscreteProblem<double> dp2(&wf2, &space);
@@ -178,7 +177,7 @@ int main(int argc, char* argv[])
   MlPrecond<double> pc("sa");
   if (PRECOND)
   {
-    if (JFNK) solver_nox.set_precond(pc);
+    if (TRILINOS_JFNK) solver_nox.set_precond(pc);
     else solver_nox.set_precond("ML");
   }
 

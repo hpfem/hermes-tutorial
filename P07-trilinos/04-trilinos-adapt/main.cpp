@@ -23,10 +23,6 @@ using namespace Hermes::Hermes2D::RefinementSelectors;
 
 const int P_INIT = 2;                      // Initial polynomial degree of all mesh elements.
 const int INIT_REF_NUM = 1;                // Number of initial uniform mesh refinements.
-const bool JFNK = true;                    // true = jacobian-free method,
-                                           // false = Newton.
-const bool PRECOND = true;                 // Preconditioning by jacobian in case of jfnk,
-                                           // default ML proconditioner in case of Newton.
 const double THRESHOLD = 0.3;              // This is a quantitative parameter of the adapt(...) function and
                                            // it has different meanings for various adaptive strategies (see below).
 const int STRATEGY = 0;                    // Adaptive strategy:
@@ -54,12 +50,28 @@ const double ERR_STOP = 1.0;               // Stopping criterion for adaptivity 
                                            // fine mesh and coarse mesh solution in percent).
 const int NDOF_STOP = 60000;               // Adaptivity process stops when the number of degrees of freedom grows
                                            // over this limit. This is to prevent h-adaptivity to go on forever.
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+                                                  // This solver is used for projections only.
+
+// Problem parameters.
+double slope = 60;                                // Slope of the layer inside the domain.
 
 // NOX parameters.
-//unsigned message_type = 0;
+const bool TRILINOS_JFNK = true;                  // true = Jacobian-free method (for NOX),
+                                                  // false = Newton (for NOX).
+const bool PRECOND = true;                        // Preconditioning by jacobian in case of JFNK (for NOX),
+                                                  // default ML preconditioner in case of Newton.
+const char* iterative_method = "GMRES";           // Name of the iterative method employed by AztecOO (ignored
+                                                  // by the other solvers). 
+                                                  // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
+const char* preconditioner = "AztecOO";           // Name of the preconditioner employed by AztecOO 
+                                                  // Possibilities: None" - No preconditioning. 
+                                                  // "AztecOO" - AztecOO internal preconditioner.
+                                                  // "New Ifpack" - Ifpack internal preconditioner.
+                                                  // "ML" - Multi level preconditione
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
                                                   // NOX error messages, see NOX_Utils.h.
-
 double ls_tolerance = 1e-5;                       // Tolerance for linear system.
 unsigned flag_absresid = 0;                       // Flag for absolute value of the residuum.
 double abs_resid = 1.0e-3;                        // Tolerance for absolute value of the residuum.
@@ -67,12 +79,6 @@ unsigned flag_relresid = 1;                       // Flag for relative value of 
 double rel_resid = 1.0e-2;                        // Tolerance for relative value of the residuum.
 int max_iters = 100;                              // Max number of iterations.
 
-// Problem parameters.
-double slope = 60;                                // Slope of the layer inside the domain.
-
-MatrixSolverType matrix_solver_type = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-                                                  // This solver is used for projections only.
 
 int main(int argc, char* argv[])
 {
@@ -153,7 +159,7 @@ int main(int argc, char* argv[])
     MlPrecond<double> pc("sa");
     if (PRECOND)
     {
-      if (JFNK) solver.set_precond(pc);
+      if (TRILINOS_JFNK) solver.set_precond(pc);
       else solver.set_precond("ML");
     }
 
@@ -174,7 +180,7 @@ int main(int argc, char* argv[])
       error("NOX failed.");
 
     info("Projecting reference solution on coarse mesh.");
-    OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver_type);
+    OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver);
 
     // View the coarse mesh solution and polynomial orders.
     sview.show(&sln);
