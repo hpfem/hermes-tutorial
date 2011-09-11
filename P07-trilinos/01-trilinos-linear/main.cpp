@@ -18,22 +18,22 @@
 
 const int INIT_REF_NUM = 6;                       // Number of initial uniform mesh refinements.
 const int P_INIT = 3;                             // Initial polynomial degree of all mesh elements.
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+
+// NOX parameters.
 const bool TRILINOS_JFNK = true;                  // true = Jacobian-free method (for NOX),
                                                   // false = Newton (for NOX).
 const bool PRECOND = true;                        // Preconditioning by jacobian in case of JFNK (for NOX),
                                                   // default ML preconditioner in case of Newton.
-MatrixSolverType matrix_solver_type = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-
-const char* iterative_method = "GMRES";              // Name of the iterative method employed by AztecOO (ignored
+const char* iterative_method = "GMRES";           // Name of the iterative method employed by AztecOO (ignored
                                                   // by the other solvers). 
                                                   // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
-const char* preconditioner = "AztecOO";            // Name of the preconditioner employed by AztecOO 
+const char* preconditioner = "AztecOO";           // Name of the preconditioner employed by AztecOO 
                                                   // Possibilities: None" - No preconditioning. 
                                                   // "AztecOO" - AztecOO internal preconditioner.
                                                   // "New Ifpack" - Ifpack internal preconditioner.
                                                   // "ML" - Multi level preconditione
-// NOX parameters.
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
                                                   // NOX error messages, see NOX_Utils.h.
 
@@ -74,18 +74,18 @@ int main(int argc, char **argv)
   info("ndof: %d", ndof);
 
   info("---- Assembling by DiscreteProblem, solving by %s:", 
-       MatrixSolverNames[matrix_solver_type].c_str());
+       MatrixSolverNames[matrix_solver].c_str());
 
   // Initialize the linear discrete problem.
   DiscreteProblem<double> dp1(&wf1, &space);
     
   // Set up the solver, matrix, and rhs according to the solver selection.
-  SparseMatrix<double>* matrix = create_matrix<double>(matrix_solver_type);
-  Vector<double>* rhs = create_vector<double>(matrix_solver_type);
-  LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver_type, matrix, rhs);
+  SparseMatrix<double>* matrix = create_matrix<double>(matrix_solver);
+  Vector<double>* rhs = create_vector<double>(matrix_solver);
+  LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver, matrix, rhs);
   
   #ifdef HAVE_AZTECOO
-    if (matrix_solver_type == SOLVER_AZTECOO) 
+    if (matrix_solver == SOLVER_AZTECOO) 
     {
       (dynamic_cast<AztecOOSolver<double>*>(solver))->set_solver(iterative_method);
       (dynamic_cast<AztecOOSolver<double>*>(solver))->set_precond(preconditioner);
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
   memset(coeff_vec, 0, ndof*sizeof(double));
 
   // Initialize the Newton solver.
-  Hermes::Hermes2D::NewtonSolver<double> newton(&dp1, matrix_solver_type);
+  Hermes::Hermes2D::NewtonSolver<double> newton(&dp1, matrix_solver);
 
   // Perform Newton's iteration and translate the resulting coefficient vector into a Solution.
   Hermes::Hermes2D::Solution<double> sln1;

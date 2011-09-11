@@ -44,8 +44,6 @@ const double CONV_EXP = 1.0;                      // Default value is 1.0. This 
                                                   // fine mesh and coarse mesh solution in percent).
 const int NDOF_STOP = 60000;                      // Adaptivity process stops when the number of degrees of freedom grows
                                                   // over this limit. This is to prevent h-adaptivity to go on forever.
-MatrixSolverType matrix_solver_type = SOLVER_UMFPACK; // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                                      // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
                                                   
 // Problem parameters.
 const double EPS0 = 8.863e-12;
@@ -53,15 +51,39 @@ const double VOLTAGE = 50.0;
 const double EPS_MOTOR = 10.0 * EPS0;
 const double EPS_AIR = 1.0 * EPS0;
 
+// NOX parameters.
+const bool TRILINOS_JFNK = true;                  // true = Jacobian-free method (for NOX),
+                                                  // false = Newton (for NOX).
+const bool PRECOND = true;                        // Preconditioning by jacobian in case of JFNK (for NOX),
+                                                  // default ML preconditioner in case of Newton.
+const char* iterative_method = "GMRES";           // Name of the iterative method employed by AztecOO (ignored
+                                                  // by the other solvers). 
+                                                  // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
+const char* preconditioner = "AztecOO";           // Name of the preconditioner employed by AztecOO 
+                                                  // Possibilities: None" - No preconditioning. 
+                                                  // "AztecOO" - AztecOO internal preconditioner.
+                                                  // "New Ifpack" - Ifpack internal preconditioner.
+                                                  // "ML" - Multi level preconditione
+unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
+                                                  // NOX error messages, see NOX_Utils.h.
+
+double ls_tolerance = 1e-5;                       // Tolerance for linear system.
+unsigned flag_absresid = 0;                       // Flag for absolute value of the residuum.
+double abs_resid = 1.0e-3;                        // Tolerance for absolute value of the residuum.
+unsigned flag_relresid = 1;                       // Flag for relative value of the residuum.
+double rel_resid = 1.0e-2;                        // Tolerance for relative value of the residuum.
+int max_iters = 100;                              // Max number of iterations.
+
+
 int main(int argc, char* argv[])
 {
   // Load the mesh.
   Mesh mesh;
   MeshReaderH2D mloader;
-  mloader.load("motor.mesh", &mesh);
+  mloader.load("domain.mesh", &mesh);
 
   // Initialize the weak formulation.
-  CustomWeakFormPoisson wf("Motor", EPS_MOTOR, "Air", EPS_AIR);
+  CustomWeakFormPoisson wf("Motor", EPS_MOTOR, "Air", EPS_AIR, TRILINOS_JFNK);
   
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_essential_out("Outer", 0.0);
@@ -71,7 +93,7 @@ int main(int argc, char* argv[])
   // Create an H1 space with default shapeset.
   H1Space<double> space(&mesh, &bcs, P_INIT);
 
-  // Initialize coarse and reference mesh solution.
+  // Initialize coarse and fine mesh solution.
   Solution<double> sln, ref_sln;
 
   // Initialize refinement selector.
@@ -91,6 +113,7 @@ int main(int argc, char* argv[])
 
   // Adaptivity loop:
   int as = 1; bool done = false;
+  Space<double>* ref_space_new = NULL, *ref_space_prev = NULL;
   do
   {
     info("---- Adaptivity step %d:", as);
@@ -98,38 +121,71 @@ int main(int argc, char* argv[])
     // Time measurement.
     cpu_time.tick();
 
-    // Construct globally refined reference mesh and setup reference space.
-    Space<double>* ref_space = Space<double>::construct_refined_space(&space);
-    int ndof_ref = ref_space->get_num_dofs();
+    // Backup fine mesh space if it already exists.
+    if (ref_space_new != NULL) 
+    {
+      if (ref_space_prev != NULL) delete ref_space_prev;
+      ref_space_prev = ref_space_new;
+    }
 
-    // Initialize reference problem.
-    info("Solving on reference mesh.");
-    DiscreteProblem<double> dp(&wf, ref_space);
+    // Construct (new) fine mesh and setup (new) fine mesh space.
+    ref_space_new = Space<double>::construct_refined_space(&space);
+    int ndof_ref = ref_space_new->get_num_dofs();
+
+    // Initialize (new) fine mesh problem.
+    DiscreteProblem<double> dp(&wf, ref_space_new);
     
-    NewtonSolverNOX<double> newton_nox(&dp);
-    newton_nox.set_verbose_output(false);
-
     // Allocate initial coefficient vector for the Newton's method
     // on the (new) fine mesh.
     double* coeff_vec = new double[ndof_ref];
+    memset(coeff_vec, 0, ndof_ref * sizeof(double));
 
-    // In the first step it is set to zero, in the following steps
-    // one takes the OG projection of the previous fine mesh solution.
-    if (as == 1) memset(coeff_vec, 0, ndof_ref * sizeof(double));
-    else 
+    // Initialize the NOX solver with the vector "coeff_vec".
+    info("Initializing NOX.");
+    NewtonSolverNOX<double> newton_nox(&dp);
+    newton_nox.set_verbose_output(true);
+    newton_nox.set_output_flags(message_type);
+    newton_nox.set_ls_type(iterative_method);
+    newton_nox.set_ls_tolerance(ls_tolerance);
+    newton_nox.set_conv_iters(max_iters);
+    if (flag_absresid)
+      newton_nox.set_conv_abs_resid(abs_resid);
+    if (flag_relresid)
+      newton_nox.set_conv_rel_resid(rel_resid);
+
+    // Transfer previous fine mesh solution to new fine mesh.
+    if (as > 1)
     {
-      OGProjectionNOX<double>::project_global(ref_space, &ref_sln, coeff_vec);
+      info("Transferring previous fine mesh solution to new fine mesh.");
+      OGProjectionNOX<double>::project_global(ref_space_new, &ref_sln, coeff_vec);
+    }
+
+    // Choose preconditioning.
+    MlPrecond<double> pc("sa");
+    if (PRECOND)
+    {
+      if (TRILINOS_JFNK) newton_nox.set_precond(pc);
+      else newton_nox.set_precond(preconditioner);
     }
 
     // Perform Newton's iteration.
+    info("Performing JFNK on new fine mesh.");
     if (!newton_nox.solve(coeff_vec)) 
-      error("Newton's iteration failed.");
+      error("JFNK iteration failed.");
     else
+    {
       // Translate the resulting coefficient vector into the instance of Solution.
-      Solution<double>::vector_to_solution(newton_nox.get_sln_vector(), ref_space, &ref_sln);
-    
+      Solution<double>::vector_to_solution(newton_nox.get_sln_vector(), ref_space_new, &ref_sln);
+
+      // Output.
+      info("Number of nonlin iterations: %d (norm of residual: %g)", 
+        newton_nox.get_num_iters(), newton_nox.get_residual());
+      info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
+        newton_nox.get_num_lin_iters(), newton_nox.get_achieved_tol());
+    }
+
     // Project the fine mesh solution on the coarse mesh.
-    info("Projecting reference solution on coarse mesh.");
+    info("Projecting fine mesh solution to coarse mesh.");
     OGProjectionNOX<double>::project_global(&space, &ref_sln, &sln);
 
     // Time measurement.
@@ -177,7 +233,7 @@ int main(int argc, char* argv[])
 
     // Report results.
     info("ndof_coarse: %d, ndof_fine: %d, err_est_rel: %g%%",
-      space.get_num_dofs(), ref_space->get_num_dofs(), err_est_rel);
+      space.get_num_dofs(), ref_space_new->get_num_dofs(), err_est_rel);
 
     // Add entry to DOF and CPU convergence graphs.
     cpu_time.tick();    
@@ -214,7 +270,7 @@ int main(int argc, char* argv[])
 
   verbose("Total running time: %g s", cpu_time.accumulated());
 
-  // Show the reference solution - the final result.
+  // Show the last fine mesh solution - final result.
   sview.set_title("Fine mesh solution");
   sview.show_mesh(false);
   sview.show(&ref_sln);

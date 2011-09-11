@@ -9,5 +9,5 @@ class CustomWeakFormPoisson : public WeakForm<double>
 {
 public:
   CustomWeakFormPoisson(const std::string& mat_motor, double eps_motor, 
-                        const std::string& mat_air, double eps_air);
+                        const std::string& mat_air, double eps_air, bool is_matfree = true);
 };

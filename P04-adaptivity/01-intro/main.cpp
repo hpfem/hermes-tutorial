@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
   // Create an H1 space with default shapeset.
   H1Space<double> space(&mesh, &bcs, P_INIT);
 
-  // Initialize coarse and reference mesh solution.
+  // Initialize coarse and fine mesh solution.
   Solution<double> sln, ref_sln;
 
   // Initialize refinement selector.
@@ -113,12 +113,12 @@ int main(int argc, char* argv[])
     // Time measurement.
     cpu_time.tick();
 
-    // Construct globally refined reference mesh and setup reference space.
+    // Construct globally refined mesh and setup fine mesh space.
     Space<double>* ref_space = Space<double>::construct_refined_space(&space);
     int ndof_ref = ref_space->get_num_dofs();
 
-    // Initialize reference problem.
-    info("Solving on reference mesh.");
+    // Initialize fine mesh problem.
+    info("Solving on fine mesh.");
     DiscreteProblem<double> dp(&wf, ref_space);
     
     NewtonSolver<double> newton(&dp, matrix_solver_type);
@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
       Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
     
     // Project the fine mesh solution onto the coarse mesh.
-    info("Projecting reference solution on coarse mesh.");
+    info("Projecting fine mesh solution on coarse mesh.");
     OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver_type);
 
     // Time measurement.
@@ -214,7 +214,7 @@ int main(int argc, char* argv[])
 
     // Clean up.
     delete [] coeff_vec;
-    // Keep the mesh from final step to allow further working with the final reference solution.
+    // Keep the mesh from final step to allow further work with the final fine mesh solution.
     if(done == false) 
       delete ref_space->get_mesh(); 
     delete ref_space;
@@ -223,7 +223,7 @@ int main(int argc, char* argv[])
 
   verbose("Total running time: %g s", cpu_time.accumulated());
 
-  // Show the reference solution - the final result.
+  // Show the fine mesh solution - final result.
   sview.set_title("Fine mesh solution");
   sview.show_mesh(false);
   sview.show(&ref_sln);
