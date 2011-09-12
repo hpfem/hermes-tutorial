@@ -75,7 +75,7 @@ project(hermes_tutorial)
   add_subdirectory(P02-nonlinear)
 
   # Time-dependent problems.
-  #add_subdirectory(P03-transient)
+  add_subdirectory(P03-transient)
 
   # Adaptivity.
   add_subdirectory(P04-adaptivity)
