@@ -81,12 +81,18 @@ int main(int argc, char* argv[])
 
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp, matrix_solver);
+  newton.set_verbose_output(true);
 
   // Perform Newton's iteration.
-  bool verbose = true;
-  bool jacobian_changed = true;
-  if (!newton.solve(coeff_vec, NEWTON_TOL, NEWTON_MAX_ITER)) 
+  try
+  {
+    newton.solve(coeff_vec, NEWTON_TOL, NEWTON_MAX_ITER);
+  }
+  catch(Hermes::Exceptions::Exception e)
+  {
+    e.printMsg();
     error("Newton's iteration failed.");
+  }
 
   // Translate the resulting coefficient vector into the Solution sln.
   Solution<double> u1_sln, u2_sln;

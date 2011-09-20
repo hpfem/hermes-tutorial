@@ -169,19 +169,24 @@ int main(int argc, char* argv[])
 
     // Perform Newton's iteration.
     info("Performing JFNK on new fine mesh.");
-    if (!newton_nox.solve(coeff_vec)) 
-      error("JFNK iteration failed.");
-    else
+    try
     {
-      // Translate the resulting coefficient vector into the instance of Solution.
-      Solution<double>::vector_to_solution(newton_nox.get_sln_vector(), ref_space_new, &ref_sln);
-
-      // Output.
-      info("Number of nonlin iterations: %d (norm of residual: %g)", 
-        newton_nox.get_num_iters(), newton_nox.get_residual());
-      info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
-        newton_nox.get_num_lin_iters(), newton_nox.get_achieved_tol());
+      newton_nox.solve(coeff_vec);
     }
+    catch(Hermes::Exceptions::Exception e)
+    {
+      e.printMsg();
+      error("JFNK iteration failed.");
+    }
+
+    // Translate the resulting coefficient vector into the instance of Solution.
+    Solution<double>::vector_to_solution(newton_nox.get_sln_vector(), ref_space_new, &ref_sln);
+
+    // Output.
+    info("Number of nonlin iterations: %d (norm of residual: %g)", 
+      newton_nox.get_num_iters(), newton_nox.get_residual());
+    info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
+      newton_nox.get_num_lin_iters(), newton_nox.get_achieved_tol());
 
     // Project the fine mesh solution on the coarse mesh.
     info("Projecting fine mesh solution to coarse mesh.");

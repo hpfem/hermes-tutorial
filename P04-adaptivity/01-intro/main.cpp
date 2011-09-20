@@ -129,11 +129,18 @@ int main(int argc, char* argv[])
     memset(coeff_vec, 0, ndof_ref * sizeof(double));
 
     // Perform Newton's iteration.
-    if (!newton.solve(coeff_vec)) 
+    try
+    {
+      newton.solve(coeff_vec);
+    }
+    catch(Hermes::Exceptions::Exception e)
+    {
+      e.printMsg();
       error("Newton's iteration failed.");
-    else
-      // Translate the resulting coefficient vector into the instance of Solution.
-      Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
+    }
+
+    // Translate the resulting coefficient vector into the instance of Solution.
+    Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
     
     // Project the fine mesh solution onto the coarse mesh.
     info("Projecting fine mesh solution on coarse mesh.");

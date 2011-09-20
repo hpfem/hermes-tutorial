@@ -72,8 +72,15 @@ int main(int argc, char* argv[])
   NewtonSolver<double> newton(&dp, matrix_solver);
 
   // Perform Newton's iteration.
-  if (!newton.solve(coeff_vec)) 
+  try
+  {
+    newton.solve(coeff_vec);
+  }
+  catch(Hermes::Exceptions::Exception e)
+  {
+    e.printMsg();
     error("Newton's iteration failed.");
+  }
 
   // Translate the resulting coefficient vector into a Solution.
   Solution<double> sln;

@@ -118,10 +118,17 @@ int main(int argc, char* argv[])
 
   // Perform Newton's iteration and translate the resulting coefficient vector into a Solution.
   Hermes::Hermes2D::Solution<double> sln1;
-  if (!newton.solve(coeff_vec)) 
+  try
+  {
+    newton.solve(coeff_vec);
+  }
+  catch(Hermes::Exceptions::Exception e)
+  {
+    e.printMsg();
     error("Newton's iteration failed.");
-  else
-    Hermes::Hermes2D::Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln1);
+  }
+
+  Hermes::Hermes2D::Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln1);
 
   // Cleanup.
   delete(matrix);
@@ -184,16 +191,21 @@ int main(int argc, char* argv[])
   // Solve the nonlinear problem using NOX.
   info("Assembling by DiscreteProblem, solving by NOX.");
   Solution<double> sln2;
-  if (solver_nox.solve(coeff_vec))
+  try
   {
-    Solution<double>::vector_to_solution(solver_nox.get_sln_vector(), &space, &sln2);
-    info("Number of nonlin iterations: %d (norm of residual: %g)", 
-         solver_nox.get_num_iters(), solver_nox.get_residual());
-    info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
-         solver_nox.get_num_lin_iters(), solver_nox.get_achieved_tol());
+    solver_nox.solve(coeff_vec);
   }
-  else
+  catch(Hermes::Exceptions::Exception e)
+  {
+    e.printMsg();
     error("NOX failed.");
+  }
+
+  Solution<double>::vector_to_solution(solver_nox.get_sln_vector(), &space, &sln2);
+  info("Number of nonlin iterations: %d (norm of residual: %g)", 
+        solver_nox.get_num_iters(), solver_nox.get_residual());
+  info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
+        solver_nox.get_num_lin_iters(), solver_nox.get_achieved_tol());
 
   // CPU time needed by NOX.
   double time2 = cpu_time.tick().last();

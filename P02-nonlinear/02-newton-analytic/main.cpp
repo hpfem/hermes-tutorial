@@ -72,9 +72,15 @@ int main(int argc, char* argv[])
   NewtonSolver<double> newton(&dp, matrix_solver);
 
   // Perform Newton's iteration.
-  bool freeze_jacobian = false;
-  if (!newton.solve(coeff_vec, NEWTON_TOL, NEWTON_MAX_ITER, freeze_jacobian)) 
+  try
+  {
+    newton.solve(coeff_vec, NEWTON_TOL, NEWTON_MAX_ITER);
+  }
+  catch(Hermes::Exceptions::Exception e)
+  {
+    e.printMsg();
     error("Newton's iteration failed.");
+  }
 
   // Translate the resulting coefficient vector into a Solution.
   Solution<double> sln;

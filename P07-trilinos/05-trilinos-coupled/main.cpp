@@ -131,43 +131,48 @@ int main(int argc, char* argv[])
     info("---- Time step %d, t = %g s", ts, total_time + TAU);
 
     cpu_time.tick(HERMES_SKIP);
-    if (solver.solve(coeff_vec))
+    try
     {
-      Solution<double>::vector_to_solutions(solver.get_sln_vector(), Hermes::vector<Space<double> *>(t_space, c_space), 
-                Hermes::vector<Solution<double> *>(&t_prev_newton, &c_prev_newton));
-
-      cpu_time.tick();
-      info("Number of nonlin iterations: %d (norm of residual: %g)",
-          solver.get_num_iters(), solver.get_residual());
-      info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)",
-          solver.get_num_lin_iters(), solver.get_achieved_tol());
-
-      // Time measurement.
-      cpu_time.tick(HERMES_SKIP);
-			
-      // Skip visualization time.
-      cpu_time.tick(HERMES_SKIP);
-
-      // Update global time.
-      total_time += TAU;
-
-      // Saving solutions for the next time step.
-      if(ts > 1)
-      {
-        t_prev_time_2.copy(&t_prev_time_1);
-        c_prev_time_2.copy(&c_prev_time_1);
-      }
-
-      t_prev_time_1.copy(&t_prev_newton);
-      c_prev_time_1.copy(&c_prev_newton);
-      
-      // Visualization.
-      rview.set_min_max_range(0.0,2.0);
-      rview.show(&omega);
-      cpu_time.tick(HERMES_SKIP);
+      solver.solve(coeff_vec);
     }
-    else
+    catch(Hermes::Exceptions::Exception e)
+    {
+      e.printMsg();
       error("NOX failed.");
+    }
+
+    Solution<double>::vector_to_solutions(solver.get_sln_vector(), Hermes::vector<Space<double> *>(t_space, c_space), 
+              Hermes::vector<Solution<double> *>(&t_prev_newton, &c_prev_newton));
+
+    cpu_time.tick();
+    info("Number of nonlin iterations: %d (norm of residual: %g)",
+        solver.get_num_iters(), solver.get_residual());
+    info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)",
+        solver.get_num_lin_iters(), solver.get_achieved_tol());
+
+    // Time measurement.
+    cpu_time.tick(HERMES_SKIP);
+			
+    // Skip visualization time.
+    cpu_time.tick(HERMES_SKIP);
+
+    // Update global time.
+    total_time += TAU;
+
+    // Saving solutions for the next time step.
+    if(ts > 1)
+    {
+      t_prev_time_2.copy(&t_prev_time_1);
+      c_prev_time_2.copy(&c_prev_time_1);
+    }
+
+    t_prev_time_1.copy(&t_prev_newton);
+    c_prev_time_1.copy(&c_prev_newton);
+      
+    // Visualization.
+    rview.set_min_max_range(0.0,2.0);
+    rview.show(&omega);
+    cpu_time.tick(HERMES_SKIP);
 
     info("Total running time for time level %d: %g s.", ts, cpu_time.tick().last());
   }

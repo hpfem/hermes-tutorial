@@ -169,15 +169,21 @@ int main(int argc, char* argv[])
     Solution<double> sln, ref_sln;
 
     info("Assembling by DiscreteProblem, solving by NOX.");
-    if (solver.solve(coeff_vec)) {
-      Solution<double>::vector_to_solution(solver.get_sln_vector(), ref_space, &ref_sln);
-      info("Number of nonlin iterations: %d (norm of residual: %g)", 
-        solver.get_num_iters(), solver.get_residual());
-      info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
-        solver.get_num_lin_iters(), solver.get_achieved_tol());
+    try
+    {
+      solver.solve(coeff_vec);
     }
-    else
+    catch(Hermes::Exceptions::Exception e)
+    {
+      e.printMsg();
       error("NOX failed.");
+    }
+
+    Solution<double>::vector_to_solution(solver.get_sln_vector(), ref_space, &ref_sln);
+    info("Number of nonlin iterations: %d (norm of residual: %g)", 
+      solver.get_num_iters(), solver.get_residual());
+    info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
+      solver.get_num_lin_iters(), solver.get_achieved_tol());
 
     info("Projecting reference solution on coarse mesh.");
     OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver);

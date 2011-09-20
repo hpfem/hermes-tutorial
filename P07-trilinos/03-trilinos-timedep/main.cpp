@@ -119,10 +119,17 @@ int main(int argc, char* argv[])
     info("---- Time step %d, t = %g s", ts, total_time += TAU);
 
     info("Assembling by DiscreteProblem, solving by NOX.");
-    if (solver_nox.solve(coeff_vec))
-      Solution<double>::vector_to_solution(solver_nox.get_sln_vector(), &space, &t_prev_time);
-    else
+    try
+    {
+      solver_nox.solve(coeff_vec);
+    }
+    catch(Hermes::Exceptions::Exception e)
+    {
+      e.printMsg();
       error("NOX failed.");
+    }
+
+    Solution<double>::vector_to_solution(solver_nox.get_sln_vector(), &space, &t_prev_time);
 
     // Show the new solution.
     Tview.show(&t_prev_time);
