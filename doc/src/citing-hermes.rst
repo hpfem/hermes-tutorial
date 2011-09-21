@@ -3,7 +3,7 @@ Citing Hermes
 
 If you use Hermes for your work, please be so kind to include some of the references below as appropriate.
 
-Monographs:
+**Monographs**:
 
 ::
 
@@ -23,7 +23,7 @@ Monographs:
        year = {2005}
     }
 
-Reference to the Hermes open-source project:
+**Reference to the Hermes open-source project**:
 
 ::
 
@@ -33,13 +33,55 @@ Reference to the Hermes open-source project:
        url =    {http://hpfem.org/}
     }
 
-Underlying algorithms (hanging nodes, adaptivity, shape functions):
+**Underlying algorithms (hanging nodes, adaptivity, shape functions)**:
 
-::
+.. sourcecode::
+    .
+
+    @Article{Hermes-time-integration,
+      author = {P. Solin, L. Korous},
+      title = {Adaptive Higher-Order Finite Element Methods for Transient PDE Problems Based on 
+      Embedded Higher-Order Implicit Runge-Kutta Methods},
+      journal = {J. Comput. Physics},
+      year = {2011},
+      status = {accepted},
+      volume = {},
+      pages = {}
+    }
+
+.. latexcode::
+    .
+
+    @Article{Hermes-time-integration,
+      author = {P. Solin, L. Korous},
+      title = {Adaptive Higher-Order Finite Element Methods for Transient PDE 
+      Problems Based on Embedded Higher-Order Implicit Runge-Kutta Methods},
+      journal = {J. Comput. Physics},
+      year = {2011},
+      status = {accepted},
+      volume = {},
+      pages = {}
+    }
+
+.. sourcecode::
+    .
 
     @Article{Hermes-hanging-nodes,
       author = {P. Solin, J. Cerveny, I. Dolezel},
       title = {Arbitrary-Level Hanging Nodes and Automatic Adaptivity in the hp-FEM},
+      journal = {Math. Comput. Simul.},
+      year = {2008},
+      volume = {77},
+      pages = {117 - 132}
+    }
+
+.. latexcode::
+    .
+
+    @Article{Hermes-hanging-nodes,
+      author = {P. Solin, J. Cerveny, I. Dolezel},
+      title = {Arbitrary-Level Hanging Nodes and Automatic Adaptivity 
+      in the hp-FEM},
       journal = {Math. Comput. Simul.},
       year = {2008},
       volume = {77},
@@ -96,12 +138,116 @@ Underlying algorithms (hanging nodes, adaptivity, shape functions):
       pages = {1374 - 1394}
     } 
 
-Multimesh hp-FEM and selected applications:
+**Selected applications**:
+
 
 .. sourcecode::
    .
 
-    @Article{Hermes-multiphysics,
+    @Article{Hermes-polymer-metal-composites,
+      author = {D. Pugal, P. Solin, K.J. Kim, A. Aabloo},
+      title = {Modeling Ionic Polymer-Metal Composites with Space-Time Adaptive Multimesh hp-FEM},
+      journal = {Communications in Computational Physics},
+      year = {2011},
+      status = {accepted},
+      volume = {},
+      pages = {}
+    } 
+
+.. latexcode::
+   .
+
+    @Article{Hermes-polymer-metal-composites,
+      author = {D. Pugal, P. Solin, K.J. Kim, A. Aabloo},
+      title = {Modeling Ionic Polymer-Metal Composites with Space-Time Adaptive Multimesh hp-FEM},
+      journal = {Communications in Computational Physics},
+      year = {2011},
+      status = {accepted},
+      volume = {},
+      pages = {}
+    } 
+
+.. sourcecode::
+   .
+
+    @Article{Hermes-anisotropic-benchmarks,
+      author = {P. Solin, O. Certik, L. Korous},
+      title = {Three Anisotropic Benchmarks for Adaptive Finite Element Methods},
+      journal = {Appl. Math. Comput.},
+      year = {2011},
+      status = {accepted},
+      volume = {},
+      pages = {}
+    } 
+
+.. latexcode::
+   .
+
+    @Article{Hermes-anisotropic-benchmarks,
+      author = {P. Solin, O. Certik, L. Korous},
+      title = {Three Anisotropic Benchmarks for Adaptive Finite Element Methods},
+      journal = {Appl. Math. Comput.},
+      year = {2011},
+      status = {accepted},
+      volume = {},
+      pages = {}
+    } 
+
+.. sourcecode::
+   .
+
+    @Article{Hermes-richards,
+      author = {P. Solin, M. Kuraz},
+      title = {Solving the Nonstationary Richards Equation with Adaptive hp-FEM},
+      journal = {Advanced Water Resources},
+      year = {2011},
+      volume = {34},
+      pages = {1062-1081}
+    } 
+
+.. latexcode::
+   .
+
+    @Article{Hermes-richards,
+      author = {P. Solin, M. Kuraz},
+      title = {Solving the Nonstationary Richards Equation with Adaptive hp-FEM},
+      journal = {Advanced Water Resources},
+      year = {2011},
+      volume = {34},
+      pages = {1062-1081}
+    } 
+
+.. sourcecode::
+   .
+
+    @Article{Hermes-nuclear,
+      author = {L. Dubcova, P. Solin, G. Hansen, H. Park},
+      title = {Comparison of Multimesh hp-FEM to Interpolation and Projection Methods for Spatial Coupling of Reactor Thermal and Neutron Diffusion Calculations},
+      journal = {J. Comput. Physics},
+      year = {2011},
+      volume = {230},
+      pages = {1182-1197}
+    } 
+
+
+.. latexcode::
+   .
+
+    @Article{Hermes-nuclear,
+      author = {L. Dubcova, P. Solin, G. Hansen, H. Park},
+      title = {Comparison of Multimesh hp-FEM to Interpolation and Projection Methods 
+      for Spatial Coupling of Reactor Thermal and Neutron Diffusion Calculations},
+      journal = {J. Comput. Physics},
+      year = {2011},
+      volume = {230},
+      pages = {1182-1197}
+    } 
+
+
+.. sourcecode::
+   .
+
+    @Article{Hermes-heat-and-moisture,
       author = {P. Solin, L. Dubcova, J. Kruis},
       title = {Adaptive hp-FEM with Dynamical Meshes for Transient Heat and Moisture Transfer Problems},
       journal = {J. Comput. Appl. Math},
@@ -113,7 +259,7 @@ Multimesh hp-FEM and selected applications:
 .. latexcode::
     .
 
-    @Article{Hermes-multiphysics,
+    @Article{Hermes-heat-and-moisture,
       author = {P. Solin, L. Dubcova, J. Kruis,
       title = {Adaptive hp-FEM with Dynamical Meshes for Transient Heat and Moisture
       Transfer Problems},
@@ -126,7 +272,7 @@ Multimesh hp-FEM and selected applications:
 .. sourcecode::
    . 
 
-    @Article{Hermes-solid-mechanics,
+    @Article{Hermes-thermoelasticity,
       author = {P. Solin, J. Cerveny, L. Dubcova, D. Andrs},
       title = {Monolithic Discretization of Linear Thermoelasticity Problems via Adaptive Multimesh hp-FEM},
       journal = {J. Comput. Appl. Math},
@@ -138,7 +284,7 @@ Multimesh hp-FEM and selected applications:
 .. latexcode::
     .
 
-    @Article{Hermes-solid-mechanics,
+    @Article{Hermes-thermoelasticity,
       author = {P. Solin, J. Cerveny, L. Dubcova, D. Andrs},
       title = {Monolithic Discretization of Linear Thermoelasticity Problems via 
       Adaptive Multimesh hp-FEM},

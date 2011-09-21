@@ -18,9 +18,7 @@ This document is organized as follows:
 * Section 2 describes how to install Hermes on various hardware platforms, and how to 
   install matrix solver packages and various optional packages. 
 * Section 3 explains how to use Git and Github, and how you can contribute to the project if interested.
-* Section 4 contains a tutorial to Hermes2D. Please read this tutorial first even if you are 
-  interested in 1D or 3D problems, since the syntax is virtually the same. The tutorial 
-  will walk you in small steps through the solution
+* Section 4 contains a tutorial to Hermes2D. The tutorial will walk you in small steps through the solution
   of linear, nonlinear, and time-dependent problems from various engineering and scientific areas, 
   using higher-order elements and adaptivity algorithms, and solving multiphysics coupled problems. 
 * Section 5 shows how to solve 1D problems.
@@ -82,10 +80,5 @@ Solving 1D Problems
 -------------------
 
 There is no separate Hermes1D library -- one-dimensional problems are solved using Hermes2D. 
-
-.. toctree::
-    :maxdepth: 1
-
-    src/hermes1d/examples.rst
-    src/hermes1d/quantum-notes.rst
+For 1D examples see the repository "hermes-dev-examples". Description coming soon.
 

@@ -19,13 +19,13 @@ better at approximating anisotropies such as boundary layers.
  
 In contrast to traditional non-adaptive low-order finite element codes 
 that require fine initial meshes, in Hermes it often suffices to create 
-an extremely coarse initial mesh by hand and use a variety of built-in 
+a rather coarse initial mesh by hand and use a variety of built-in 
 functions for a-priori mesh refinement. In most cases, automatic adaptivity 
 then takes care of the rest successfully. Of course, Hermes can also accept 
 fine meshes created automatically by external mesh generation packages. 
 
-Hermes2D mesh file format
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Hermes2D native mesh format
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This tutorial example assumes an L-shaped domain consisting of two materials (Copper and Aluminum),
 that is initially split into four elements - two quadrilaterals and two curvilinear triangles:
@@ -36,8 +36,7 @@ that is initially split into four elements - two quadrilaterals and two curvilin
    :figclass: align-center
    :alt: Sample finite element mesh.
 
-The mesh file `domain.mesh <http://git.hpfem.org/hermes.git/blob/HEAD:/hermes2d/tutorial/P01-linear/01-mesh/domain.mesh>`_ 
-looks as follows::
+The corresponding native Hermes mesh file looks as follows::
 
     a = 1.0
     ma = -1.0
@@ -81,8 +80,7 @@ looks as follows::
 In the following we will use this example to explain the structure of
 Hermes mesh files.
 
-Variables
-~~~~~~~~~
+**Variables**
 
 Hermes mesh file consists of variables. Each variable can hold a real 
 number, list of real numbers, or list of lists. The following are all 
@@ -93,14 +91,12 @@ valid definitions::
     list = [ 1, 2, 3, 4, var ]               # list
     pairs = [ [1, 2], [1, var], [0, list] ]  # list of lists
 
-Vertices 
-~~~~~~~~
+**Vertices**
 
 The variable ``vertices`` defines the coordinates of all mesh vertices 
 (in any order). 
 
-Elements
-~~~~~~~~
+**Elements**
 
 The variable ``elements`` defines all elements in the mesh via zero-based indices 
 of their vertices in counter-clockwise order, plus an extra string (or nonnegative integer) 
@@ -110,8 +106,7 @@ multiple materials, but it is also possible to assign completely different physi
 processes to subdomains in this way. The user can access the element and boundary 
 markers from inside of weak forms. Integer markers do not have to be in apostrophes.
 
-Boundaries
-~~~~~~~~~~
+**Boundaries**
 
 The last mandatory variable, ``boundaries``, defines boundary markers for all
 boundary edges. An edge is identified by a triplet: two vertex indices and 
@@ -128,8 +123,7 @@ integer markers, but the trend is to use strings that make the mesh files
 easier to read. String markers are converted to integers by Hermes 
 internally. 
 
-Curves (Circular arcs and general NURBS)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Curves (Circular arcs and general NURBS)**
 
 The mesh file can also include the variable ``curves`` that lists all
 curved edges. Each curved edge is described by one Non-Uniform Rational 
@@ -141,8 +135,7 @@ The most common type of curved boundary is a circular arc which is defined
 via two vertex indices and central angle. For the treatment of full-featured 
 NURBS boundaries see example `P10-miscellaneous/35-nurbs <http://hpfem.org/hermes/doc/src/hermes2d/P10-miscellaneous/35-nurbs.html>`_. 
 
-Initial refinements
-~~~~~~~~~~~~~~~~~~~
+**Initial refinements**
 
 Finally, the mesh file can also contain the variable ``refinements`` where 
 the user can specify initial mesh refinements. The following code snippet
@@ -163,8 +156,7 @@ in the horizontal direction (with respect to the reference coordinate system), a
 be careful to have the element IDs of the newly generated elements right. The MeshView
 class is a great help for this.
 
-Loading meshes in Hermes2D format
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Loading meshes in Hermes2D format**
 
 As a ''Hello world'' example, let us load the mesh we have just created, and display it in a window. 
 Every main.cpp file in the git repository contains lots of comments and instructions. Skipping those, 
@@ -173,25 +165,85 @@ file for this example begins with creating an instance of the class Mesh. In ord
 the mesh file, you have to create a mesh loader class (in our case that is ``H2DReader``) and
 call the method ``load()``::
 
-    #include "hermes2d.h"
+    MeshReaderH2D mloader;
+    mloader.load("domain.mesh", &mesh);
 
-    int main(int argc, char* argv[])
-    {
-      // Load the mesh file.
-      Mesh mesh;
-      H2DReader mloader;
-      mloader.load("domain.mesh", &mesh);
+Hermes2D XML mesh format
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-Loading meshes in ExodusII format
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Hermes can also read meshes in XML format. The same mesh as the 
+one above looks in XML as follows::
+
+    <?xml version="1.0" encoding="utf-8"?>
+    <mesh:mesh xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mesh="XMLMesh"
+      xmlns:element="XMLMesh"
+      xsi:schemaLocation="XMLMesh ../../xml_schemas/mesh_h2d_xml.xsd">
+      <variables>
+	<variable name="a" value="1.0" />
+	<variable name="m_a" value="-1.0" />
+	<variable name="b" value="0.70710678118654757" />    
+      </variables>
+
+      <vertices>
+	<vertex x="0.00000000000000000000" y="m_a" i="0"/>
+	<vertex x="a" y="m_a" i="1"/>
+	<vertex x="m_a" y="0" i="2"/>
+	<vertex x="." y=".00" i="3"/>
+	<vertex x="a" y=".00000000" i="4"/>
+	<vertex x="m_a" y="a" i="5"/>
+	<vertex x="0.000" y="a" i="6"/>
+	<vertex x="b" y="b" i="7"/>
+      </vertices>
+
+      <elements>
+	<element:quad v1="0" v2="1" v3="4" v4="3" marker="Copper" />
+	<element:triangle v1="3" v2="4" v3="7" marker="Copper" />
+	<element:triangle v1="3" v2="7" v3="6" marker="Aluminum" />
+	<element:quad v1="2" v2="3" v3="6" v4="5" marker="Aluminum" />
+      </elements>
+
+      <edges>
+	<edge v1="0" v2="1" marker="Bottom" />
+	<edge v1="1" v2="4" marker="Outer" />
+	<edge v1="3" v2="0" marker="Inner" />
+	<edge v1="4" v2="7" marker="Outer" />
+	<edge v1="7" v2="6" marker="Outer" />
+	<edge v1="2" v2="3" marker="Inner" />
+	<edge v1="6" v2="5" marker="Outer" />
+	<edge v1="5" v2="2" marker="Left" />
+      </edges>
+
+      <curves>
+	<arc v1="4" v2="7" angle="45" />
+	<arc v1="7" v2="6" angle="45" />
+      </curves>
+    </mesh:mesh>
+
+The meaning of the tags is straightforward, and we also show several different ways to write zero.
+Note that in the XML file, vertices have an additional 
+index 'i' in them. These indices are used to define elements, edges, and curves.
+They are not needed in the Hermes native mesh format since vertices
+are always read in a sequential fashion, which is not necessarily the case 
+with XML readers. To load a XML mesh file, 
+one has to use the ``MeshReaderH2DXML`` class::
+
+    MeshReaderH2DXML mloader;  
+    mloader.load("domain.xml", &mesh);
+
+
+ExodusII mesh format
+~~~~~~~~~~~~~~~~~~~~
 
 Hermes can read meshes in the `ExodusII <http://sourceforge.net/projects/exodusii/>`_ format.
 This is a widely used format that can be generated, for example, 
 with `Cubit <http://cubit.sandia.gov/>`_. To load an ExodusII mesh file, 
-one has to use the ``ExodusIIReader`` class instead of the ``H2DReader`` class above.
-We will use meshes in the ExodusII format in example 
-`iron-water <http://hpfem.org/hermes/doc/src/hermes2d/examples/neutronics/neutronics-iron-water.html>`_
-and others. 
+one has to use the ``MeshReaderExodusII`` class::
+
+    MeshReaderExodusII mloader;  
+    mloader.load("domain.e", &mesh);
+
+Mesh in the ExodusII format is used, e.g., in example "neutronics/iron-water".
 
 Geometry rescaling
 ~~~~~~~~~~~~~~~~~~
@@ -230,7 +282,7 @@ as follows:
 Manual mesh refinements
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Below are examples of manual mesh refinements that the user can do after loading the mesh.
+Below we show examples of manual mesh refinements that the user can do after loading the mesh.
 All of them work for (possibly curved) triangular and quadrilateral elements. 
 
 To begin with, here is how to refine an element with index 'id'. If the element
