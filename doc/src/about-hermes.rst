@@ -29,26 +29,3 @@ Anyone who contributes with at least one patch becomes automatically a
 
 The library is available under the GPL license (Version 2, 1991). 
 
-User and Developer Documentation
---------------------------------
-
-This user documentation can be found in the directory doc/. Type "make html" there 
-to build it. The HTML pages can then be displayed by typing "firefox _build/html",
-"chromium-browser _build/html" or similar.
-
-To compile the C++ reference manual for Hermes2D, go to 'hermes2d/doc.cpp/'. There
-type "doxygen hermes2d.lib-real.doxyfile" to build references for the 
-real version, or "doxygen hermes2d.lib-cplx.doxyfile" to build refs for the 
-complex version. The HTML files are then in "h2d-real/html/index.html" and
-"h2d-cplx/html/index.html", respectively. The Doxygen documentation for the 
-real and complex version is also 
-available online at http://hpfem.org/hermes2d/doc.cpp/h2d-real/html/index.html
-and http://hpfem.org/hermes2d/doc.cpp/h2d-cplx/html/index.html, respectively.
-
-.. toctree::
-   :maxdepth: 2
-
-    math-background
-    citing-hermes
-
-

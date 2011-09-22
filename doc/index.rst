@@ -34,6 +34,7 @@ Introduction
     :maxdepth: 1
 
     src/about-hermes
+    src/documentation
     src/math-background
     src/web-access
     src/citing-hermes
