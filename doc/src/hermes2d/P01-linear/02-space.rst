@@ -8,29 +8,52 @@ Finite Element Space (02-space)
 
     `Tutorial Video <http://hpfem.org/hermes/doc/src/hermes2d/P01-linear/01-mesh/videos.html#p01-linear02-space-tutorial>`_. 
 
-Hermes follows the mathematical concept of FEM closely -- after creating a mesh,
-the next step is to construct a finite element space on it.
+Hermes follows the mathematical concept of FEM closely -- after reading a mesh,
+the user has to create a finite element space on it.
 
 Spaces available in Hermes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following predefined spaces are currently available:
 
-* H1Space - the most common space of continuous, piecewise-polynomial functions belonging to $H^1(\Omega) = \{ v \in L^2(\Omega); \nabla u \in [L^2(\Omega)]^2 \}$,
-* HcurlSpace - space of vector-valued functions discontinuous along mesh edges, with continuous tangential component on the edges $H(\mbox{curl},\Omega) = \{ E \in [L^2(\Omega)]^2; \nabla \times E \in L^2(\Omega)\}$,
-* HdivSpace - space of vector-valued functions discontinuous along mesh edges, with continuous normal component on the edges $H(\mbox{div},\Omega) = \{ v \in [L^2(\Omega)^2; \nabla \cdot v \in L^2(\Omega)\}$,
-* L2Space - space of functions discontinuous along mesh edges, belonging to the space $L^2(\Omega)$.
+* H1Space - the most common FE space of continuous, piecewise-polynomial functions: 
+
+.. math::
+
+    H^1(\Omega) = \{ v \in L^2(\Omega); \nabla u \in [L^2(\Omega)]^2 \}.
+
+* HcurlSpace - FE space of vector-valued functions discontinuous along mesh edges, with continuous 
+  tangential component on the edges:
+
+.. math::
+
+    H(\mbox{curl},\Omega) = \{ E \in [L^2(\Omega)]^2; \nabla \times E \in L^2(\Omega)\}.
+
+
+* HdivSpace - FE space of vector-valued functions discontinuous along mesh edges, with continuous 
+  normal component on the edges:
+
+.. math::
+
+    H(\mbox{div},\Omega) = \{ v \in [L^2(\Omega)^2; \nabla \cdot v \in L^2(\Omega)\}.
+
+
+* L2Space - FE space of functions discontinuous along mesh edges:
+
+.. math::
+
+    L^2(\Omega).
 
 All these spaces admit higher-order elements, arbitrary-level hanging nodes, 
-automatic *hp*-adaptivity, and they can be combined arbitrarily via the 
-multimesh *hp*-FEM. 
+automatic *hp*-adaptivity, and they can be combined arbitrarily in multi-physics
+problems via the multimesh *hp*-FEM. 
 
-Structure of higher-order basis functions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Structure of higher-order basis functions in H1Space
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let us discuss the $H^1$ space first. In 2D, there are three types of basis functions.
-First, of course, there are the standard (bi)linear *vertex functions* ("pyramids") that 
-are used in the lowest-order FEM:
+In 2D, there are three types of basis functions.
+First, of course, the standard piecewise linear or bilinear *vertex functions* 
+("pyramids") that are used in the lowest-order FEM:
 
 .. figure:: 02-space/2.png
    :align: center
@@ -66,8 +89,8 @@ in most computations, according to our experience, are simply called
 H1Shapeset, HcurlShapeset, HdivShapeset and L2Shapeset.
 Other shapesets can be found in the directory "src/shapeset".
 
-Initializing an H1Space
-~~~~~~~~~~~~~~~~~~~~~~~
+Creating an H1Space
+~~~~~~~~~~~~~~~~~~~
 
 An instance of a real-valued H1Space can be created as follows::
 
@@ -91,7 +114,7 @@ class (if essential boundary conditions are used).
 Setting element orders individually
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Polynomial degrees of elements can also be set individually by calling 
+Polynomial degrees of elements can be set individually by calling 
 the methods
 ::
 
@@ -104,8 +127,8 @@ or
     virtual void set_element_orders(int* elem_orders);
 
 of the class Space. There are additional methods in this class that
-can be used to manipulate element orders, see the file 
-"include/space/space.h". 
+can be used to manipulate element orders, see the Doxygen docs for the 
+Space class.
 
 It is worth mentioning that element degrees
 are stored in Space, not in Mesh. The reason is that in Hermes one can
