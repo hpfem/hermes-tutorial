@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
   // View FE basis functions.
   BaseView<double> bview("Finite Element Space", new WinGeom(0, 0, 440, 350));
   bview.fix_scale_width(50);
-  bview.show(&space);
+  bview.show(&space, HERMES_EPS_HIGH);
 
   // Practice keyboard and mouse controls.
   printf("%s", text);
