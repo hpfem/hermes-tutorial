@@ -13,7 +13,7 @@ After login, the user sees a virtual desktop:
 
 .. figure:: img/nclab2.png
    :align: center
-   :scale: 55%
+   :scale: 56%
    :figclass: align-center
    :alt: NCLab
 
@@ -21,7 +21,7 @@ Here one can do unrestricted Python programming:
 
 .. figure:: img/nclab3.png
    :align: center
-   :scale: 55%
+   :scale: 56%
    :figclass: align-center
    :alt: NCLab
 
@@ -30,7 +30,7 @@ other packages. One can work with arbitrary numerical methods and of course also
 
 .. figure:: img/nclab4.png
    :align: center
-   :scale: 30.2%
+   :scale: 31%
    :figclass: align-center
    :alt: NCLab
 
