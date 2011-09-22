@@ -77,9 +77,6 @@ The corresponding native Hermes mesh file looks as follows::
       [ 7, 6, 45 ]   # circular arc with central angle of 45 degrees
     ]
 
-In the following we will use this example to explain the structure of
-Hermes mesh files.
-
 **Variables**
 
 Hermes mesh file consists of variables. Each variable can hold a real 

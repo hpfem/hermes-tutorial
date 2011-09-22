@@ -20,7 +20,7 @@ to a prescribed constant on the boundary. We will learn how to:
  * Solve the discrete problem.
  * Output the solution and element orders in VTK format 
    (to be visualized, e.g., using Paraview).
- * Visualize the solution using Hermes' native OpenGL-based functionality.
+ * Visualize the solution using Hermes native OpenGL functionality.
 
 Model problem
 ~~~~~~~~~~~~~
@@ -122,37 +122,38 @@ This is the constructor of the corresponding weak formulation in Hermes:
 .. sourcecode::
     .
 
-    CustomWeakFormPoisson::CustomWeakFormPoisson(std::string marker_al, HermesFunction* lambda_al,
-    			                         std::string marker_cu, HermesFunction* lambda_cu,
-			                         HermesFunction* src_term) : WeakForm(1)
+    CustomWeakFormPoisson::CustomWeakFormPoisson(std::string mat_al, Hermes1DFunction<double>* lambda_al,
+						 std::string mat_cu, Hermes1DFunction<double>* lambda_cu,
+						 Hermes2DFunction<double>* src_term) : WeakForm<double>(1)
     {
       // Jacobian forms.
-      add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, marker_al, lambda_al));
-      add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, marker_cu, lambda_cu));
+      add_matrix_form(new DefaultJacobianDiffusion<double>(0, 0, mat_al, lambda_al));
+      add_matrix_form(new DefaultJacobianDiffusion<double>(0, 0, mat_cu, lambda_cu));
 
       // Residual forms.
-      add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, marker_al, lambda_al));
-      add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, marker_cu, lambda_cu));
-      add_vector_form(new WeakFormsH1::DefaultVectorFormVol(0, HERMES_ANY, src_term));
+      add_vector_form(new DefaultResidualDiffusion<double>(0, mat_al, lambda_al));
+      add_vector_form(new DefaultResidualDiffusion<double>(0, mat_cu, lambda_cu));
+      add_vector_form(new DefaultVectorFormVol<double>(0, HERMES_ANY, src_term));
     };
 
 .. latexcode::
     .
 
-    CustomWeakFormPoisson::CustomWeakFormPoisson(std::string marker_al, 
-                           HermesFunction* lambda_al, std::string marker_cu, 
-                           HermesFunction* lambda_cu, HermesFunction*
-                           src_term) : WeakForm(1)
+    CustomWeakFormPoisson::CustomWeakFormPoisson(std::string mat_al, 
+                           Hermes1DFunction<double>* lambda_al,
+                           std::string mat_cu, Hermes1DFunction<double>* lambda_cu,
+                           Hermes2DFunction<double>* src_term) : WeakForm<double>(1)
     {
       // Jacobian forms.
-      add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, marker_al, lambda_al));
-      add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, marker_cu, lambda_cu));
+      add_matrix_form(new DefaultJacobianDiffusion<double>(0, 0, mat_al, lambda_al));
+      add_matrix_form(new DefaultJacobianDiffusion<double>(0, 0, mat_cu, lambda_cu));
 
       // Residual forms.
-      add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, marker_al, lambda_al));
-      add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, marker_cu, lambda_cu));
-      add_vector_form(new WeakFormsH1::DefaultVectorFormVol(0, HERMES_ANY, src_term));
+      add_vector_form(new DefaultResidualDiffusion<double>(0, mat_al, lambda_al));
+      add_vector_form(new DefaultResidualDiffusion<double>(0, mat_cu, lambda_cu));
+      add_vector_form(new DefaultVectorFormVol<double>(0, HERMES_ANY, src_term));
     };
+
 
 Here HERMES_ANY means that the volumetric vector form will be assigned to all material
 markers.
@@ -162,47 +163,42 @@ For constant LAMBDA_AL and LAMBDA_CU, the form is instantiated as follows:
 .. sourcecode::
     .
 
-    CustomWeakFormPoisson wf("Aluminum", new HermesFunction(LAMBDA_AL), "Copper", 
-                             new HermesFunction(LAMBDA_CU), new HermesFunction(-VOLUME_HEAT_SRC));
+    CustomWeakFormPoisson wf("Aluminum", new Hermes1DFunction<double>(LAMBDA_AL), "Copper", 
+                             new Hermes1DFunction<double>(LAMBDA_CU), 
+                             new Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
 
 .. latexcode::
     .
 
-    CustomWeakFormPoisson wf("Aluminum", new HermesFunction(LAMBDA_AL), "Copper", 
-                             new HermesFunction(LAMBDA_CU), 
-                             new HermesFunction(-VOLUME_HEAT_SRC));
+    CustomWeakFormPoisson wf("Aluminum", new Hermes1DFunction<double>(LAMBDA_AL), 
+                             "Copper", new Hermes1DFunction<double>(LAMBDA_CU), 
+                             new Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
 
-To replace the constants with cubic splines, one just needs to do
+Once a linear version of a problem works, it is very easy to extend it to a nonlinear case.
+For example, to replace the constants with cubic splines, one just needs to do
 
 ::
 
-    CubicSpline lambda_al(...);
-    CubicSpline lambda_cu(...);
-    CustomWeakFormPoisson wf("Aluminum", &lambda_al, "Copper", 
-                             &lambda_cu, new HermesFunction(-VOLUME_HEAT_SRC));
+    CubicSpline LAMBDA_AL(...);
+    CubicSpline LAMBDA_CU(...);
+    CustomWeakFormPoisson wf("Aluminum", new Hermes1DFunction<double>(LAMBDA_AL), "Copper", 
+                             new Hermes1DFunction<double>(LAMBDA_CU), 
+                             new Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
 
-If the reader guesses that CubicSpline is a descendant of HermesFunction, then this is a good guess::
+This is possible since CubicSpline is a descendant of Hermes1DFunction. Analogously, the 
+constant VOLUME_HEAT_SRC can be replaced with an arbitrary function of $x$ and $y$ by
+subclassing Hermes2DFunction::
 
-    class CubicSpline : public HermesFunction
+    class CustomNonConstSrc : public Hermes2DFunction
     ...
 
-The constant VOLUME_HEAT_SRC can be replaced with an arbitrary function of $x$ and $y$ by
-subclassing HermesFunction::
-
-    class CustomNonConstSrc : public HermesFunction
-    ...
-
-If cubic splines are not enough, then one can subclass HermesFunction to define 
+If cubic splines are not enough, then one can subclass Hermes1DFunction to define 
 arbitrary nonlinearities::
 
-    class CustomLanbdaAl : public HermesFunction
+    class CustomLanbdaAl : public Hermes1DFunction
     ...
-    class CustomLanbdaCu : public HermesFunction
+    class CustomLanbdaCu : public Hermes1DFunction
     ...
-
-*Note that we are able to extend a linear problem to a nonlinear one
-without touching the CustomWeakFormPoisson class.* This is also 
-how all default weak forms in Hermes work.
 
 In the rest of part P01 we will focus on linear problems.
 
@@ -211,13 +207,12 @@ Default Jacobian for the diffusion operator
 
 Hermes provides default weak forms for many common PDE operators. The above 
 default weak forms DefaultJacobianDiffusion, DefaultResidualDiffusion and 
-DefaultVectorFormVol can be found in the file `weakforms_h1.h 
-<http://git.hpfem.org/hermes.git/blob/HEAD:/hermes2d/src/weakform_library/weakforms_h1.h>`_.
+DefaultVectorFormVol can be found in the file "weakforms_h1.h". 
 To begin with, the line 
 
 ::
 
-    add_matrix_form(new DefaultJacobianDiffusion(0, 0, marker_al, lambda_al));
+    add_matrix_form(new DefaultJacobianDiffusion<double>(0, 0, marker_al, lambda_al));
 
 adds to the Jacobian weak form the integral
 
@@ -227,11 +222,19 @@ adds to the Jacobian weak form the integral
 
 where $u$ is a basis function and $v$ a test function.
 
-It has the following constructor::
+It has the following constructors::
 
     DefaultJacobianDiffusion(int i = 0, int j = 0, std::string area = HERMES_ANY, 
-                             HermesFunction* coeff = HERMES_ONE,
+                             Hermes1DFunction<Scalar>* coeff = HERMES_ONE,
                              SymFlag sym = HERMES_NONSYM, GeomType gt = HERMES_PLANAR);
+
+and
+::
+
+    DefaultJacobianDiffusion(int i = 0, int j = 0, Hermes::vector<std::string> areas,  
+                             Hermes1DFunction<Scalar>* coeff = HERMES_ONE,
+                             SymFlag sym = HERMES_NONSYM, GeomType gt = HERMES_PLANAR);
+
 
 The pair of indices 'i' and 'j' identifies a block in the Jacobian matrix (for systems of 
 equations). For a single equation it is i = j = 0. 
@@ -257,7 +260,7 @@ or axisymmetrix with respect to the y-axis (HERMES_AXISYM_Y).
 The form can be linked to multiple material markers::
 
     DefaultJacobianDiffusion(int i, int j, Hermes::vector<std::string> areas,
-                             HermesFunction* coeff = HERMES_ONE,
+                             Hermes1DFunction* coeff = HERMES_ONE,
                              SymFlag sym = HERMES_NONSYM, GeomType gt = HERMES_PLANAR);
 
 Here, Hermes::vector is just a std::vector equipped with additional constructors for
@@ -272,7 +275,7 @@ Similarly, the line
 
 ::
 
-    add_vector_form(new DefaultResidualDiffusion(0, marker_al, lambda_al));
+    add_vector_form(new DefaultResidualDiffusion<double>(0, marker_al, lambda_al));
 
 adds to the residual weak form the integral
 
@@ -282,20 +285,6 @@ adds to the residual weak form the integral
 
 where $u$ is the approximate solution and $v$ a test function.
 
-It has the following constructor::
-
-    DefaultResidualDiffusion(int i = 0, std::string area = HERMES_ANY, 
-                             HermesFunction* coeff = HERMES_ONE,
-                             GeomType gt = HERMES_PLANAR);
-
-The index 'i' identifies a block in the residual vector (for systems of 
-equations). For a single equation it is i = 0. Again the form can be assigned 
-to multiple material markers::
-
-    DefaultResidualDiffusion(int i, Hermes::vector<std::string> areas,
-                             HermesFunction* coeff = HERMES_ONE,
-                             GeomType gt = HERMES_PLANAR);
-
 Default volumetric vector form
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -303,7 +292,7 @@ The last default weak form used in the CustomWeakFormPoisson class above is
 
 ::
 
-    add_vector_form(new DefaultVectorFormVol(0, HERMES_ANY, c));
+    add_vector_form(new DefaultVectorFormVol<double>(0, HERMES_ANY, c));
 
 It adds to the residual weak form the integral
 
@@ -311,21 +300,7 @@ It adds to the residual weak form the integral
 
     \int_{\Omega} c v \, \mbox{d}x \mbox{d}y
 
-and thus it completes :eq:`poissonweak01b`. The constructors of this class
-are::
-
-    DefaultVectorFormVol(int i = 0, std::string area = HERMES_ANY,
-                         HermesFunction* coeff = HERMES_ONE,
-                         GeomType gt = HERMES_PLANAR);
-
-and
-
-::
-
-    DefaultVectorFormVol(int i, Hermes::vector<std::string> areas,
-                         HermesFunction* coeff = HERMES_ONE,
-                         GeomType gt = HERMES_PLANAR);
-
+and thus it completes :eq:`poissonweak01b`.
 
 Loading the mesh
 ~~~~~~~~~~~~~~~~
@@ -356,16 +331,16 @@ Next, an instance of the corresponding weak form class is created:
     .
 
     // Initialize the weak formulation.
-    CustomWeakFormPoisson wf("Aluminum", new HermesFunction(LAMBDA_AL), "Copper", 
-                             new HermesFunction(LAMBDA_CU), new HermesFunction(-VOLUME_HEAT_SRC));
+    CustomWeakFormPoisson wf("Aluminum", new Hermes1DFunction<double>(LAMBDA_AL), "Copper", 
+                             new Hermes1DFunction<double>(LAMBDA_CU), new Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
 
 .. latexcode::
     .
 
     // Initialize the weak formulation.
-    CustomWeakFormPoisson wf("Aluminum", new HermesFunction(LAMBDA_AL), "Copper", 
-                             new HermesFunction(LAMBDA_CU), 
-                             new HermesFunction(-VOLUME_HEAT_SRC));
+    CustomWeakFormPoisson wf("Aluminum", new Hermes1DFunction<double>(LAMBDA_AL), "Copper", 
+                             new Hermes1DFunction<double>(LAMBDA_CU), 
+                             new Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
 
 Setting constant Dirichlet boundary conditions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -377,16 +352,16 @@ Constant Dirichlet boundary conditions are assigned to the boundary markers
     .
 
     // Initialize essential boundary conditions.
-    DefaultEssentialBCConst bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"), FIXED_BDY_TEMP);
-    EssentialBCs bcs(&bc_essential);
+    DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"), FIXED_BDY_TEMP);
+    EssentialBCs<double> bcs(&bc_essential);
 
 .. latexcode::
     .
 
     // Initialize essential boundary conditions.
-    DefaultEssentialBCConst bc_essential(Hermes::vector<std::string>("Bottom", "Inner",
+    DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner",
                                                  "Outer", "Left"), FIXED_BDY_TEMP);
-    EssentialBCs bcs(&bc_essential);
+    EssentialBCs<double> bcs(&bc_essential);
 
 Do not worry about the complicated-looking Hermes::vector, this is just std::vector enhanced 
 with a few extra constructors. It is used to avoid using variable-length arrays.
@@ -403,7 +378,7 @@ As a next step, we initialize the FE space in the same way as in the previous tu
 example 02-space::
 
     // Create an H1 space with default shapeset.
-    H1Space space(&mesh, &bcs, P_INIT);
+    H1Space<double> space(&mesh, &bcs, P_INIT);
     int ndof = space.get_num_dofs();
     info("ndof = %d", ndof);
 
@@ -418,7 +393,7 @@ problem. To define it, one needs to create an instance of the DiscreteProblem
 class::
 
     // Initialize the FE problem.
-    DiscreteProblem dp(&wf, &space);
+    DiscreteProblem<double> dp(&wf, &space);
 
 Initializing matrix solver
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -464,8 +439,7 @@ The discrete problem is solved via the Newton's method:
     if (!hermes2d.solve_newton(coeff_vec, &dp, solver, matrix, rhs)) 
         error("Newton's iteration failed.");
 
-This function comes with a number of optional parameters, see the file 
-`hermes2d/src/h2d_common.h <https://github.com/hpfem/hermes/blob/master/hermes2d/src/h2d_common.h>`_
+This function comes with a number of optional parameters, see the file "hermes2d/src/h2d_common.h"
 for more details.
 
 Translating the coefficient vector into a solution
@@ -475,8 +449,8 @@ The coefficient vector can be converted into a piecewise-polynomial
 Solution via the function Solution::vector_to_solution()::
 
     // Translate the resulting coefficient vector into a Solution.
-    Solution sln;
-    Solution::vector_to_solution(coeff_vec, &space, &sln);
+    Solution<double> sln;
+    Solution<double>::vector_to_solution(coeff_vec, &space, &sln);
 
 Saving solution in VTK format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -492,31 +466,9 @@ polynomial solution using linear triangles::
     lin.save_solution_vtk(&sln, "sln.vtk", "Temperature", mode_3D);
     info("Solution in VTK format saved to file %s.", "sln.vtk");
 
-The function save_solution_vtk() can be found in hermes2d/src/linearizer/ and its 
-complete header is:
-
-.. sourcecode::
-    .
-
-    // Saves a MeshFunction (Solution, Filter) in VTK format.
-    virtual void save_solution_vtk(MeshFunction* meshfn, const char* file_name, const char* quantity_name,
-                                   bool mode_3D = true, int item = H2D_FN_VAL_0, 
-                                   double eps = HERMES_EPS_NORMAL, double max_abs = -1.0,
-                                   MeshFunction* xdisp = NULL, MeshFunction* ydisp = NULL,
-                                   double dmult = 1.0);
-
-.. latexcode::
-    .
-
-    // Saves a MeshFunction (Solution, Filter) in VTK format.
-    virtual void save_solution_vtk(MeshFunction* meshfn, const char* file_name, const 
-                                   char* quantity_name, bool mode_3D = true, int item 
-                                   = H2D_FN_VAL_0, double eps = HERMES_EPS_NORMAL, 
-                                   double max_abs = -1.0, MeshFunction* xdisp = NULL, 
-                                   MeshFunction* ydisp = NULL, double dmult = 1.0);
-
-Only the first three arguments are mandatory, the remaining ones are optional.
-Their meaning is as follows:
+The function save_solution_vtk() can be found in "hermes2d/src/linearizer/".
+Only the first three arguments are mandatory and there is a number 
+of optional parameters whose meaning is as follows:
 
  * mode_3D ... select either 2D or 3D rendering (default is 3D).
  * item:

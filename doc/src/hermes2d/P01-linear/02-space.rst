@@ -68,8 +68,8 @@ in most computations, according to our experience, are simply called
 H1Shapeset, HcurlShapeset, HdivShapeset and L2Shapeset.
 Other shapesets can be found in the directory "src/shapeset".
 
-Initializing a H1Space
-~~~~~~~~~~~~~~~~~~~~~~
+Initializing an H1Space
+~~~~~~~~~~~~~~~~~~~~~~~
 
 An instance of a real-valued H1Space can be created as follows::
 
