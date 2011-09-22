@@ -1,17 +1,39 @@
 Interactive Web Accessibility
 -----------------------------
 
-* **Interactive web usage**. Anyone can use Hermes (and do many other types of symbolic and numerical computations) in any web browser, using the `Networked Computing Laboratory (NCLab) <http://nclab.com/>`_. 
+Anyone can use Hermes (and do many other types of symbolic and numerical computations) in any web browser, using the `Networked Computing Laboratory (NCLab) <http://nclab.com/>`_. 
 
-.. figure:: hermes2d/img/intro/iphone_large.png
+.. figure:: img/nclab.png
    :align: center
-   :scale: 35%
+   :scale: 55%
    :figclass: align-center
-   :alt: Hermes in iPhone.
+   :alt: NCLab
 
-See the `NCLab's home page <http://femhub.com/?page_id=813>`_ for more information. 
+After login, the user sees a virtual desktop:
 
-Other Resources
-~~~~~~~~~~~~~~~
+.. figure:: img/nclab2.png
+   :align: center
+   :scale: 55%
+   :figclass: align-center
+   :alt: NCLab
 
-An overview of books, journal articles, conference proceedings papers and talks about Hermes and adaptive *hp*-FEM can be found in the `publications section <http://hpfem.org/publications/>`_ and/or on `Pavel Solin's home page <http://hpfem.org/~pavel/>`_.
+Here one can do unrestricted Python programming:
+
+.. figure:: img/nclab3.png
+   :align: center
+   :scale: 55%
+   :figclass: align-center
+   :alt: NCLab
+
+In NCLab one can use the complete Python scientific stack including SciPy, Numpy, Sympy, Pylab and 
+other packages. One can work with arbitrary numerical methods and of course also with Hermes:
+
+.. figure:: img/nclab4.png
+   :align: center
+   :scale: 30.2%
+   :figclass: align-center
+   :alt: NCLab
+
+
+See the `NCLab's overview page <http://femhub.com/?page_id=813>`_ for more information. 
+

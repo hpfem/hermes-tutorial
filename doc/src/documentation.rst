@@ -44,10 +44,13 @@ subfolder doc/html/ and you can view them in any web browser, such as::
 To build Doxygen files for Hermes2D, go to the directory hermes2d/ and type again
 "doxygen Doxyfile". The HTML docs will be located in the file doc/html/index.html.
 
-.. toctree::
-   :maxdepth: 2
+Other Resources
+---------------
 
-    math-background
-    citing-hermes
+See the section "Citing Hermes" in this document for a representative selection of 
+books and scientific papers about Hermes. A more complete overview of publications 
+about Hermes and adaptive *hp*-FEM can be found in the `publications section <http://hpfem.org/publications/>`_
+at hpfem.org. The most recent list is probably the one 
+on `Pavel Solin's publications page <http://hpfem.org/~pavel/public/papers.html>`_.
 
 
