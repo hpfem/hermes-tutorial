@@ -1,8 +1,6 @@
 Time-Harmonic Maxwell's Equations (04-hcurl)
 --------------------------------------------
 
-**Git reference:** Tutorial example `04-hcurl <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P04-adaptivity/04-hcurl>`_. 
-
 Model problem
 ~~~~~~~~~~~~~
 

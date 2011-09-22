@@ -1,9 +1,6 @@
 Trilinos - Timedep (03-trilinos-timedep)
 ----------------------------------------
 
-**Git reference:** Example `03-trilinos-timedep 
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P07-trilinos/03-trilinos-timedep>`_.
-
 This  example shows how to use Trilinos for time-dependent PDE problems.
 The NOX solver is employed, either using Newton's method or JFNK, and with 
 or without preconditioning,

@@ -1,9 +1,6 @@
 Trilinos - Linear (01-trilinos-linear)
 --------------------------------------
 
-**Git reference:** Example `01-trilinos-linear 
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P07-trilinos/01-trilinos-linear>`_.
-
 The purpose of this example is to show how to use Trilinos for linear PDE problems where
 NOX only does one nonlinear iteration. Thus this is a good example to test various preconditioners
 for the linear problem. First we use the Newton's method in Hermes (assembling via the DiscreteProblem 

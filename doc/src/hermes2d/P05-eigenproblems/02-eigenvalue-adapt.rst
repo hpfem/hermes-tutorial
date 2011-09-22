@@ -1,8 +1,6 @@
 Adaptivity Problems (02-eigenvalue-adapt)
 -----------------------------------------
 
-**Git reference:** Tutorial example `02-eigenvalue-adapt <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P05-eigenproblems/02-eigenvalue-adapt>`_. 
-
 This is an inofficial example. Its purpose is solely to illustrate problems 
 associated with repeated calls to an eigensolver in each mesh refinement step.
 Observe how eigenfunctions associated with eigenvalues of multiplicity greater than 

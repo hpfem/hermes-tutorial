@@ -4,8 +4,6 @@ Poisson Equation (03-poisson)
 .. popup:: '#p01-linear-03-poisson-tutorial'
    ../../../_static/clapper.png
 
-**Git reference:** Tutorial example `03-poisson <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P01-linear/03-poisson>`_. 
-
 .. only:: latex
 
     `Tutorial Video <http://hpfem.org/hermes/doc/src/hermes2d/P01-linear/01-mesh/videos.html#p01-linear-03-poisson-tutorial>`_. 

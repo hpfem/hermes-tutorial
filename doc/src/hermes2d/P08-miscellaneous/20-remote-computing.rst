@@ -1,8 +1,6 @@
 Remote Computing (20-remote-computing)
 --------------------------------------
 
-**Git reference:** Tutorial example `20-remote-computing <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P08-miscellaneous/20-remote-computing>`_. 
-
 This example shows how to save visualization data if you are working 
 on a distant computer and cannot use ScalarView, OrderView, or 
 related classes directly. There are two basic options:

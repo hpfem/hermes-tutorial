@@ -1,9 +1,6 @@
 Neumann BC (05-bc-neumann)
 --------------------------
 
-**Git reference:** Tutorial example `05-bc-neumann 
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P01-linear/05-bc-neumann>`_. 
-
 Let us recall the domain and boundary markers from the previous example:
 
 .. figure:: 04-05-06-bc/simplemesh.png

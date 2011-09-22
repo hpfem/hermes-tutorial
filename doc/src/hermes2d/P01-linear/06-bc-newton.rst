@@ -1,9 +1,6 @@
 Newton BC (06-bc-newton)
 ------------------------
 
-**Git reference:** Tutorial example `06-bc-newton 
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P01-linear/06-bc-newton>`_. 
-
 This example uses the same domain $\Omega$ as the previous one, and the same equation 
 
 .. math::

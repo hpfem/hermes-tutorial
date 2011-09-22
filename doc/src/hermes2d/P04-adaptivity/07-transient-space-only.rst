@@ -1,13 +1,10 @@
 Transient Problems I - Adaptivity in Space (07-transient-space-only)
 --------------------------------------------------------------------
 
-**Git reference:** Tutorial example `07-transient-space-only 
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P04-adaptivity/07-transient-space-only>`_.
-
 Model problem
 ~~~~~~~~~~~~~
 
-This example is derived from example `P03-timedep/03-nonlinear <http://hpfem.org/hermes/doc/src/hermes2d/P03-transient/03-nonlinear.html>`_
+This example is derived from example "P03-timedep/03-nonlinear"
 and it shows how automatic adaptivity in space can be combined with 
 arbitrary Runge-Kutta methods in time. The example uses fixed time 
 step size. 

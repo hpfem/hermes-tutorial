@@ -1,8 +1,6 @@
 Adapting Mesh to an Exact Function (05-exact)
 ---------------------------------------------
 
-**Git reference:** Tutorial example `05-exact <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P04-adaptivity/05-exact>`_. 
-
 This technique can be useful in a number of situations, 
 for example when a time-dependent proces
 starts from a complicated initial condition that would not be represented

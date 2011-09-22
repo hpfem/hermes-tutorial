@@ -1,8 +1,6 @@
 An Introductory Example (01-intro)
 ----------------------------------
 
-**Git reference:** Tutorial example `01-intro <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P04-adaptivity/01-intro>`_. 
-
 Model problem
 ~~~~~~~~~~~~~
 

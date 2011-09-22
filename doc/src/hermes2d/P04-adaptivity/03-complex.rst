@@ -1,12 +1,9 @@
 Complex-Valued Problem (03-complex)
 -----------------------------------
 
-**Git reference:** Tutorial example `03-complex <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P04-adaptivity/03-complex>`_. 
-
 For this example we use the matrix solver AztecOO from the Trilinos package (other
 solvers including UMFPACK are usable as well). If you want to use AztecOO, 
-you need to have `Trilinos installed <http://hpfem.org/hermes/doc/src/installation/matrix_solvers.html>`_ on your system
-and enabled in your CMake.vars file::
+you need to have Trilinos installed on your system and enabled in your CMake.vars file::
 
     set(WITH_TRILINOS YES)
     set(TRILINOS_ROOT /opt/packages/trilinos)

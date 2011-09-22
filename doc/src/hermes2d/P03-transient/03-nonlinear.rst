@@ -1,9 +1,6 @@
 Nonlinear Example (03-nonlinear)
 --------------------------------
 
-**Git reference:** Tutorial example `03-nonlinear 
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P03-timedep/03-nonlinear>`_.
-
 Model problem
 ~~~~~~~~~~~~~
 

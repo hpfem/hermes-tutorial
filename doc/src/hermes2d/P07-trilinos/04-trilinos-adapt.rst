@@ -1,9 +1,6 @@
 Trilinos - Adapt (04-trilinos-adapt)
 ------------------------------------
 
-**Git reference:** Example `04-trilinos-adapt
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P07-trilinos/04-trilinos-adapt>`_.
-
 The purpose of this example is to show how to use Trilinos while adapting mesh.
 We'll use the NOX solver, either using Newton's method or JFNK, with or without 
 preconditioning. 
@@ -11,8 +8,7 @@ preconditioning.
 Model problem
 ~~~~~~~~~~~~~
 
-The underlying problem is benchmark 
-`layer-internal <http://hpfem.org/hermes/doc/src/hermes3d/benchmarks/layer-interior.html>`_.
+The underlying problem is benchmark "layer-interior".
 
 Initial coefficient vector on fine mesh
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

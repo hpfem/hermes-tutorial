@@ -1,8 +1,6 @@
 Using NURBS (30-nurbs)
 ----------------------
 
-**Git reference:** Tutorial example `35-nurbs <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P08-miscellaneous/35-nurbs>`_. 
-
 This example illustrates how to use full-featured NURBS
 to define curved boundary edges. Recall that simplified 
 format is available for circular arcs, as was shown 

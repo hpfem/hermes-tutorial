@@ -1,7 +1,5 @@
 Using Pysparse (01-eigenvalue)
---------------------------------
-
-**Git reference:** Tutorial example `01-eigenvalue <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P05-eigenproblems/01-eigenvalue>`_. 
+------------------------------
 
 This tutorial example shows how to solve generalized eigenproblems using the EigenSolver
 class which is based on the Pysparse library. 

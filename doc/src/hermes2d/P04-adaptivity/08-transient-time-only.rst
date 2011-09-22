@@ -1,19 +1,14 @@
 Transient Problems II - Adaptivity in Time (08-transient-time-only)
 -------------------------------------------------------------------
 
-**Git reference:** Tutorial example `08-transient-time-only 
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P04-adaptivity/08-transient-time-only>`_.
-
-
-
 Model problem
 ~~~~~~~~~~~~~
 
-This example is analogous to example `P04-adaptivity/07-transient-space-only <http://hpfem.org/hermes/doc/src/hermes2d/P04-adaptivity/07-transient-space-only.html>`_ except that 
+This example is analogous to example "P04-adaptivity/07-transient-space-only" except that 
 a fixed mesh is used and only the time stepping is adaptive. An arbitrary 
 embedded Runge-Kutta method can be used. By embedded we mean that the 
 Butcher's table contains two B rows. The two B rows are used to calculate 
-two different approximations Y_{n+1} on the next time level, with different 
+two different approximations $Y_{n+1}$ on the next time level, with different 
 orders of accuracy. The difference between these two solutions is used 
 to adapt the time step.
 

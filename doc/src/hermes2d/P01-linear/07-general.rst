@@ -1,8 +1,6 @@
 General 2nd-Order Linear Equation (07-general)
 ----------------------------------------------
 
-**Git reference:** Tutorial example `07-general <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P01-linear/07-general>`_. 
-
 The purpose of this example is threefold:
 
  * To show how to define non-constant Dirichlet and Neumann boundary conditions. 

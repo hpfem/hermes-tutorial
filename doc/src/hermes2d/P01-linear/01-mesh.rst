@@ -4,30 +4,28 @@ Finite Element Mesh (01-mesh)
 .. popup:: '#'
    ../../../_static/clapper.png
 
-**Git reference:** Tutorial example `01-mesh <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P01-linear/01-mesh>`_. 
-
 .. only:: latex
 
     `Tutorial Video <http://hpfem.org/hermes/doc/src/hermes2d/P01-linear/01-mesh/videos.html#>`_. 
 
 Every finite element computation starts with partitioning the domain
-into a finite element mesh. Hermes uses (possibly curvilinear) triangles and 
-quadrilaterals that can be combined. This is very useful since 
+into a finite element mesh. Hermes admits (possibly curvilinear) triangles and 
+quadrilaterals that can be arbitrarily combined. This is useful since 
 triangular elements are best for approximating isotropic solutions (solutions 
 that have similar behavior in all spatial directions) while quads are much 
-better at approximating anisotropies such as boundary layers.
+better for approximating anisotropies such as boundary layers.
  
 In contrast to traditional non-adaptive low-order finite element codes 
 that require fine initial meshes, in Hermes it often suffices to create 
-a rather coarse initial mesh by hand and use a variety of built-in 
-functions for a-priori mesh refinement. In most cases, automatic adaptivity 
-then takes care of the rest successfully. Of course, Hermes can also accept 
-fine meshes created automatically by external mesh generation packages. 
+a rather coarse initial mesh by hand, apply a few steps of a-priori 
+mesh refinement, and then let automatic adaptivity take care of the rest.
+Of course, Hermes can also read fine meshes created automatically by 
+external mesh generation packages. 
 
 Hermes2D native mesh format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This tutorial example assumes an L-shaped domain consisting of two materials (Copper and Aluminum),
+Consider a simple L-shaped domain consisting of two materials (Copper and Aluminum),
 that is initially split into four elements - two quadrilaterals and two curvilinear triangles:
 
 .. figure:: 01-mesh/simplemesh.png
@@ -90,8 +88,9 @@ valid definitions::
 
 **Vertices**
 
-The variable ``vertices`` defines the coordinates of all mesh vertices 
-(in any order). 
+The variable ``vertices`` defines the coordinates of all mesh vertices. 
+The position of a vertex in this list serves as an index for defining 
+elements. These indices start at zero.
 
 **Elements**
 
@@ -130,7 +129,7 @@ For an explanation of NURBS see, e.g., the `Wikipedia NURBS page
 
 The most common type of curved boundary is a circular arc which is defined
 via two vertex indices and central angle. For the treatment of full-featured 
-NURBS boundaries see example `P10-miscellaneous/35-nurbs <http://hpfem.org/hermes/doc/src/hermes2d/P10-miscellaneous/35-nurbs.html>`_. 
+NURBS boundaries see example "P10-miscellaneous/35-nurbs".
 
 **Initial refinements**
 
@@ -183,13 +182,13 @@ one above looks in XML as follows::
       </variables>
 
       <vertices>
-	<vertex x="0.00000000000000000000" y="m_a" i="0"/>
+	<vertex x="0" y="m_a" i="0"/>
 	<vertex x="a" y="m_a" i="1"/>
 	<vertex x="m_a" y="0" i="2"/>
 	<vertex x="." y=".00" i="3"/>
-	<vertex x="a" y=".00000000" i="4"/>
+	<vertex x="a" y="0" i="4"/>
 	<vertex x="m_a" y="a" i="5"/>
-	<vertex x="0.000" y="a" i="6"/>
+	<vertex x="0" y="a" i="6"/>
 	<vertex x="b" y="b" i="7"/>
       </vertices>
 
@@ -217,13 +216,16 @@ one above looks in XML as follows::
       </curves>
     </mesh:mesh>
 
-The meaning of the tags is straightforward, and we also show several different ways to write zero.
+The meaning of the tags is straightforward.
 Note that in the XML file, vertices have an additional 
 index 'i' in them. These indices are used to define elements, edges, and curves.
 They are not needed in the Hermes native mesh format since vertices
 are always read in a sequential fashion, which is not necessarily the case 
-with XML readers. To load a XML mesh file, 
-one has to use the ``MeshReaderH2DXML`` class::
+with XML readers. 
+
+**Loading meshes in Hermes2D XML format**
+
+To load a Hermes2D XML mesh file, one has to use the ``MeshReaderH2DXML`` class::
 
     MeshReaderH2DXML mloader;  
     mloader.load("domain.xml", &mesh);
@@ -234,8 +236,11 @@ ExodusII mesh format
 
 Hermes can read meshes in the `ExodusII <http://sourceforge.net/projects/exodusii/>`_ format.
 This is a widely used format that can be generated, for example, 
-with `Cubit <http://cubit.sandia.gov/>`_. To load an ExodusII mesh file, 
-one has to use the ``MeshReaderExodusII`` class::
+with `Cubit <http://cubit.sandia.gov/>`_. 
+
+**Loading meshes in ExodusII format**
+
+To load an ExodusII mesh file, one has to use the ``MeshReaderExodusII`` class::
 
     MeshReaderExodusII mloader;  
     mloader.load("domain.e", &mesh);
@@ -344,7 +349,7 @@ All elements in the mesh can be unrefined using::
 
     Mesh::unrefine_all_elements();
 
-See the file `src/mesh/mesh.cpp <http://git.hpfem.org/hermes.git/blob/HEAD:/hermes2d/src/mesh/mesh.cpp>`_ for more details. 
+See the Doxygen docs for more details on the Mesh class.
 
 Visualizing the mesh
 ~~~~~~~~~~~~~~~~~~~~
@@ -357,11 +362,11 @@ The following code illustrates how to visualize the mesh using the MeshView clas
     MeshView mview("Hello world!", new WinGeom(0, 0, 350, 350));
     mview.show(&mesh);
 
-The class MeshView provides the method show() that displays a window showing the mesh:
+The class MeshView provides a method show() that displays a window with the mesh:
 
 .. figure:: 01-mesh/meshview2.png
    :align: center
-   :scale: 50% 
+   :scale: 52% 
    :figclass: align-center
    :alt: Image of the mesh created via the MeshView class.
 

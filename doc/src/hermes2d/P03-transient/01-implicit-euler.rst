@@ -1,8 +1,6 @@
 Using Implicit Euler Method (01-implicit-euler)
 -----------------------------------------------
 
-**Git reference:** Tutorial example `01-implicit-euler <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P03-timedep/01-implicit-euler>`_. 
-
 Model problem
 ~~~~~~~~~~~~~
 

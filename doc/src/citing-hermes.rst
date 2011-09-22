@@ -159,7 +159,8 @@ If you use Hermes for your work, please be so kind to include some of the refere
 
     @Article{Hermes-polymer-metal-composites,
       author = {D. Pugal, P. Solin, K.J. Kim, A. Aabloo},
-      title = {Modeling Ionic Polymer-Metal Composites with Space-Time Adaptive Multimesh hp-FEM},
+      title = {Modeling Ionic Polymer-Metal Composites with Space-Time 
+      Adaptive Multimesh hp-FEM},
       journal = {Communications in Computational Physics},
       year = {2011},
       status = {accepted},

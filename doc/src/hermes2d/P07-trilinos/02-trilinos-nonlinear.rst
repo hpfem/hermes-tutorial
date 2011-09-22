@@ -1,9 +1,6 @@
 Trilinos - Nonlinear (02-trilinos-nonlinear)
 --------------------------------------------
 
-**Git reference:** Example `02-trilinos-nonlinear 
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P07-trilinos/02-trilinos-nonlinear>`_.
-
 This example is analogous to the previous one, but the underlying problem is nonlinear
 and thus NOX will do more than one nonlinear iteration. First we use the Newton's method 
 in Hermes (assembling via the DiscreteProblem class and matrix problem solution via UMFpack). 

@@ -1,9 +1,6 @@
 Picard's Method (01-picard)
 ---------------------------
 
-**Git reference:** Tutorial example `01-picard 
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P02-nonlinear/01-picard>`_.
-
 Picard's Method
 ~~~~~~~~~~~~~~~
 

@@ -1,10 +1,6 @@
 Transient Problems III - Adaptivity in Space and Time (09-transient-space-and-time)
 -----------------------------------------------------------------------------------
 
-**Git reference:** Tutorial example `09-transient-space-and-time 
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P04-adaptivity/09-transient-space-and-time>`_.
-
-
 
 Model problem
 ~~~~~~~~~~~~~

@@ -4,8 +4,6 @@ Finite Element Space (02-space)
 .. popup:: '#p01-linear-02-space-tutorial'
    ../../../_static/clapper.png
 
-**Git reference:** Tutorial example `02-space <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P01-linear/02-space>`_. 
-
 .. only:: latex
 
     `Tutorial Video <http://hpfem.org/hermes/doc/src/hermes2d/P01-linear/01-mesh/videos.html#p01-linear02-space-tutorial>`_. 

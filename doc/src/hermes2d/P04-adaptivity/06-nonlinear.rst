@@ -1,11 +1,7 @@
 Newton's Method and Adaptivity (06-nonlinear)
 ---------------------------------------------
 
-**Git reference:** Tutorial example `06-nonlinear
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P04-adaptivity/06-nonlinear>`_.
-
-In this example we use the nonlinear model problem from example
-`P02-nonlinear/02-newton-spline <http://hpfem.org/hermes/doc/src/hermes2d/P02-nonlinear/03-newton-spline.html>`_,
+In this example we use the nonlinear model problem from example "P02-nonlinear/02-newton-spline",
 
 .. math::
 

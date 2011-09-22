@@ -1,8 +1,6 @@
 Space H(div) (10-space-hdiv)
 ----------------------------
 
-**Git reference:** Tutorial example `10-space-hdiv <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P08-miscellaneous/10-space-hdiv>`_. 
-
 The space H(div) in 2D is very similar in nature to the space H(curl), except its functions 
 behave like (vector-valued) divergences of $H^1$ functions. Finite element basis functions 
 in the space H(div) are discontinuous across element interfaces but their normal components 

@@ -1,19 +1,14 @@
 Trilinos - Coupled (05-trilinos-coupled)
 ----------------------------------------
 
-**NOTE - THIS EXAMPLE HAS NOT BEEN UPGRADED TO NEW WEAK FORMS YET**
-
-**Git reference:** Example `05-trilinos-coupled
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P07-trilinos/05-trilinos-coupled>`_.
-
 The purpose of this example is to show how to use Trilinos for nonlinear time-dependent coupled PDE systems.
 Solved by NOX solver via Newton or JFNK, with or without preconditioning. 
 
 Model problem
 ~~~~~~~~~~~~~
 
-We solve the simplified flame
-propagation problem from `P03-timedep/flame <http://hpfem.org/hermes/doc/src/hermes2d/timedep/flame.html>`_.
+We solve the simplified flame propagation problem that can be found in Hermes examples as
+"laminar-flame".
 
 Weak formulation
 ~~~~~~~~~~~~~~~~

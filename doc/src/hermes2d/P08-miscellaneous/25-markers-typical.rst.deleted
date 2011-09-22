@@ -1,8 +1,6 @@
 Using Material and Boundary Markers: Typical Way (25-markers-typical)
 ---------------------------------------------------------------------
 
-**Git reference:** Tutorial example `25-markers-typical <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P10-miscellaneous/25-markers-typical>`_. 
-
 This example shows how to solve a problem with complex area / boundary
 properties using the typical approach -- to define an individual weak form 
 for each element and boundary marker and register them separately.

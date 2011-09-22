@@ -1,8 +1,6 @@
 Adaptive Multimesh hp-FEM Example (02-system)
 ---------------------------------------------
 
-**Git reference:** Tutorial example `02-system <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P04-adaptivity/02-system>`_. 
-
 Model problem
 ~~~~~~~~~~~~~
 

@@ -1,8 +1,6 @@
 Systems of Equations (08-system)
 --------------------------------
 
-**Git reference:** Tutorial example `08-system <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P01-linear/08-system>`_. 
-
 So far we have solved single PDEs with a weak formulation
 of the form $a(u,v) - l(v) = 0$, where $u$ was a continuous approximation in the
 $H^1$ space. Hermes can also solve equations whose solutions lie in the spaces

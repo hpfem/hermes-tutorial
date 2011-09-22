@@ -1,11 +1,7 @@
 Nonzero Dirichlet BC (04-bc-dirichlet)
 --------------------------------------
 
-**Git reference:** Tutorial example `04-bc-dirichlet 
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P01-linear/04-bc-dirichlet>`_. 
-
-We will keep the equation from  
-example `03-poisson <http://hpfem.org/hermes/doc/src/hermes2d/P01-linear/03-poisson.html>`_ 
+We will keep the equation from example "03-poisson",
 
 .. math::
     :label: poisson40

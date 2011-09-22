@@ -1,10 +1,7 @@
 Space L2 (15-space-l2)
 ----------------------
 
-**Git reference:** Tutorial example `15-space-l2 <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P08-miscellaneous/15-space-l2>`_. 
-
-The $L^2$ space is frequently used in `Navier-Stokes equations 
-<http://hpfem.org/hermes/doc/src/hermes2d/examples/navier-stokes.html>`_ where 
+The $L^2$ space is frequently used in `Navier-Stokes equations where 
 it keeps the velocity discreetely divergence-free. This example shows how to 
 create an $L^2$ space, visualize finite element basis functions, and perform 
 an orthogonal $L^2$-projection of a continuous function onto the FE space.

@@ -1,9 +1,6 @@
 Newton's Method with Spline Nonlinearity (02-newton-spline)
 -----------------------------------------------------------
 
-**Git reference:** Tutorial example `03-newton-spline 
-<http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P02-nonlinear/03-newton-spline>`_.
-
 Model problem
 ~~~~~~~~~~~~~
 

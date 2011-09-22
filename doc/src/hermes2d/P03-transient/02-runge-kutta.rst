@@ -1,10 +1,7 @@
 Time-Integration with Arbitrary Runge-Kutta Methods (02-runge-kutta)
 --------------------------------------------------------------------
 
-**Git reference:** Tutorial example `02-runge-kutta <http://git.hpfem.org/hermes.git/tree/HEAD:/hermes2d/tutorial/P03-timedep/02-runge-kutta>`_. 
-
-This example solves the same model problem as example `01-implicit-euler <http://hpfem.org/hermes/doc/src/hermes2d/P03-timedep/01-implicit-euler.html>`_ but it shows how various Runge-Kutta methods can be used for time stepping. Let us begin with a brief introduction 
-to the Runge-Kutta methods and Butcher's tables before we explain implementation details.
+This example solves the same model problem as example "01-implicit-euler" but it shows how various Runge-Kutta methods can be used for time stepping. Let us begin with a brief introduction to the Runge-Kutta methods and Butcher's tables before we explain implementation details.
 
 Runge-Kutta methods and Butcher's tables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
