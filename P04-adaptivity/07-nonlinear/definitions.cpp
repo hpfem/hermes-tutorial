@@ -1,0 +1,30 @@
+#include "definitions.h"
+
+/* Initial condition */
+
+double InitialSolutionHeatTransfer::value (double x, double y) const 
+{
+  return (x + 10) * (y + 10) / 100. + 2.;
+}
+
+void InitialSolutionHeatTransfer::derivatives (double x, double y, double& dx, double& dy) const 
+{
+  dx = (y + 10) / 10.;
+  dy = (x + 10) / 10.;
+}
+
+Ord InitialSolutionHeatTransfer::ord(Ord x, Ord y) const 
+{
+  return (x + 10) * (y + 10) / 100. + 2.;
+}
+
+/* Essential BC */
+EssentialBoundaryCondition<double>::EssentialBCValueType CustomEssentialBCNonConst::get_value_type() const 
+{
+  return EssentialBoundaryCondition<double>::BC_FUNCTION;
+}
+
+double CustomEssentialBCNonConst::value(double x, double y, double n_x, double n_y, double t_x, double t_y) const 
+{
+  return (x + 10) * (y + 10) / 100.;
+}
