@@ -1,4 +1,3 @@
-# Linear problems.
 add_subdirectory(01-mesh)
 add_subdirectory(02-space)
 add_subdirectory(03-poisson)

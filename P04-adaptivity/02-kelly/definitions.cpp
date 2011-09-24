@@ -1,8 +1,8 @@
 #include "definitions.h"
 
 CustomWeakFormPoisson::CustomWeakFormPoisson(const std::string& mat_motor, double eps_motor, 
-                                             const std::string& mat_air, double eps_air) 
-  : WeakForm<double>(1), mat_motor(mat_motor), eps_motor(eps_motor), mat_air(mat_air), eps_air(eps_air)
+                                             const std::string& mat_air, double eps_air, Mesh* mesh) 
+  : WeakForm<double>(1), mat_motor(mat_motor), eps_motor(eps_motor), mat_air(mat_air), eps_air(eps_air), mesh(mesh)
 {
   // Jacobian.
   add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(0, 0, mat_motor, new Hermes1DFunction<double>(eps_motor)));
@@ -15,7 +15,7 @@ CustomWeakFormPoisson::CustomWeakFormPoisson(const std::string& mat_motor, doubl
 
 double CustomWeakFormPoisson::get_element_eps(Hermes2D::Geom< double >* e)
 {
-  std::string marker = this->get_element_markers_conversion()->get_user_marker(e->elem_marker);
+  std::string marker = mesh->get_element_markers_conversion().get_user_marker(e->elem_marker).marker;
     
   if (marker == mat_motor)
     return eps_motor;

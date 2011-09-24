@@ -400,7 +400,7 @@ void KuzminDiscontinuityDetector::find_centroid_values(Hermes::Hermes2D::Element
 {
   double c_x, c_y;
   double c_ref_x, c_ref_y;
-  if(e->nvert == 3)
+  if(e->get_num_surf() == 3)
   {
       c_x = (0.33333333333333333) * (e->vn[0]->x + e->vn[1]->x + e->vn[2]->x);
       c_y = (0.33333333333333333) * (e->vn[0]->y + e->vn[1]->y + e->vn[2]->y);
@@ -423,7 +423,7 @@ void KuzminDiscontinuityDetector::find_centroid_derivatives(Hermes::Hermes2D::El
 {
   double c_x, c_y;
   double c_ref_x, c_ref_y;
-  if(e->nvert == 3)
+  if(e->get_num_surf() == 3)
   {
       c_x = (0.33333333333333333) * (e->vn[0]->x + e->vn[1]->x + e->vn[2]->x);
       c_y = (0.33333333333333333) * (e->vn[0]->y + e->vn[1]->y + e->vn[2]->y);
@@ -447,7 +447,7 @@ void KuzminDiscontinuityDetector::find_second_centroid_derivatives(Hermes::Herme
 {
   double c_x, c_y;
   double c_ref_x, c_ref_y;
-  if(e->nvert == 3)
+  if(e->get_num_surf() == 3)
   {
       c_x = (0.33333333333333333) * (e->vn[0]->x + e->vn[1]->x + e->vn[2]->x);
       c_y = (0.33333333333333333) * (e->vn[0]->y + e->vn[1]->y + e->vn[2]->y);
@@ -473,7 +473,7 @@ void KuzminDiscontinuityDetector::find_vertex_values(Hermes::Hermes2D::Element* 
   double c_ref_x, c_ref_y;
   for(unsigned int i = 0; i < this->solutions.size(); i++)
   {
-    for(unsigned int j = 0; j < e->nvert; j++)
+    for(unsigned int j = 0; j < e->get_num_surf(); j++)
     {
       solutions[i]->get_refmap()->set_active_element(e);
       solutions[i]->get_refmap()->untransform(e, e->vn[j]->x, e->vn[j]->y, c_ref_x, c_ref_y);
@@ -487,7 +487,7 @@ void KuzminDiscontinuityDetector::find_vertex_derivatives(Hermes::Hermes2D::Elem
   double c_ref_x, c_ref_y;
   for(unsigned int i = 0; i < this->solutions.size(); i++)
   {
-    for(unsigned int j = 0; j < e->nvert; j++)
+    for(unsigned int j = 0; j < e->get_num_surf(); j++)
     {
       solutions[i]->get_refmap()->set_active_element(e);
       solutions[i]->get_refmap()->untransform(e, e->vn[j]->x, e->vn[j]->y, c_ref_x, c_ref_y);
@@ -499,7 +499,7 @@ void KuzminDiscontinuityDetector::find_vertex_derivatives(Hermes::Hermes2D::Elem
 
 void KuzminDiscontinuityDetector::find_u_i_min_max_first_order(Hermes::Hermes2D::Element* e, double u_i_min[1][4], double u_i_max[1][4])
 {
-  for(unsigned int j = 0; j < e->nvert; j++)
+  for(unsigned int j = 0; j < e->get_num_surf(); j++)
   {
     Hermes::Hermes2D::NeighborSearch<double> ns(e, mesh);
     if(e->en[j]->bnd)
@@ -521,19 +521,19 @@ void KuzminDiscontinuityDetector::find_u_i_min_max_first_order(Hermes::Hermes2D:
     ns.set_active_segment(ns.get_num_neighbors() - 1);
     find_centroid_values(ns.get_neighb_el(), u_c);
     for(unsigned int min_i = 0; min_i < 1; min_i++)
-      if(u_i_min[min_i][(j + 1) % e->nvert] > u_c[min_i])
-        u_i_min[min_i][(j + 1) % e->nvert] = u_c[min_i];
+      if(u_i_min[min_i][(j + 1) % e->get_num_surf()] > u_c[min_i])
+        u_i_min[min_i][(j + 1) % e->get_num_surf()] = u_c[min_i];
     for(unsigned int max_i = 0; max_i < 1; max_i++)
-      if(u_i_max[max_i][(j + 1) % e->nvert] < u_c[max_i])
-        u_i_max[max_i][(j + 1) % e->nvert] = u_c[max_i];
+      if(u_i_max[max_i][(j + 1) % e->get_num_surf()] < u_c[max_i])
+        u_i_max[max_i][(j + 1) % e->get_num_surf()] = u_c[max_i];
 
     // Now the hard part, neighbors' neighbors.
     /// \todo This is where it fails for triangles, where it is much more complicated to look for elements sharing a vertex.
     ns.set_active_segment(0);
     Hermes::Hermes2D::NeighborSearch<double> ns_1(ns.get_neighb_el(), mesh);
-    if(ns.get_neighb_el()->en[(ns.get_neighbor_edge().local_num_of_edge + 1) % ns.get_neighb_el()->nvert]->bnd)
+    if(ns.get_neighb_el()->en[(ns.get_neighbor_edge().local_num_of_edge + 1) % ns.get_neighb_el()->get_num_surf()]->bnd)
       continue;
-    ns_1.set_active_edge((ns.get_neighbor_edge().local_num_of_edge + 1) % ns.get_neighb_el()->nvert);
+    ns_1.set_active_edge((ns.get_neighbor_edge().local_num_of_edge + 1) % ns.get_neighb_el()->get_num_surf());
     ns_1.set_active_segment(0);
     find_centroid_values(ns_1.get_neighb_el(), u_c);
     for(unsigned int min_i = 0; min_i < 1; min_i++)
@@ -576,7 +576,7 @@ void KuzminDiscontinuityDetector::find_alpha_i_first_order(double u_i_min[1][4],
 
 void KuzminDiscontinuityDetector::find_u_i_min_max_second_order(Hermes::Hermes2D::Element* e, double u_d_i_min[1][4][2], double u_d_i_max[1][4][2])
 {
-  for(unsigned int j = 0; j < e->nvert; j++)
+  for(unsigned int j = 0; j < e->get_num_surf(); j++)
   {
     Hermes::Hermes2D::NeighborSearch<double> ns(e, mesh);
     if(e->en[j]->bnd)
@@ -607,26 +607,26 @@ void KuzminDiscontinuityDetector::find_u_i_min_max_second_order(Hermes::Hermes2D
     find_centroid_derivatives(ns.get_neighb_el(), u_dx_c, u_dy_c);
     for(unsigned int min_i = 0; min_i < 1; min_i++)
     {
-      if(u_d_i_min[min_i][(j + 1) % e->nvert][0] > u_dx_c[min_i])
-        u_d_i_min[min_i][(j + 1) % e->nvert][0] = u_dx_c[min_i];
-      if(u_d_i_min[min_i][(j + 1) % e->nvert][1] > u_dy_c[min_i])
-        u_d_i_min[min_i][(j + 1) % e->nvert][1] = u_dy_c[min_i];
+      if(u_d_i_min[min_i][(j + 1) % e->get_num_surf()][0] > u_dx_c[min_i])
+        u_d_i_min[min_i][(j + 1) % e->get_num_surf()][0] = u_dx_c[min_i];
+      if(u_d_i_min[min_i][(j + 1) % e->get_num_surf()][1] > u_dy_c[min_i])
+        u_d_i_min[min_i][(j + 1) % e->get_num_surf()][1] = u_dy_c[min_i];
     }
     for(unsigned int max_i = 0; max_i < 1; max_i++)
     {
-      if(u_d_i_max[max_i][(j + 1) % e->nvert][0] < u_dx_c[max_i])
-        u_d_i_max[max_i][(j + 1) % e->nvert][0] = u_dx_c[max_i];
-      if(u_d_i_max[max_i][(j + 1) % e->nvert][1] < u_dy_c[max_i])
-        u_d_i_max[max_i][(j + 1) % e->nvert][1] = u_dy_c[max_i];
+      if(u_d_i_max[max_i][(j + 1) % e->get_num_surf()][0] < u_dx_c[max_i])
+        u_d_i_max[max_i][(j + 1) % e->get_num_surf()][0] = u_dx_c[max_i];
+      if(u_d_i_max[max_i][(j + 1) % e->get_num_surf()][1] < u_dy_c[max_i])
+        u_d_i_max[max_i][(j + 1) % e->get_num_surf()][1] = u_dy_c[max_i];
     }
 
     // Now the hard part, neighbors' neighbors.
     /// \todo This is where it fails for triangles, where it is much more complicated to look for elements sharing a vertex.
     ns.set_active_segment(0);
     Hermes::Hermes2D::NeighborSearch<double> ns_1(ns.get_neighb_el(), mesh);
-    if(ns.get_neighb_el()->en[(ns.get_neighbor_edge().local_num_of_edge + 1) % ns.get_neighb_el()->nvert]->bnd)
+    if(ns.get_neighb_el()->en[(ns.get_neighbor_edge().local_num_of_edge + 1) % ns.get_neighb_el()->get_num_surf()]->bnd)
       continue;
-    ns_1.set_active_edge((ns.get_neighbor_edge().local_num_of_edge + 1) % ns.get_neighb_el()->nvert);
+    ns_1.set_active_edge((ns.get_neighbor_edge().local_num_of_edge + 1) % ns.get_neighb_el()->get_num_surf());
     ns_1.set_active_segment(0);
     find_centroid_derivatives(ns_1.get_neighb_el(), u_dx_c, u_dy_c);
     for(unsigned int min_i = 0; min_i < 1; min_i++)

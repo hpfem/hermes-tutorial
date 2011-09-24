@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
   mloader.load("motor.mesh", &mesh);
 
   // Initialize the weak formulation.
-  CustomWeakFormPoisson wf("Motor", EPS_MOTOR, "Air", EPS_AIR);
+  CustomWeakFormPoisson wf("Motor", EPS_MOTOR, "Air", EPS_AIR, &mesh);
   
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_essential_out("Outer", 0.0);
@@ -124,11 +124,17 @@ int main(int argc, char* argv[])
     memset(coeff_vec, 0, ndof * sizeof(double));
 
     // Perform Newton's iteration.
-    if (!newton.solve(coeff_vec)) 
+    try
+    {
+      newton.solve(coeff_vec);
+    }
+    catch(Hermes::Exceptions::Exception e)
+    {
+      e.printMsg();
       error("Newton's iteration failed.");
-    else
-      // Translate the resulting coefficient vector into the instance of Solution.
-      Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);
+    }
+    // Translate the resulting coefficient vector into the instance of Solution.
+    Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);
     
     // Time measurement.
     cpu_time.tick();
@@ -137,10 +143,10 @@ int main(int argc, char* argv[])
     if (VTK_VISUALIZATION) 
     {
       // Output solution in VTK format.
-      Views::Linearizer lin(&sln);
+      Views::Linearizer lin;
       char* title = new char[100];
       sprintf(title, "sln-%d.vtk", as);
-      lin.save_solution_vtk(title, "Potential", false);
+      lin.save_solution_vtk(&sln, title, "Potential", false);
       info("Solution in VTK format saved to file %s.", title);
 
       // Output mesh and element orders in VTK format.
