@@ -24,10 +24,7 @@ project(hermes_tutorial)
 		set(WITH_MPI                NO)
 		# set(MPI_LIBRARIES         -lmpi)
 		# set(MPI_INCLUDE_PATH      /usr/include/openmpi
-		
-  # Tests.
-	set(WITH_TESTS              YES)
-	
+
 	# Include debugging symbols.
 	set(DEBUG_VERSION           YES)
 	
@@ -58,13 +55,6 @@ project(hermes_tutorial)
 	include_directories(${HERMES_COMMON_INCLUDE_PATH})
 	include_directories(${HERMES2D_INCLUDE_PATH})
 	include_directories(${DEP_INCLUDE_PATHS})
-	
-	# --- TESTING
-	#
-	if (WITH_TESTS)
-	  enable_testing()
-	  add_custom_target(test COMMAND ctest)
-	endif (WITH_TESTS)
 
   # --- SUBFOLDERS WITH TUTORIAL TOPICS
   #
