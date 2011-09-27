@@ -26,10 +26,10 @@
   </vertices>
 
   <elements>
-    <element:tria v1="4" v2="1" v3="0" marker="Material" />
-    <element:tria v1="6" v2="2" v3="1" marker="Material" />
-    <element:tria v1="3" v2="4" v3="0" marker="Material" />
-    <element:tria v1="6" v2="7" v3="2" marker="Material" />
+    <element:triangle v1="4" v2="1" v3="0" marker="Material" />
+    <element:triangle v1="6" v2="2" v3="1" marker="Material" />
+    <element:triangle v1="3" v2="4" v3="0" marker="Material" />
+    <element:triangle v1="6" v2="7" v3="2" marker="Material" />
     <element:quad v1="1" v2="4" v3="5" v4="6" marker="Material" />
     <element:quad v1="3" v2="8" v3="9" v4="4" marker="Material" />
     <element:quad v1="4" v2="9" v3="10" v4="5" marker="Material" />
