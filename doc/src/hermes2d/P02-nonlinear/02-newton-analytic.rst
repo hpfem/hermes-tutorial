@@ -37,10 +37,10 @@ Initializing the weak formulation
 
 This is very simple, using the predefined DefaultWeakFormPoisson class::
 
-  // Initialize the weak formulation
-  CustomNonlinearity lambda(alpha);
-  HermesFunction src(-heat_src);
-  WeakFormsH1::DefaultWeakFormPoisson wf(HERMES_ANY, &lambda, &src);
+    // Initialize the weak formulation
+    CustomNonlinearity lambda(alpha);
+    Hermes2DFunction<double> src(-heat_src);
+    DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &src);
 
 We should mention that the CustomNonlinearity class is identical with example 01-picard.
 
@@ -58,20 +58,28 @@ an initial coefficient vector::
     // NOTE: If you want to start from the zero vector, just define 
     // coeff_vec to be a vector of ndof zeros (no projection is needed).
     info("Projecting to obtain initial vector for the Newton's method.");
-    scalar* coeff_vec = new scalar[Space::get_num_dofs(&space)] ;
+    double* coeff_vec = new double[ndof];
     CustomInitialCondition init_sln(&mesh);
-    OGProjection::project_global(&space, &init_sln, coeff_vec, matrix_solver); 
+    OGProjection<double>::project_global(&space, &init_sln, coeff_vec, matrix_solver); 
 
 The Newton's iteration loop
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The call to the Newton's iteration loop is the same as for linear problems::
+The Newton's iteration loop is done as in linear problems::
+
+    // Initialize Newton solver.
+    NewtonSolver<double> newton(&dp, matrix_solver);
 
     // Perform Newton's iteration.
-    bool verbose = true;
-    bool jacobian_changed = true;
-    if (!hermes2d.solve_newton(coeff_vec, &dp, solver, matrix, rhs, jacobian_changed,
-        NEWTON_TOL, NEWTON_MAX_ITER, verbose)) error("Newton's iteration failed.");
+    try
+    {
+      newton.solve(coeff_vec, NEWTON_TOL, NEWTON_MAX_ITER);
+    }
+    catch(Hermes::Exceptions::Exception e)
+    {
+      e.printMsg();
+      error("Newton's iteration failed.");
+    }
 
 Note that the Newton's loop always handles a coefficient vector, not 
 Solutions. 
@@ -82,19 +90,17 @@ Translating the resulting coefficient vector into a Solution
 After the Newton's loop is finished, the resulting coefficient vector 
 is translated into a Solution as follows::
 
-    // Translate the resulting coefficient vector into the Solution sln.
-    Solution::vector_to_solution(coeff_vec, &space, &sln);
+    // Translate the resulting coefficient vector into a Solution.
+    Solution<double> sln;
+    Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);
 
 Cleaning up
 ~~~~~~~~~~~
 
 As a last step, we clean up as usual::
 
-    // Cleanup.
+    // Clean up.
     delete [] coeff_vec;
-    delete matrix;
-    delete rhs;
-    delete solver;
 
 Convergence
 ~~~~~~~~~~~
@@ -114,9 +120,7 @@ in example 01-picard::
     I ---- Newton iter 7, residual norm: 5.27303e-09
       << close all views to continue >>
 
-This will not surprize a reader who had Numerical Methods I.
-
 Sample results
 ~~~~~~~~~~~~~~
 
-The resulting approximation is the same as in example 01-picard. 
+The resulting approximation is the same as in example P02/01-picard. 

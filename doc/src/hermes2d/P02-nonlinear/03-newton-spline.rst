@@ -102,9 +102,9 @@ Initializing the weak formulation
 Since the CubicSpline class is just another descendant of HermesFunction,
 we can use the DefaultWeakFormPoisson class as in example 02-newton-analytic::
 
-    // Initialize the weak formulation
-    HermesFunction src(-heat_src);
-    WeakFormsH1::DefaultWeakFormPoisson wf(HERMES_ANY, &lambda, &src);
+    // Initialize the weak formulation.
+    Hermes2DFunction<double> src(-heat_src);
+    DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &src);
 
 Convergence
 ~~~~~~~~~~~
