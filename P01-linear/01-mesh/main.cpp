@@ -44,19 +44,6 @@ int main(int argc, char* argv[])
     mloader.load("domain.mesh", &mesh);
   }
 
-  // Optional rescaling of mesh (all vertex x- and y-coordinates are 
-  // divided by x_ref and y_ref, respectively). Mesh with curved edges 
-  // cannot be rescaled. So to try this feature, comment out the "curves" 
-  // section in the mesh file.
-  double x_ref = 2.0, y_ref = 3.0;
-  info("Rescaling mesh by the factors of %g and %g in the x- and y- direction, respectively.", 
-         x_ref, y_ref);
-  if(!mesh.rescale(x_ref, y_ref)) info("Mesh could not be rescaled.");
-
-  // Conversion between triangular and quadrilateral meshes (optional). 
-  //mesh.convert_quads_to_triangles();
-  //mesh.convert_triangles_to_quads();
-
   // Refine mesh uniformly (optional).
   mesh.refine_all_elements();          
 
