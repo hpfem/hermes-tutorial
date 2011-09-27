@@ -56,7 +56,7 @@ reads: Find $u \in V$ such that
 
          \int_\Omega \lambda \nabla u \cdot \nabla v \;\mbox{d\bfx} = \int_\Omega C_{src} v \;\mbox{d\bfx}\ \ \ \mbox{for all}\ v \in V.
 
-Hermes, however, needs the equation in the form 
+Hermes, however, expects the equation in the form 
 
 .. math::
     :label: poissonweak01b
@@ -73,19 +73,20 @@ Newton's method to solve it. Other methods for the solution of nonlinear problem
 are available as well (to be discussed later). 
 
 For linear problems, the Newton's
-method converges in one step. Well, at least that's what the theory says. 
+method converges in one step - the theory says. 
 
 In practice the Newton's method 
 may take more than one step for a linear problem 
 if the matrix solver does not do a good job. This is not 
 unusual at all, in particular when an iterative solver is used. By checking the residual of the 
 equation, *the Newton's method always makes sure that the problem is solved correctly,
-or it fails in a clearly visible way*. This is the reason No. 1 why the Newton's 
-method should be used even for problems that are linear. 
+or it fails in a transparent way*. This is the main reason why Hermes employs 
+the Newton's method even for problems that are linear. 
 
 Another reason is that a consistent approach to linear and nonlinear problems allows 
-Hermes' users to first formulate and solve a simplified linear version of the problem, 
-and then extend it to a nonlinear version effortlessly. Let's explain how this works.
+the users to first formulate and solve a simplified linear version of the problem, 
+and then upgrade it to a full nonlinear version effortlessly. Let's explain how 
+this works.
 
 Consistent approach to linear and nonlinear problems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -100,8 +101,8 @@ are constants. Then the problem is linear and the weak form for the Jacobian is
     + \int_{\Omega_{cu}} \lambda_{cu} \nabla u \cdot \nabla v \, \mbox{d}x \mbox{d}y,
 
 where $u$ stands for a basis function and $v$ for a test function.
-The reader does not have to worry about the word "Jacobian" since for linear 
-problems this is the same as "stiffness matrix". Simply forget from the left-hand side
+The reader does not have to worry about the word "Jacobian" here since for linear 
+problems it is the same as "stiffness matrix". Simply forget from the left-hand side
 of the weak formulation :eq:`poissonweak01b` all expressions that do not contain $u$. 
 A detailed explanation of the Newton's method for nonlinear problems will be provided 
 at the beginning of the tutorial part P02.
@@ -183,19 +184,19 @@ For example, to replace the constants with cubic splines, one just needs to do
                              new Hermes1DFunction<double>(LAMBDA_CU), 
                              new Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
 
-This is possible since CubicSpline is a descendant of Hermes1DFunction. Analogously, the 
+This is possible since CubicSpline is a descendant of Hermes1DFunction<Scalar>. Analogously, the 
 constant VOLUME_HEAT_SRC can be replaced with an arbitrary function of $x$ and $y$ by
-subclassing Hermes2DFunction::
+subclassing Hermes2DFunction<Scalar>::
 
-    class CustomNonConstSrc : public Hermes2DFunction
+    class CustomNonConstSrc<Scalar> : public Hermes2DFunction<Scalar>
     ...
 
-If cubic splines are not enough, then one can subclass Hermes1DFunction to define 
+If cubic splines are not enough, then one can subclass Hermes1DFunction<Scalar> to define 
 arbitrary nonlinearities::
 
-    class CustomLanbdaAl : public Hermes1DFunction
+    class CustomLanbdaAl<Scalar> : public Hermes1DFunction<Scalar>
     ...
-    class CustomLanbdaCu : public Hermes1DFunction
+    class CustomLanbdaCu<Scalar> : public Hermes1DFunction<Scalar>
     ...
 
 In the rest of part P01 we will focus on linear problems.
@@ -203,9 +204,7 @@ In the rest of part P01 we will focus on linear problems.
 Default Jacobian for the diffusion operator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Hermes provides default weak forms for many common PDE operators. The above 
-default weak forms DefaultJacobianDiffusion, DefaultResidualDiffusion and 
-DefaultVectorFormVol can be found in the file "weakforms_h1.h". 
+Hermes provides default weak forms for many common PDE operators. 
 To begin with, the line 
 
 ::
@@ -258,7 +257,7 @@ or axisymmetrix with respect to the y-axis (HERMES_AXISYM_Y).
 The form can be linked to multiple material markers::
 
     DefaultJacobianDiffusion(int i, int j, Hermes::vector<std::string> areas,
-                             Hermes1DFunction* coeff = HERMES_ONE,
+                             Hermes1DFunction<Scalar>* coeff = HERMES_ONE,
                              SymFlag sym = HERMES_NONSYM, GeomType gt = HERMES_PLANAR);
 
 Here, Hermes::vector is just a std::vector equipped with additional constructors for
@@ -300,25 +299,48 @@ It adds to the residual weak form the integral
 
 and thus it completes :eq:`poissonweak01b`.
 
+Selecting matrix solver
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before the main function, one needs to choose a matrix solver::
+
+    MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
+
+Besides UMFPACK, one can use SOLVER_AMESOS, SOLVER_MUMPS, SOLVER_PETSC, and
+SOLVER_SUPERLU. Matrix-free SOLVER_NOX for nonlinear problems 
+will be discussed later. 
+
 Loading the mesh
 ~~~~~~~~~~~~~~~~
 
-The main.cpp file typically begins with loading the mesh::
+The main.cpp file begins with loading the mesh. In many examples including this one, 
+the mesh is available both in the native Hermes format and the Hermes XML format::
 
     // Load the mesh.
     Mesh mesh;
-    H2DReader mloader;
-    mloader.load("domain.mesh", &mesh);
+    if (USE_XML_FORMAT == true)
+    {
+      MeshReaderH2DXML mloader;  
+      info("Reading mesh in XML format.");
+      mloader.load("domain.xml", &mesh);
+    }
+    else 
+    {
+      MeshReaderH2D mloader;
+      info("Reading mesh in original format.");
+      mloader.load("domain.mesh", &mesh);
+    }
 
 Performing initial mesh refinements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A number of initial refinement operations can be done as 
-explained above. In this case we just perform optional 
-uniform mesh refinements::
+explained in example P01/01-mesh. In this case we just 
+perform optional uniform mesh refinements::
 
     // Perform initial mesh refinements (optional).
-    for (int i=0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
+    for (int i = 0; i < INIT_REF_NUM; i++) 
+      mesh.refine_all_elements();
 
 Initializing the weak formulation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -350,14 +372,15 @@ Constant Dirichlet boundary conditions are assigned to the boundary markers
     .
 
     // Initialize essential boundary conditions.
-    DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"), FIXED_BDY_TEMP);
+    DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"), 
+                                                 FIXED_BDY_TEMP);
     EssentialBCs<double> bcs(&bc_essential);
 
 .. latexcode::
     .
 
     // Initialize essential boundary conditions.
-    DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner",
+    DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner", 
                                                  "Outer", "Left"), FIXED_BDY_TEMP);
     EssentialBCs<double> bcs(&bc_essential);
 
@@ -365,7 +388,7 @@ Do not worry about the complicated-looking Hermes::vector, this is just std::vec
 with a few extra constructors. It is used to avoid using variable-length arrays.
 
 The treatment of nonzero Dirichlet and other boundary conditions 
-will be explained in more detail, and illustrated on examples, in 
+will be explained in more detail in 
 the following examples. For the moment, let's proceed to the finite 
 element space. 
 
@@ -393,62 +416,58 @@ class::
     // Initialize the FE problem.
     DiscreteProblem<double> dp(&wf, &space);
 
-Initializing matrix solver
+Initializing Newton solver
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Next one needs to choose a matrix solver::
+The Newton's method needs an initial guess. In this case we use
+the zero vector::
 
-    MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
+    // Initial coefficient vector for the Newton's method.  
+    double* coeff_vec = new double[ndof];
+    memset(coeff_vec, 0, ndof*sizeof(double));
 
-Besides UMFPACK, one can use SOLVER_AMESOS, SOLVER_MUMPS, SOLVER_PETSC, and
-SOLVER_SUPERLU (and matrix-free SOLVER_NOX for nonlinear problems - to be discussed
-later). 
+The Newton solver class is initialized using a pointer to DiscreteProblem and 
+the matrix solver::
 
-After that one needs to create instances of a matrix, vector, and matrix solver 
-as follows:: 
-
-    // Set up the solver, matrix, and rhs according to the solver selection.
-    SparseMatrix* matrix = create_matrix(matrix_solver);
-    Vector* rhs = create_vector(matrix_solver);
-    Solver* solver = create_linear_solver(matrix_solver, matrix, rhs);
+    // Initialize Newton solver.
+    NewtonSolver<double> newton(&dp, matrix_solver);
 
 Solving the discrete problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Before solving the discrete problem, one has to create a coefficient 
-vector:: 
-
-    // Initial coefficient vector for the Newton's method.  
-    scalar* coeff_vec = new scalar[ndof];
-    memset(coeff_vec, 0, ndof*sizeof(scalar));
-
-The discrete problem is solved via the Newton's method:
-
-.. sourcecode::
-    .
+Next, the Newton's method is employed in an exception-safe way::
 
     // Perform Newton's iteration.
-    if (!hermes2d.solve_newton(coeff_vec, &dp, solver, matrix, rhs)) error("Newton's iteration failed.");
+    try
+    {
+      newton.solve(coeff_vec);
+    }
+    catch(Hermes::Exceptions::Exception e)
+    {
+      e.printMsg();
+      error("Newton's iteration failed.");
+    }
 
-.. latexcode::
-    .
+The method solve() comes in several versions::
 
-    // Perform Newton's iteration.
-    if (!hermes2d.solve_newton(coeff_vec, &dp, solver, matrix, rhs)) 
-        error("Newton's iteration failed.");
+    virtual void solve(Scalar* coeff_vec);
+    virtual void solve(Scalar* coeff_vec, bool residual_as_function);
+    void solve(Scalar* coeff_vec, double newton_tol, int newton_max_iter, bool residual_as_function = false);
+    void solve_keep_jacobian(Scalar* coeff_vec, bool residual_as_function = false);
+    void solve_keep_jacobian(Scalar* coeff_vec, double newton_tol, int newton_max_iter, bool residual_as_function = false);
 
-This function comes with a number of optional parameters, see the file "hermes2d/src/h2d_common.h"
-for more details.
+For their detailed description, as well as for additional useful methods of the NewtonSolver class,
+we refer to Doxygen documentation.
 
 Translating the coefficient vector into a solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The coefficient vector can be converted into a piecewise-polynomial 
-Solution via the function Solution::vector_to_solution()::
+Solution<Scalar> via the function Solution<Scalar>::vector_to_solution()::
 
     // Translate the resulting coefficient vector into a Solution.
     Solution<double> sln;
-    Solution<double>::vector_to_solution(coeff_vec, &space, &sln);
+    Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);
 
 Saving solution in VTK format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -458,13 +477,23 @@ using `Paraview <http://www.paraview.org/>`_. To do this, one uses the
 Linearizer class that has the ability to approximate adaptively a higher-order
 polynomial solution using linear triangles::
 
-    // Output solution in VTK format.
-    Linearizer lin;
-    bool mode_3D = true;
-    lin.save_solution_vtk(&sln, "sln.vtk", "Temperature", mode_3D);
-    info("Solution in VTK format saved to file %s.", "sln.vtk");
+    // VTK output.
+    if (VTK_VISUALIZATION) 
+    {
+      // Output solution in VTK format.
+      Linearizer lin;
+      bool mode_3D = true;
+      lin.save_solution_vtk(&sln, "sln.vtk", "Temperature", mode_3D);
+      info("Solution in VTK format saved to file %s.", "sln.vtk");
 
-The function save_solution_vtk() can be found in "hermes2d/src/linearizer/".
+      // Output mesh and element orders in VTK format.
+      Orderizer ord;
+      ord.save_orders_vtk(&space, "ord.vtk");
+      info("Element orders in VTK format saved to file %s.", "ord.vtk");
+    }
+
+The full header of the method save_solution_vtk() can be found in 
+Doxygen documentation.
 Only the first three arguments are mandatory and there is a number 
 of optional parameters whose meaning is as follows:
 
@@ -500,7 +529,7 @@ The solution can also be visualized via the ScalarView class::
 
     // Visualize the solution.
     ScalarView view("Solution", new WinGeom(0, 0, 440, 350));
-    view.show(&sln);
+    view.show(&sln, HERMES_EPS_HIGH);
     View::wait();
 
 Hermes' built-in OpenGL visualization looks as follows:
@@ -521,7 +550,7 @@ Hermes uses to approximate higher-order polynomial solutions with linear triangl
 In fact, the EPS value is a stopping criterion for automatic adaptivity that Hermes 
 uses to keep the number of the linear triangles as low as possible. 
 
-**IMPORTANT**: If you notice in the image white points or even discontinuities 
+If you notice in the image white points or even discontinuities 
 where the approximation is continuous, try to move from HERMES_EPS_NORMAL to 
 HERMES_EPS_HIGH. If the interval of solution values is very small compared to 
 the solution magnitude, such as if the solution values lie in the interval 
@@ -538,7 +567,7 @@ function values or partial derivatives should be displayed. For example,
 HERMES_FN_VAL_0 stands for the function value of solution component 0
 (first solution component which in this case is the VonMises stress).
 HERMES_FN_VAL_1 would mean the function value of the second solution component
-(relevant for vector-valued $Hcurl$ or $Hdiv$ elements only), 
+(relevant for vector-valued Hcurl or Hdiv elements only), 
 HERMES_FN_DX_0 means the x-derivative of the first solution component, etc.
 
 
