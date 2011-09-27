@@ -59,107 +59,13 @@ for the diffusion operator
 
     -\mbox{div}(\lambda \, \mbox{grad}\, u).
 
-These forms have the following constructors::
-
-    DefaultJacobianDiffusion(int i = 0, int j = 0, std::string area = HERMES_ANY, 
-                             HermesFunction* coeff = HERMES_ONE,
-                             SymFlag sym = HERMES_NONSYM, GeomType gt = HERMES_PLANAR);
-
-    DefaultJacobianDiffusion(int i, int j, Hermes::vector<std::string> areas,
-                             HermesFunction* coeff = HERMES_ONE,
-                             SymFlag sym = HERMES_NONSYM, GeomType gt = HERMES_PLANAR);
-
-and
-
-::
-
-    DefaultResidualDiffusion(int i = 0, std::string area = HERMES_ANY,
-                             HermesFunction* coeff = HERMES_ONE,
-                             GeomType gt = HERMES_PLANAR);
-
-    DefaultResidualDiffusion(int i, Hermes::vector<std::string> areas,
-                             HermesFunction* coeff = HERMES_ONE,
-                             GeomType gt = HERMES_PLANAR);
+For their headers we refer to the Doxygen documentation.
 
 Custom weak forms
 ~~~~~~~~~~~~~~~~~
 
-The weak formulation is custom because of the Newton boundary condition. 
-The class header reads
-
-.. sourcecode::
-    .
-
-    class CustomWeakFormPoissonNewton : public WeakForm
-    {
-    public:
-      CustomWeakFormPoissonNewton(double lambda, double alpha, double T0, std::string bdy_heat_flux);
-    };
-
-.. latexcode::
-    .
-
-    class CustomWeakFormPoissonNewton : public WeakForm
-    {
-    public:
-      CustomWeakFormPoissonNewton(double lambda, double alpha, double T0,
-                                  std::string bdy_heat_flux);
-    };
-
-
-and the constructor has the form
-
-.. sourcecode::
-    .
-
-    CustomWeakFormPoissonNewton::CustomWeakFormPoissonNewton(double lambda, double alpha, double T0, 
-							     std::string bdy_heat_flux) : WeakForm(1)
-    {
-      // Jacobian form - volumetric.
-      add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, HERMES_ANY, new HermesFunction(lambda),
-								HERMES_SYM, HERMES_AXISYM_Y));
-
-      // Jacobian form - surface.
-      add_matrix_form_surf(new WeakFormsH1::DefaultMatrixFormSurf(0, 0, bdy_heat_flux, new HermesFunction(alpha),
-								  HERMES_AXISYM_Y));
-
-      // Residual forms - volumetric.
-      add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, HERMES_ANY, new HermesFunction(lambda),
-								HERMES_AXISYM_Y));
-
-      // Residual form - surface.
-      add_vector_form_surf(new WeakFormsH1::DefaultResidualSurf(0, bdy_heat_flux, new HermesFunction(alpha),
-								HERMES_AXISYM_Y));
-      add_vector_form_surf(new WeakFormsH1::DefaultVectorFormSurf(0, bdy_heat_flux, new HermesFunction(-alpha * T0),
-                                                                  HERMES_AXISYM_Y));
-    };
-
-.. latexcode::
-    .
-
-    CustomWeakFormPoissonNewton::CustomWeakFormPoissonNewton(double lambda, double alpha,
-                                 double T0, std::string bdy_heat_flux) : WeakForm(1)
-    {
-      // Jacobian form - volumetric.
-      add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, HERMES_ANY,
-                                       new HermesFunction(lambda), HERMES_SYM, 
-                                       HERMES_AXISYM_Y));
-
-      // Jacobian form - surface.
-      add_matrix_form_surf(new WeakFormsH1::DefaultMatrixFormSurf(0, 0, bdy_heat_flux,
-                                            new HermesFunction(alpha), HERMES_AXISYM_Y));
-
-      // Residual forms - volumetric.
-      add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, HERMES_ANY,
-                                       new HermesFunction(lambda), HERMES_AXISYM_Y));
-
-      // Residual form - surface.
-      add_vector_form_surf(new WeakFormsH1::DefaultResidualSurf(0, bdy_heat_flux,
-                                            new HermesFunction(alpha), HERMES_AXISYM_Y));
-      add_vector_form_surf(new WeakFormsH1::DefaultVectorFormSurf(0, bdy_heat_flux,
-                                            new HermesFunction(-alpha * T0),
-                                            HERMES_AXISYM_Y));
-    };
+The weak formulation is custom because of the Newton boundary condition
+(see definitions.h and definitions.cpp).
 
 Sample results
 ~~~~~~~~~~~~~~
