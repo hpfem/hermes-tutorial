@@ -14,7 +14,7 @@ heat sources (such as with a DC current). The temperature equals
 to a prescribed constant on the boundary. We will learn how to:
 
  * Define a weak formulation.
- * Initialize matrix solver.
+ * Select a matrix solver.
  * Solve the discrete problem.
  * Output the solution and element orders in VTK format 
    (to be visualized, e.g., using Paraview).

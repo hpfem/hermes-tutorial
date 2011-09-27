@@ -11,7 +11,7 @@
 //   - perform initial refinements,
 //   - create a H1 space over the mesh,
 //   - define weak formulation,
-//   - initialize matrix solver,
+//   - select a matrix solver,
 //   - assemble and solve the matrix system,
 //   - output the solution and element orders in VTK format 
 //     (to be visualized, e.g., using Paraview),

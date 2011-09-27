@@ -8,13 +8,9 @@ Hermes Tutorial
 
 Thank you for your interest in Hermes!
 
-Hermes is a C++ library for rapid development of adaptive *hp*-FEM and *hp*-DG solvers,
-with emphasis on nonlinear, time-dependent, multi-physics problems.
-
 This document contains a beginner's tutorial. It will walk you in small steps through the solution
 of linear, nonlinear, and time-dependent problems from various engineering and scientific areas, 
 using higher-order elements and adaptivity algorithms, and solving multiphysics coupled problems. 
-Section 2 shows how to solve 1D problems.
 
 The document is under continuous development. If you find bugs, typos, dead links 
 and such, please report them to the 
@@ -40,7 +36,7 @@ Solving 1D Problems
 
 Selected 1D problems are part of the repository "hermes-examples". To clone it, type::
 
-    git clone http://git.hpfem.org/git/hermes-examples.git
+    git clone git://github.com/hpfem/hermes-examples.git
 
 The repository contains a folder doc/ with Sphinx documentation. To build the docs,
 type "make html" in that directory. 
