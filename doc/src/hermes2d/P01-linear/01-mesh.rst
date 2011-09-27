@@ -247,39 +247,12 @@ To load an ExodusII mesh file, one has to use the ``MeshReaderExodusII`` class::
 
 Mesh in the ExodusII format is used, e.g., in example "neutronics/iron-water".
 
-Geometry rescaling
-~~~~~~~~~~~~~~~~~~
+Optional geometry rescaling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In some situations, such as when using dimensionless form of the governing equations, 
+In some situations, such as when using a dimensionless form of the governing equations, 
 it may be useful to rescale the domain in the x- and y-directions. This is done 
-as follows:
-
-.. sourcecode::
-    .
-
-    // Optional rescaling of mesh (all vertex x- and y-coordinates are 
-    // divided by x_ref and y_ref, respectively). Mesh with curved edges 
-    // cannot be rescaled. So to try this feature, comment out the "curves" 
-    // section in the mesh file.
-    double x_ref = 2.0, y_ref = 3.0;
-    if(!mesh.rescale(x_ref, y_ref)) info("Mesh was not rescaled.");
-    else {
-      info("Mesh scaled by the factors of %g and %g in the x- and y- direction, respectively.", x_ref, y_ref);
-    }
-
-.. latexcode::
-    .
-
-    // Optional rescaling of mesh (all vertex x- and y-coordinates are 
-    // divided by x_ref and y_ref, respectively). Mesh with curved edges 
-    // cannot be rescaled. So to try this feature, comment out the "curves" 
-    // section in the mesh file.
-    double x_ref = 2.0, y_ref = 3.0;
-    if(!mesh.rescale(x_ref, y_ref)) info("Mesh was not rescaled.");
-    else (
-      info("Mesh scaled by the factors of %g and %g in the x- and y- direction, 
-      respectively.", x_ref, y_ref);
-    )
+using the method Mesh::rescale(). See the Doxygen documentation for more details.
 
 Manual mesh refinements
 ~~~~~~~~~~~~~~~~~~~~~~~
