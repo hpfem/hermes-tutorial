@@ -47,88 +47,76 @@ a surface matrix form
 
     - \int_{\Gamma_{Outer}} \alpha u v   \;\mbox{dS}
 
-Default surface matrix form
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using a default surface matrix form
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This integral can be added using the default $H^1$ form DefaultMatrixFormSurf that 
-has the constructors
-
-::
-
-      DefaultMatrixFormSurf(int i, int j, std::string area = HERMES_ANY,
-                            HermesFunction* coeff = HERMES_ONE,
-                            GeomType gt = HERMES_PLANAR);
-
-      DefaultMatrixFormSurf(int i, int j, Hermes::vector<std::string> areas,
-                            HermesFunction* coeff = HERMES_ONE,
-                            GeomType gt = HERMES_PLANAR);
-
+This integral can be added using the default $H^1$ form DefaultMatrixFormSurf.
 The header of the custom form CustomWeakFormPoissonNewton is defined in 
-`definitions.h <http://git.hpfem.org/hermes.git/blob/HEAD:/hermes2d/tutorial/P01-linear/06-bc-newton/definitions.h>`_::
+definitions.h::
 
-    class CustomWeakFormPoissonNewton : public WeakForm
+    class CustomWeakFormPoissonNewton : public WeakForm<double>
     {
     public:
-      CustomWeakFormPoissonNewton(std::string mat_al, HermesFunction* lambda_al,
-				  std::string mat_cu, HermesFunction* lambda_cu,
-				  HermesFunction* vol_src_term, std::string bdy_heat_flux,
+      CustomWeakFormPoissonNewton(std::string mat_al, Hermes1DFunction<double>* lambda_al,
+				  std::string mat_cu, Hermes1DFunction<double>* lambda_cu,
+				  Hermes2DFunction<double>* vol_src_term, std::string bdy_heat_flux,
 				  double alpha, double t_exterior);
     };
 
-and its constructor in `definitions.cpp <http://git.hpfem.org/hermes.git/blob/HEAD:/hermes2d/tutorial/P01-linear/06-bc-newton/definitions.cpp>`_:
+and its constructor in definitions.cpp::
 
 .. sourcecode::
     .
 
-    CustomWeakFormPoissonNewton::CustomWeakFormPoissonNewton(std::string mat_al, HermesFunction* lambda_al,
-							     std::string mat_cu, HermesFunction* lambda_cu,
-							     HermesFunction* vol_src_term, std::string bdy_heat_flux,
+    CustomWeakFormPoissonNewton::CustomWeakFormPoissonNewton(std::string mat_al, Hermes1DFunction<double>* lambda_al,
+							     std::string mat_cu, Hermes1DFunction<double>* lambda_cu,
+							     Hermes2DFunction<double>* vol_src_term, std::string bdy_heat_flux,
 							     double alpha, double t_exterior) : WeakForm(1)
     {
       // Jacobian forms - volumetric.
-      add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, mat_al, lambda_al));
-      add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, mat_cu, lambda_cu));
+      add_matrix_form(new DefaultJacobianDiffusion<double>(0, 0, mat_al, lambda_al));
+      add_matrix_form(new DefaultJacobianDiffusion<double>(0, 0, mat_cu, lambda_cu));
 
       // Jacobian forms - surface.
-      add_matrix_form_surf(new WeakFormsH1::DefaultMatrixFormSurf(0, 0, bdy_heat_flux, new HermesFunction(alpha)));
+      add_matrix_form_surf(new DefaultMatrixFormSurf<double>(0, 0, bdy_heat_flux, new Hermes2DFunction<double>(alpha)));
 
       // Residual forms - volumetric.
-      add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, mat_al, lambda_al));
-      add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, mat_cu, lambda_cu));
-      add_vector_form(new WeakFormsH1::DefaultVectorFormVol(0, HERMES_ANY, vol_src_term));
+      add_vector_form(new DefaultResidualDiffusion<double>(0, mat_al, lambda_al));
+      add_vector_form(new DefaultResidualDiffusion<double>(0, mat_cu, lambda_cu));
+      add_vector_form(new DefaultVectorFormVol<double>(0, HERMES_ANY, vol_src_term));
 
       // Residual forms - surface.
-      add_vector_form_surf(new WeakFormsH1::DefaultResidualSurf(0, bdy_heat_flux, new HermesFunction(alpha)));
-      add_vector_form_surf(new WeakFormsH1::DefaultVectorFormSurf(0, bdy_heat_flux, new HermesFunction(-alpha * t_exterior)));
+      add_vector_form_surf(new DefaultResidualSurf<double>(0, bdy_heat_flux, new Hermes2DFunction<double>(alpha)));
+      add_vector_form_surf(new DefaultVectorFormSurf<double>(0, bdy_heat_flux, new Hermes2DFunction<double>(-alpha * t_exterior)));
     };
 
 .. latexcode::
     .
 
-    CustomWeakFormPoissonNewton::CustomWeakFormPoissonNewton(std::string mat_al,
-                                 HermesFunction* lambda_al, std::string mat_cu,
-                                 HermesFunction* lambda_cu, HermesFunction* vol_src_term,
-                                 std::string bdy_heat_flux, double alpha, double t_exterior)
-                                 : WeakForm(1)
+    CustomWeakFormPoissonNewton::CustomWeakFormPoissonNewton(
+                                 std::string mat_al, Hermes1DFunction<double>* lambda_al,
+				 std::string mat_cu, Hermes1DFunction<double>* lambda_cu,
+				 Hermes2DFunction<double>* vol_src_term, std::string bdy_heat_flux,
+				 double alpha, double t_exterior) : WeakForm(1)
     {
       // Jacobian forms - volumetric.
-      add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, mat_al, lambda_al));
-      add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, mat_cu, lambda_cu));
+      add_matrix_form(new DefaultJacobianDiffusion<double>(0, 0, mat_al, lambda_al));
+      add_matrix_form(new DefaultJacobianDiffusion<double>(0, 0, mat_cu, lambda_cu));
 
       // Jacobian forms - surface.
-      add_matrix_form_surf(new WeakFormsH1::DefaultMatrixFormSurf(0, 0, bdy_heat_flux,
-                                            new HermesFunction(alpha)));
+      add_matrix_form_surf(new DefaultMatrixFormSurf<double>(0, 0, bdy_heat_flux, 
+                           new Hermes2DFunction<double>(alpha)));
 
       // Residual forms - volumetric.
-      add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, mat_al, lambda_al));
-      add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, mat_cu, lambda_cu));
-      add_vector_form(new WeakFormsH1::DefaultVectorFormVol(0, HERMES_ANY, vol_src_term));
+      add_vector_form(new DefaultResidualDiffusion<double>(0, mat_al, lambda_al));
+      add_vector_form(new DefaultResidualDiffusion<double>(0, mat_cu, lambda_cu));
+      add_vector_form(new DefaultVectorFormVol<double>(0, HERMES_ANY, vol_src_term));
 
       // Residual forms - surface.
-      add_vector_form_surf(new WeakFormsH1::DefaultResidualSurf(0, bdy_heat_flux, 
-                                            new HermesFunction(alpha)));
-      add_vector_form_surf(new WeakFormsH1::DefaultVectorFormSurf(0, bdy_heat_flux, 
-                                            new HermesFunction(-alpha * t_exterior)));
+      add_vector_form_surf(new DefaultResidualSurf<double>(0, bdy_heat_flux, 
+                                 new Hermes2DFunction<double>(alpha)));
+      add_vector_form_surf(new DefaultVectorFormSurf<double>(0, bdy_heat_flux, 
+                                 new Hermes2DFunction<double>(-alpha * t_exterior)));
     };
 
 Sample results

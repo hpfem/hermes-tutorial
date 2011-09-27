@@ -1,7 +1,7 @@
-Nonzero Dirichlet BC (04-bc-dirichlet)
---------------------------------------
+Nonconstant Dirichlet BC (04-bc-dirichlet)
+------------------------------------------
 
-We will keep the equation from example "03-poisson",
+Let us keep the equation from the previous example P01/03-poisson,
 
 .. math::
     :label: poisson40
@@ -18,61 +18,61 @@ where $A$, $B$ and $C$ are real constants.
 Subclassing EssentialBoundaryCondition
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is done by defining a descendant of the EssentialBoundaryCondition class
-(see `definitions.h <http://git.hpfem.org/hermes.git/blob/HEAD:/hermes2d/tutorial/P01-linear/04-bc-dirichlet/definitions.h>`_):
+This is done by defining a descendant of the EssentialBoundaryCondition class:
 
 .. sourcecode::
     .
 
-    class CustomDirichletCondition : public EssentialBoundaryCondition 
+    class CustomDirichletCondition : public EssentialBoundaryCondition<double>
     {
     public:
       CustomDirichletCondition(Hermes::vector<std::string> markers, double A, double B, double C);
 
-      virtual EssentialBoundaryCondition::EssentialBCValueType get_value_type() const; 
+      virtual EssentialBoundaryCondition<double>::EssentialBCValueType get_value_type() const; 
 
-      virtual scalar value(double x, double y, double n_x, double n_y, double t_x, double t_y) const; 
+      virtual double value(double x, double y, double n_x, double n_y, double t_x, double t_y) const; 
 
       protected:
-        double A, B, C;
+	double A, B, C;
     };
 
 .. latexcode::
     .
 
-    class CustomDirichletCondition : public EssentialBoundaryCondition 
+    class CustomDirichletCondition : public EssentialBoundaryCondition<double>
     {
     public:
-      CustomDirichletCondition(Hermes::vector<std::string> markers, double A, double B,
-                               double C);
+      CustomDirichletCondition(Hermes::vector<std::string> markers, double A, 
+                               double B, double C);
 
-      virtual EssentialBoundaryCondition::EssentialBCValueType get_value_type() const; 
+      virtual EssentialBoundaryCondition<double>::EssentialBCValueType get_value_type() 
+                               const; 
 
-      virtual scalar value(double x, double y, double n_x, double n_y, double t_x, 
+      virtual double value(double x, double y, double n_x, double n_y, double t_x, 
                            double t_y) const; 
 
       protected:
-        double A, B, C;
+	double A, B, C;
     };
 
-The methods are defined in `definitions.cpp <http://git.hpfem.org/hermes.git/blob/HEAD:/hermes2d/tutorial/P01-linear/04-bc-dirichlet/definitions.cpp>`_ as follows:
+The methods are defined in the file definitions.cpp as follows:
 
 .. sourcecode::
     .
 
     CustomDirichletCondition::CustomDirichletCondition(Hermes::vector<std::string> markers, 
-                                                               double A, double B, double C)
-      : EssentialBoundaryCondition(markers), A(A), B(B), C(C) 
+						       double A, double B, double C)
+      : EssentialBoundaryCondition<double>(markers), A(A), B(B), C(C) 
     { 
     }
 
-    EssentialBoundaryCondition::EssentialBCValueType CustomDirichletCondition::get_value_type() const
+    EssentialBoundaryCondition<double>::EssentialBCValueType CustomDirichletCondition::get_value_type() const
     { 
-      return EssentialBoundaryCondition::BC_FUNCTION; 
+      return EssentialBoundaryCondition<double>::BC_FUNCTION; 
     }
 
-    scalar CustomDirichletCondition::value(double x, double y, double n_x, double n_y, 
-                                           double t_x, double t_y) const 
+    double CustomDirichletCondition::value(double x, double y, double n_x, double n_y, 
+					   double t_x, double t_y) const 
     {
       return A*x + B*y + C;
     }
@@ -80,45 +80,44 @@ The methods are defined in `definitions.cpp <http://git.hpfem.org/hermes.git/blo
 .. latexcode::
     .
 
-    CustomDirichletCondition::CustomDirichletCondition(Hermes::vector<std::string> 
-                                                       markers, double A, double B, 
-                                                       double C)
-      : EssentialBoundaryCondition(markers), A(A), B(B), C(C) 
+    CustomDirichletCondition::CustomDirichletCondition(Hermes::vector<std::string> markers, 
+						       double A, double B, double C)
+      : EssentialBoundaryCondition<double>(markers), A(A), B(B), C(C) 
     { 
     }
 
-    EssentialBoundaryCondition::EssentialBCValueType 
-                                CustomDirichletCondition::get_value_type()
-    const
+    EssentialBoundaryCondition<double>::EssentialBCValueType CustomDirichletCondition::
+                                           get_value_type() const
     { 
-      return EssentialBoundaryCondition::BC_FUNCTION; 
+      return EssentialBoundaryCondition<double>::BC_FUNCTION; 
     }
 
-    scalar CustomDirichletCondition::value(double x, double y, double n_x, double n_y, 
-                                           double t_x, double t_y) const 
+    double CustomDirichletCondition::value(double x, double y, double n_x, double n_y, 
+					   double t_x, double t_y) const 
     {
       return A*x + B*y + C;
     }
 
 
-The custom boundary condition class is used in `main.cpp <http://git.hpfem.org/hermes.git/blob/HEAD:/hermes2d/tutorial/P01-linear/04-bc-dirichlet/main.cpp>`_ as follows:
+
+The custom boundary condition class is used as follows:
 
 .. sourcecode::
     .
 
     // Initialize boundary conditions.
     CustomDirichletCondition bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"),
-                                                  BDY_A_PARAM, BDY_B_PARAM, BDY_C_PARAM);
-    EssentialBCs bcs(&bc_essential);
+					  BDY_A_PARAM, BDY_B_PARAM, BDY_C_PARAM);
+    EssentialBCs<double> bcs(&bc_essential);
 
 .. latexcode::
     .
 
     // Initialize boundary conditions.
-    CustomDirichletCondition bc_essential(Hermes::vector<std::string>("Bottom", "Inner",
-                                          "Outer", "Left"), BDY_A_PARAM, BDY_B_PARAM,
+    CustomDirichletCondition bc_essential(Hermes::vector<std::string>("Bottom", "Inner", 
+                                          "Outer", "Left"), BDY_A_PARAM, BDY_B_PARAM, 
                                           BDY_C_PARAM);
-    EssentialBCs bcs(&bc_essential);
+    EssentialBCs<double> bcs(&bc_essential);
 
 Sample results
 ~~~~~~~~~~~~~~

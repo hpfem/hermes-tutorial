@@ -184,14 +184,14 @@ For example, to replace the constants with cubic splines, one just needs to do
                              new Hermes1DFunction<double>(LAMBDA_CU), 
                              new Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
 
-This is possible since CubicSpline is a descendant of Hermes1DFunction<Scalar>. Analogously, the 
+This is possible since CubicSpline is a descendant of Hermes1DFunction. Analogously, the 
 constant VOLUME_HEAT_SRC can be replaced with an arbitrary function of $x$ and $y$ by
-subclassing Hermes2DFunction<Scalar>::
+subclassing Hermes2DFunction::
 
     class CustomNonConstSrc<Scalar> : public Hermes2DFunction<Scalar>
     ...
 
-If cubic splines are not enough, then one can subclass Hermes1DFunction<Scalar> to define 
+If cubic splines are not enough, then one can subclass Hermes1DFunction to define 
 arbitrary nonlinearities::
 
     class CustomLanbdaAl<Scalar> : public Hermes1DFunction<Scalar>
@@ -463,7 +463,7 @@ Translating the coefficient vector into a solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The coefficient vector can be converted into a piecewise-polynomial 
-Solution<Scalar> via the function Solution<Scalar>::vector_to_solution()::
+Solution via the function Solution<Scalar>::vector_to_solution()::
 
     // Translate the resulting coefficient vector into a Solution.
     Solution<double> sln;

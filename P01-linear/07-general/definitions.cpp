@@ -35,9 +35,7 @@ double a_0(double x, double y)
 /* Custom non-constant Dirichlet condition */
 
 CustomEssentialBCNonConst::CustomEssentialBCNonConst(std::string marker) 
-      : EssentialBoundaryCondition<double>(marker) 
-{ 
-}
+      : EssentialBoundaryCondition<double>(marker) { }
 
 inline EssentialBoundaryCondition<double>::EssentialBCValueType CustomEssentialBCNonConst::get_value_type() const 
 { 
