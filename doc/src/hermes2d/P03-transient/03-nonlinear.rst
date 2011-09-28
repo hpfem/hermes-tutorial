@@ -45,22 +45,22 @@ After inverting the sign of the custom nonlinearity,
 
 ::
 
-    virtual scalar value(double u) const
+    double CustomNonlinearity::value(double u) const
     {
-      return -1 - pow(u, alpha);
+      return -1 - Hermes::pow(u, alpha);
     }
 
 the DefaultWeakFormPoisson can be used::
 
     // Initialize the weak formulation
     CustomNonlinearity lambda(alpha);
-    HermesFunction f(heat_src);
-    WeakFormsH1::DefaultWeakFormPoisson wf(HERMES_ANY, &lambda, &f);
+    Hermes2DFunction<double> f(heat_src);
+    DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &f);
 
 Time stepping loop
 ~~~~~~~~~~~~~~~~~~
 
-The time stepping loop is the same as in the previous example::
+The time stepping loop is analogous to the previous example::
 
     // Time stepping loop:
     double current_time = 0; int ts = 1;
@@ -69,14 +69,21 @@ The time stepping loop is the same as in the previous example::
       // Perform one Runge-Kutta time step according to the selected Butcher's table.
       info("Runge-Kutta time step (t = %g s, tau = %g s, stages: %d).",
 	   current_time, time_step, bt.get_size());
+      bool freeze_jacobian = false;
+      bool block_diagonal_jacobian = false;
       bool verbose = true;
-      Hermes::vector<Solution*> slns_time_prev;
+      double damping_coeff = 1.0;
+      double max_allowed_residual_norm = 1e10;
+      Hermes::vector<Solution<double>*> slns_time_prev;
       slns_time_prev.push_back(&sln_time_prev);
-      Hermes::vector<Solution*> slns_time_new;
+      Hermes::vector<Solution<double>*> slns_time_new;
       slns_time_new.push_back(&sln_time_new);
 
-      if (!runge_kutta.rk_time_step(current_time, time_step, slns_time_prev, slns_time_new, 
-                                    true, verbose, NEWTON_TOL, NEWTON_MAX_ITER)) {
+      if (!runge_kutta.rk_time_step_newton(current_time, time_step, slns_time_prev, slns_time_new, 
+					   freeze_jacobian, block_diagonal_jacobian, verbose, NEWTON_TOL, 
+					   NEWTON_MAX_ITER, damping_coeff,
+					   max_allowed_residual_norm)) 
+      {
 	error("Runge-Kutta time step failed, try to decrease time step size.");
       }
 

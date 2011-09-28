@@ -1,7 +1,9 @@
-Time-Integration with Arbitrary Runge-Kutta Methods (02-runge-kutta)
---------------------------------------------------------------------
+Using Arbitrary Runge-Kutta Methods (02-runge-kutta)
+----------------------------------------------------
 
-This example solves the same model problem as example "01-implicit-euler" but it shows how various Runge-Kutta methods can be used for time stepping. Let us begin with a brief introduction to the Runge-Kutta methods and Butcher's tables before we explain implementation details.
+This example solves the same model problem as the example P03/01-implicit-euler but it shows how arbitrary 
+Runge-Kutta methods can be used for time stepping. Let us begin with a brief introduction to the Runge-Kutta 
+methods and Butcher's tables before we explain implementation details.
 
 Runge-Kutta methods and Butcher's tables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -16,8 +18,7 @@ diagonally-implicit ones are especially desirable because of relatively low comp
 Butcher's tables currently available in Hermes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is a list of predefined Runge-Kutta methods that can be found 
-in the file `hermes_common/tables.cpp <http://git.hpfem.org/hermes.git/blob/HEAD:/hermes_common/tables.cpp>`_.
+Here is a list of predefined Runge-Kutta methods in Hermes.
 The names of the tables are self-explanatory. The last number is the order of the 
 method (a pair of orders for embedded ones). The second-to-last, if provided, is the number of stages.
 
@@ -86,12 +87,12 @@ The temporal derivative is skipped, and weak formulation is only done for the ri
      F(T) = - \int_{\Omega} \frac{\lambda}{c \varrho} \nabla T\cdot \nabla v
             + \int_{\Gamma_{air}} \frac{\alpha \lambda}{c \varrho} (T_{ext}(t) - T)v.
 
-This is different from example `01-implicit-euler <http://hpfem.org/hermes/doc/src/hermes2d/P03-timedep/01-implicit-euler.html>`_
-where the discretization of the time derivative term was hardwired in the weak formulation. 
+This approach is very different from the previous example P03/01-implicit-euler
+where the discretization of the time derivative term was hardwired into the weak formulation. 
 
 The function $F$ above is the stationary residual of the equation (i.e., the weak form of the right-hand side).
 Since the Runge-Kutta equations are solved using the Newton's method, the reader may want to look at 
-the `Newton's method section <http://hpfem.org/hermes/doc/src/hermes2d/P02-nonlinear/newton-intro.html>`_ before
+the Newton's method section in Part II before
 reading further. The weak form for the Jacobian matrix of the stationary residual is
 
 .. math::
@@ -103,204 +104,8 @@ Defining weak forms
 ~~~~~~~~~~~~~~~~~~~
 
 The weak forms are very similar to the previous example, except that the terms 
-corresponding to the time derivative are missing, and the rest has an opposite sign:
-
-.. sourcecode::
-    .
-
-    class CustomWeakFormHeatRK1 : public WeakForm
-    {
-    public:
-      CustomWeakFormHeatRK1(std::string bdy_air, double alpha, double lambda, double heatcap, double rho,
-			    double time_step, double* current_time_ptr, double temp_init, double t_final,
-			    Solution* prev_time_sln) : WeakForm(1)
-      {
-	/* Jacobian */
-	// Contribution of the time derivative term.
-	add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol(0, 0, HERMES_ANY, new HermesFunction(1.0 / time_step)));
-	// Contribution of the diffusion term.
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, HERMES_ANY, new HermesFunction(lambda / (rho * heatcap))));
-	// Contribution of the Newton boundary condition.
-	add_matrix_form_surf(new WeakFormsH1::DefaultMatrixFormSurf(0, 0, bdy_air, new HermesFunction(alpha / (rho * heatcap))));
-
-	/* Residual */
-	// Contribution of the time derivative term.
-	add_vector_form(new WeakFormsH1::DefaultResidualVol(0, HERMES_ANY, new HermesFunction(1.0 / time_step)));
-	// Contribution of the diffusion term.
-	add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, HERMES_ANY, new HermesFunction(lambda / (rho * heatcap))));
-	CustomVectorFormVol* vec_form_vol = new CustomVectorFormVol(0, time_step);
-	vec_form_vol->ext.push_back(prev_time_sln);
-	add_vector_form(vec_form_vol);
-	// Contribution of the Newton boundary condition.
-	add_vector_form_surf(new WeakFormsH1::DefaultResidualSurf(0, bdy_air, new HermesFunction(alpha / (rho * heatcap))));
-	// Contribution of the Newton boundary condition.
-	add_vector_form_surf(new CustomVectorFormSurf(0, bdy_air, alpha, rho, heatcap,
-			     current_time_ptr, temp_init, t_final));
-      };
-
-    private:
-      // This form is custom since it contains previous time-level solution.
-      class CustomVectorFormVol : public WeakForm::VectorFormVol
-      {
-      public:
-	CustomVectorFormVol(int i, double time_step)
-	  : WeakForm::VectorFormVol(i), time_step(time_step) 
-	{ 
-	}
-
-	virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const 
-	{
-	  Func<double>* temp_prev_time = ext->fn[0];
-	  return -int_u_v<double, scalar>(n, wt, temp_prev_time, v) / time_step;
-	}
-
-	virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const 
-	{
-	  Func<Ord>* temp_prev_time = ext->fn[0];
-	  return -int_u_v<Ord, Ord>(n, wt, temp_prev_time, v) / time_step;
-
-	}
-
-	double time_step;
-      };
-
-      // This form is custom since it contains time-dependent exterior temperature.
-      class CustomVectorFormSurf : public WeakForm::VectorFormSurf
-      {
-      public:
-	CustomVectorFormSurf(int i, std::string area, double alpha, double rho, double heatcap,
-				    double* current_time_ptr, double temp_init, double t_final)
-	  : WeakForm::VectorFormSurf(i, area), alpha(alpha), rho(rho), heatcap(heatcap), current_time_ptr(current_time_ptr),
-				     temp_init(temp_init), t_final(t_final) 
-	{ 
-	}
-
-	virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const 
-	{
-	    return -alpha / (rho * heatcap) * temp_ext(*current_time_ptr + time_step) * int_v<double>(n, wt, v);
-	}
-
-	virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const 
-	{
-	    return -alpha / (rho * heatcap) * temp_ext(*current_time_ptr + time_step) * int_v<Ord>(n, wt, v);
-	}
-
-	// Time-dependent exterior temperature.
-	template<typename Real>
-	Real temp_ext(Real t) const 
-	{
-	  return temp_init + 10. * sin(2*M_PI*t/t_final);
-	}
-
-	double alpha, rho, heatcap, *current_time_ptr, temp_init, t_final;
-      };
-    };
-
-.. latexcode::
-    .
-
-    class CustomWeakFormHeatRK1 : public WeakForm
-    {
-    public:
-      CustomWeakFormHeatRK1(std::string bdy_air, double alpha, double lambda, 
-                            double heatcap, double rho, double time_step, double* 
-                            current_time_ptr, double temp_init, double t_final, 
-                            Solution* prev_time_sln): WeakForm(1)
-      {
-	/* Jacobian */
-	// Contribution of the time derivative term.
-	add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol(0, 0, HERMES_ANY, 
-                                           new HermesFunction(1.0 / time_step)));
-	// Contribution of the diffusion term.
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, HERMES_ANY,
-                                      new HermesFunction(lambda / (rho * heatcap))));
-	// Contribution of the Newton boundary condition.
-	add_matrix_form_surf(new WeakFormsH1::DefaultMatrixFormSurf(0, 0, bdy_air,
-                                       new HermesFunction(alpha / (rho * heatcap))));
-
-	/* Residual */
-	// Contribution of the time derivative term.
-	add_vector_form(new WeakFormsH1::DefaultResidualVol(0, HERMES_ANY, 
-                                         new HermesFunction(1.0 / time_step)));
-	// Contribution of the diffusion term.
-	add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, HERMES_ANY, 
-                                      new HermesFunction(lambda / (rho * heatcap))));
-	CustomVectorFormVol* vec_form_vol = new CustomVectorFormVol(0, time_step);
-	vec_form_vol->ext.push_back(prev_time_sln);
-	add_vector_form(vec_form_vol);
-	// Contribution of the Newton boundary condition.
-	add_vector_form_surf(new WeakFormsH1::DefaultResidualSurf(0, bdy_air,
-                                        new HermesFunction(alpha / (rho * heatcap))));
-	// Contribution of the Newton boundary condition.
-	add_vector_form_surf(new CustomVectorFormSurf(0, bdy_air, alpha, rho, heatcap,
-			     current_time_ptr, temp_init, t_final));
-      };
-
-    private:
-      // This form is custom since it contains previous time-level solution.
-      class CustomVectorFormVol : public WeakForm::VectorFormVol
-      {
-      public:
-	CustomVectorFormVol(int i, double time_step)
-	  : WeakForm::VectorFormVol(i), time_step(time_step) 
-	{ 
-	}
-
-	virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> 
-                             *v, Geom<double> *e, ExtData<scalar> *ext) const 
-	{
-	  Func<double>* temp_prev_time = ext->fn[0];
-	  return -int_u_v<double, scalar>(n, wt, temp_prev_time, v) / time_step;
-	}
-
-	virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                        Geom<Ord> *e, ExtData<Ord> *ext) const 
-	{
-	  Func<Ord>* temp_prev_time = ext->fn[0];
-	  return -int_u_v<Ord, Ord>(n, wt, temp_prev_time, v) / time_step;
-
-	}
-
-	double time_step;
-      };
-
-      // This form is custom since it contains time-dependent exterior temperature.
-      class CustomVectorFormSurf : public WeakForm::VectorFormSurf
-      {
-      public:
-	CustomVectorFormSurf(int i, std::string area, double alpha, double rho, double 
-                             heatcap, double* current_time_ptr, double temp_init, 
-                             double t_final)
-	  : WeakForm::VectorFormSurf(i, area), alpha(alpha), rho(rho), heatcap(heatcap),
-                                     current_time_ptr(current_time_ptr),
-				     temp_init(temp_init), t_final(t_final) 
-	{ 
-	}
-
-	virtual scalar value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *v,
-                             Geom<double> *e, ExtData<scalar> *ext) const 
-	{
-	    return -alpha / (rho * heatcap) * temp_ext(*current_time_ptr + time_step) * 
-                   int_v<double>(n, wt, v);
-	}
-
-	virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
-                        Geom<Ord> *e, ExtData<Ord> *ext) const 
-	{
-	    return -alpha / (rho * heatcap) * temp_ext(*current_time_ptr + time_step) *
-                   int_v<Ord>(n, wt, v);
-	}
-
-	// Time-dependent exterior temperature.
-	template<typename Real>
-	Real temp_ext(Real t) const 
-	{
-	  return temp_init + 10. * sin(2*M_PI*t/t_final);
-	}
-
-	double alpha, rho, heatcap, *current_time_ptr, temp_init, t_final;
-      };
-    };
+corresponding to the time derivative are missing, and the rest has an opposite sign
+(see files definitions.h and definitions.cpp).
 
 Selecting a Butcher's table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -323,7 +128,7 @@ pointers to the discrete problem, Butcher's table, and
 matrix solver::
 
     // Initialize Runge-Kutta time stepping.
-    RungeKutta runge_kutta(&dp, &bt, matrix_solver);
+    RungeKutta<double> runge_kutta(&dp, &bt, matrix_solver);
 
 Time-stepping loop
 ~~~~~~~~~~~~~~~~~~
@@ -335,12 +140,18 @@ The time-stepping loop has the form::
     do 
     {
       // Perform one Runge-Kutta time step according to the selected Butcher's table.
-      info("Runge-Kutta time step (t = %g s, tau = %g s, stages: %d).", 
+      info("Runge-Kutta time step (t = %g s, time step = %g s, stages: %d).", 
 	   current_time, time_step, bt.get_size());
-      bool jacobian_changed = false;
+      bool freeze_jacobian = false;
+      bool block_diagonal_jacobian = false;
       bool verbose = true;
-      if (!runge_kutta.rk_time_step(current_time, time_step, sln_time_prev, 
-				    sln_time_new, jacobian_changed, verbose)) {
+      double damping_coeff = 1.0;
+      double max_allowed_residual_norm = 1e10;
+      if (!runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, 
+				    &sln_time_new, freeze_jacobian, block_diagonal_jacobian, verbose,
+				    NEWTON_TOL, NEWTON_MAX_ITER, damping_coeff,
+				    max_allowed_residual_norm)) 
+      {
 	error("Runge-Kutta time step failed, try to decrease time step size.");
       }
 
@@ -348,14 +159,13 @@ The time-stepping loop has the form::
       char title[100];
       sprintf(title, "Time %3.2f s", current_time);
       Tview.set_title(title);
-      Tview.show(sln_time_new);
+      Tview.show(&sln_time_new);
 
       // Copy solution for the new time step.
-      sln_time_prev->copy(sln_time_new);
+      sln_time_prev.copy(&sln_time_new);
 
       // Increase current time and time step counter.
       current_time += time_step;
       ts++;
     } 
     while (current_time < T_FINAL);
-

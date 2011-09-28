@@ -76,8 +76,6 @@ int main(int argc, char* argv[])
 
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp, matrix_solver);
-  // FIXME: How can we do this?
-  //solver->set_factorization_scheme(HERMES_REUSE_FACTORIZATION_COMPLETELY);
 
   // Initialize views.
   ScalarView Tview("Temperature", new WinGeom(0, 0, 450, 600));
