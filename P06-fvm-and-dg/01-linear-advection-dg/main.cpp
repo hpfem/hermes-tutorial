@@ -67,6 +67,7 @@ int main(int argc, char* args[])
   info("Assembling Discontinuous Galerkin (ndof: %d).", space_l2.get_num_dofs());
   dp_l2.assemble(matrix, rhs);
 
+
   // Solve the linear system. If successful, obtain the solution.
   info("Solving Discontinuous Galerkin.");
   if(solver->solve())

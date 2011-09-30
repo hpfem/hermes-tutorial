@@ -129,12 +129,18 @@ int main(int argc, char* argv[])
     bool verbose = true;
     double damping_coeff = 1.0;
     double max_allowed_residual_norm = 1e10;
-    if (!runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, 
+
+    try
+    {
+      runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, 
                                   &sln_time_new, freeze_jacobian, block_diagonal_jacobian, verbose,
                                   NEWTON_TOL, NEWTON_MAX_ITER, damping_coeff,
-                                  max_allowed_residual_norm)) 
+                                  max_allowed_residual_norm);
+    }
+    catch(Exceptions::Exception& e)
     {
-      error("Runge-Kutta time step failed, try to decrease time step size.");
+      e.printMsg();
+      error("Runge-Kutta time step failed");
     }
 
     // Show the new time level solution.

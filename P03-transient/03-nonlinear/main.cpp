@@ -119,12 +119,17 @@ int main(int argc, char* argv[])
     Hermes::vector<Solution<double>*> slns_time_new;
     slns_time_new.push_back(&sln_time_new);
 
-    if (!runge_kutta.rk_time_step_newton(current_time, time_step, slns_time_prev, slns_time_new, 
-                                         freeze_jacobian, block_diagonal_jacobian, verbose, NEWTON_TOL, 
-                                         NEWTON_MAX_ITER, damping_coeff,
-                                         max_allowed_residual_norm)) 
+    try
     {
-      error("Runge-Kutta time step failed, try to decrease time step size.");
+      runge_kutta.rk_time_step_newton(current_time, time_step, slns_time_prev, slns_time_new, 
+                                        freeze_jacobian, block_diagonal_jacobian, verbose, NEWTON_TOL, 
+                                        NEWTON_MAX_ITER, damping_coeff,
+                                        max_allowed_residual_norm);
+    }
+    catch(Exceptions::Exception& e)
+    {
+      e.printMsg();
+      error("Runge-Kutta time step failed");
     }
 
     // Update time.
