@@ -11,12 +11,18 @@ adaptive low-order FEM.
 Low-order FEM is inefficient
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Adaptive low-order finite element methods are inefficient, and practitioners
-are rightfully skeptical about them. The main reason is their slow 
-(algebraic) convergence rate that makes large computations virtually freeze.
-This is shown in the following graph that compares typical convergence rates
-of adaptive FEM with linear elements, adaptive FEM with quadratic elements, and 
-adaptive *hp*-FEM:
+Many practitioners are skeptical about using adaptive FEM because adaptivity can 
+slow down and after some time virtually freeze a computation. The reason is that 
+in conventional, algebraically-convergent FEM such as linear or quadratic, one needs to add more 
+and more degrees of freedom to decrease the error. In fact the number of DOF needs 
+to grow **exponentially** if the error is to decrease linearly. This phenomenon is 
+problem-independent and it is due to poor approximation properties of low-order elements.
+In contrast to this, adaptive *hp*-FEM achieves linear decrease of error by adding degrees of freedom 
+**linearly**. The different convergence rates of adaptive FEM with linear and quadratic 
+elements, and adaptive *hp*-FEM is shown below. Note that 
+on the log-log scale, the slope of the convergence curve tells the convergence rate 
+of the method. If the slope is constant then the method converges algebraically.
+
 
 .. figure:: intro/conv_dof.png
    :align: center
