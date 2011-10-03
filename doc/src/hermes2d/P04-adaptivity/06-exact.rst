@@ -1,4 +1,4 @@
-Adapting Mesh to an Exact Function (05-exact)
+Adapting Mesh to an Exact Function (06-exact)
 ---------------------------------------------
 
 This technique can be useful in a number of situations, 
@@ -34,7 +34,7 @@ Sample results
 
 Sample solution and mesh are shown below:
 
-.. figure:: 05-exact/img.png
+.. figure:: 06-exact/img.png
    :align: center
    :scale: 100% 
    :figclass: align-center

@@ -4,7 +4,7 @@ An Introductory Example (01-intro)
 Model problem
 ~~~~~~~~~~~~~
 
-Let us demonstrate the use of adaptive h-FEM and hp-FEM on a linear elliptic problem
+Let us demonstrate the use of adaptive *h*-FEM and *hp*-FEM on a linear elliptic problem
 describing an electrostatic micromotor. This is a MEMS device free of any coils, and 
 thus (as opposed to classical electromotors) resistive to strong electromagnetic waves.
 
@@ -41,56 +41,16 @@ $\epsilon_r = 10$ in $\Omega_2$.
 Weak formulation
 ~~~~~~~~~~~~~~~~
 
-The weak forms are custom because of two materials are involved:
-
-.. sourcecode::
-    .
-
-    class CustomWeakFormPoisson : public WeakForm
-    {
-    public:
-      CustomWeakFormPoisson(std::string mat_motor, double eps_motor, 
-			    std::string mat_air, double eps_air) : WeakForm(1)
-      {
-	// Jacobian.
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, mat_motor, new HermesFunction(eps_motor)));
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, mat_air, new HermesFunction(eps_air)));
-
-	// Residual.
-	add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, mat_motor, new HermesFunction(eps_motor)));
-	add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, mat_air, new HermesFunction(eps_air)));
-      };
-    };
-
-.. latexcode::
-    .
-
-    class CustomWeakFormPoisson : public WeakForm
-    {
-    public:
-      CustomWeakFormPoisson(std::string mat_motor, double eps_motor, 
-			    std::string mat_air, double eps_air) : WeakForm(1)
-      {
-	// Jacobian.
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, mat_motor,
-                        new HermesFunction(eps_motor)));
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, mat_air, new 
-                        HermesFunction(eps_air)));
-
-	// Residual.
-	add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, mat_motor, 
-                        new HermesFunction(eps_motor)));
-	add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, mat_air, new
-                        HermesFunction(eps_air)));
-      };
-    };
+The weak forms are custom because of two materials are involved, see the files 
+definitions.h and definitions.cpp.
 
 Refinement selector
 ~~~~~~~~~~~~~~~~~~~
 
 Before the adaptivity loop starts, a refinement selector is initialized::
 
-    H1ProjBasedSelector selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
+    // Initialize refinement selector.
+    H1ProjBasedSelector<double> selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
 
 The selector is used by the class Adapt to determine how an element should be refined. 
 For that purpose, the selector does the following:
@@ -165,8 +125,7 @@ In order to plot convergence graphs, one can use the SimpleGraph class::
 
 This class will save convergence data as two numbers per line: either 
 the number of DOF and error, or CPU time and error. A more advanced 
-GnuplotGraph class is also available, see the file `graph.h 
-<http://git.hpfem.org/hermes.git/blob/HEAD:/hermes2d/src/graph.h>`_ for more details. 
+GnuplotGraph class is also available. 
 
 Adaptivity loop
 ~~~~~~~~~~~~~~~
@@ -179,54 +138,46 @@ is used to decide which elements need to be refined as well as to select optimal
 hp-refinement for each element. Hence the adaptivity loop begins with refining 
 the mesh globally::
 
-    // Construct globally refined reference mesh and setup reference space.
-    Space* ref_space = Space::construct_refined_space(&space);
+    // Construct globally refined mesh and setup fine mesh space.
+    Space<double>* ref_space = Space<double>::construct_refined_space(&space);
 
-Next we initialize a matrix solver
+Next we initialize the discrete problem on the refined mesh::    
 
-::
+    DiscreteProblem<double> dp(&wf, ref_space);
 
-    // Initialize matrix solver.
-    SparseMatrix* matrix = create_matrix(matrix_solver);
-    Vector* rhs = create_vector(matrix_solver);
-    Solver* solver = create_linear_solver(matrix_solver, matrix, rhs);
+The Newton solver is initialized and optionally, the output is muted::
 
-and the discrete problem on the refined mesh
+    NewtonSolver<double> newton(&dp, matrix_solver_type);
+    newton.set_verbose_output(false);
 
-::    
-
-    DiscreteProblem dp(&wf, ref_space);
-
-The Newton's method is used to solve the fine mesh problem:
-
-.. sourcecode::
-    .
+The Newton's method is used to solve the fine mesh problem::
 
     // Perform Newton's iteration.
-    if (!hermes2d.solve_newton(coeff_vec, &dp, solver, matrix, rhs)) error("Newton's iteration failed.");
-
-.. latexcode::
-    .
-
-    // Perform Newton's iteration.
-    if (!hermes2d.solve_newton(coeff_vec, &dp, solver, matrix, rhs))
-        error("Newton's iteration failed.");
+    try
+    {
+      newton.solve(coeff_vec);
+    }
+    catch(Hermes::Exceptions::Exception e)
+    {
+      e.printMsg();
+      error("Newton's iteration failed.");
+    }
 
 The coefficient vector is translated into a Solution::
 
-    // Translate the resulting coefficient vector into the Solution sln.
-    Solution::vector_to_solution(coeff_vec, ref_space, &ref_sln);
+    // Translate the resulting coefficient vector into the instance of Solution.
+    Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
 
 The Solution is projected on the coarse submesh to extract low-order 
 part for error calculation::
 
     // Project the fine mesh solution onto the coarse mesh.
-    info("Projecting reference solution on coarse mesh.");
-    OGProjection::project_global(&space, &ref_sln, &sln, matrix_solver);
+    info("Projecting fine mesh solution on coarse mesh.");
+    OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver_type);
 
 The function project_global() is very general, and it can accept multiple 
 spaces, multiple functions, and various projection norms as parameters. For more details,
-see the file `ogprojection.h <http://git.hpfem.org/hermes.git/blob/HEAD:/hermes2d/src/ogprojection.h>`_.
+see Doxygen documentation.
 
 Calculating error estimate
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -237,37 +188,21 @@ and a global error estimate as well as element error estimates are calculated:
 .. sourcecode::
     .
 
-    // Calculate element errors and total error estimate.
     info("Calculating error estimate.");
-    Adapt* adaptivity = new Adapt(&space);
+    Adapt<double> adaptivity(&space);
     bool solutions_for_adapt = true;
-    // In the following function, the Boolean parameter "solutions_for_adapt" determines whether
-    // the calculated errors are intended for use with adaptivity (this may not be the case, for example,
-    // when error wrt. an exact solution is calculated). The default value is solutions_for_adapt = true,
-    // The last parameter "error_flags" determine whether the total and element errors are treated as
-    // absolute or relative. Its default value is error_flags = HERMES_TOTAL_ERROR_REL | HERMES_ELEMENT_ERROR_REL.
-    // In subsequent examples and benchmarks, these two parameters will be often used with
-    // their default values, and thus they will not be present in the code explicitly.
-    double err_est_rel = adaptivity->calc_err_est(&sln, &ref_sln, solutions_for_adapt,
+    double err_est_rel = adaptivity.calc_err_est(&sln, &ref_sln, solutions_for_adapt,
                          HERMES_TOTAL_ERROR_REL | HERMES_ELEMENT_ERROR_REL) * 100;
 
 .. latexcode::
     .
 
-    // Calculate element errors and total error estimate.
     info("Calculating error estimate.");
-    Adapt* adaptivity = new Adapt(&space);
+    Adapt<double> adaptivity(&space);
     bool solutions_for_adapt = true;
-    // In the following function, the Boolean parameter "solutions_for_adapt" determines
-    // whether the calculated errors are intended for use with adaptivity (this may not
-    // be the case, for example, when error wrt. an exact solution is calculated). The
-    // default value is solutions_for_adapt = true, The last parameter "error_flags"
-    // determine whether the total and element errors are treated as absolute or relative.
-    // Its default value is error_flags = HERMES_TOTAL_ERROR_REL | HERMES_ELEMENT_ERROR_REL.
-    // In subsequent examples and benchmarks, these two parameters will be often used with
-    // their default values, and thus they will not be present in the code explicitly.
-    double err_est_rel = adaptivity->calc_err_est(&sln, &ref_sln, solutions_for_adapt,
-                         HERMES_TOTAL_ERROR_REL | HERMES_ELEMENT_ERROR_REL) * 100;
+    double err_est_rel = adaptivity.calc_err_est(&sln, &ref_sln, 
+                         solutions_for_adapt, HERMES_TOTAL_ERROR_REL | 
+                         HERMES_ELEMENT_ERROR_REL) * 100;
 
 Here, solutions_for_adapt=true means that this solution pair will be used to calculate 
 element errors to guide adaptivity. With solutions_for_adapt=false, just the total error 
@@ -289,17 +224,23 @@ Adapting the mesh
 Finally, if ``err_est_rel`` is still above the threshold ``ERR_STOP``, we perform
 mesh adaptation::
 
+    // Skip the time spent to save the convergence graphs.
+    cpu_time.tick(HERMES_SKIP);
+
     // If err_est too large, adapt the mesh.
-    if (err_est_rel < ERR_STOP) done = true;
+    if (err_est_rel < ERR_STOP) 
+      done = true;
     else
     {
       info("Adapting coarse mesh.");
-      done = adaptivity->adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
+      done = adaptivity.adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
 
       // Increase the counter of performed adaptivity steps.
-      if (done == false)  as++;
+      if (done == false)  
+        as++;
     }
-    if (Space::get_num_dofs(&space) >= NDOF_STOP) done = true;
+    if (space.get_num_dofs() >= NDOF_STOP) 
+      done = true;
 
 The constants ``THRESHOLD``, ``STRATEGY`` and ``MESH_REGULARITY`` have the following meaning:
 
@@ -357,6 +298,10 @@ components, but specify that its derivatives should be used::
    :figclass: align-center
    :alt: Solution - electrostatic potential $\varphi$ (zoomed).
 
+.. raw:: html
+
+   <hr style="clear: both; visibility: hidden;">
+
 .. figure:: 01-intro/motor-grad.png
    :align: center
    :scale: 50% 
@@ -373,8 +318,8 @@ components, but specify that its derivatives should be used::
    :figclass: align-center
    :alt: Polynomial orders of elements near singularities (zoomed).
 
-Convergence graphs of adaptive h-FEM with linear elements, h-FEM with quadratic elements
-and hp-FEM are shown below.
+Convergence graphs of adaptive *h*-FEM with linear elements, *h*-FEM with quadratic elements
+and *hp*-FEM are shown below.
 
 .. figure:: 01-intro/conv_dof.png
    :align: center

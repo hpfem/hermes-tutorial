@@ -1,4 +1,4 @@
-Time-Harmonic Maxwell's Equations (04-hcurl)
+Time-Harmonic Maxwell's Equations (05-hcurl)
 --------------------------------------------
 
 Model problem
@@ -18,14 +18,13 @@ Equation solved: Time-harmonic Maxwell's equations
 Domain of interest is the square $(-10, 10)^2$ missing the quarter lying in the 
 fourth quadrant. It is filled with air:
 
-.. figure:: 04-hcurl/domain.png
+.. figure:: 05-hcurl/domain.png
    :align: center
    :scale: 45% 
    :figclass: align-center
    :alt: Computational domain.
 
-Boundary conditions: Combined essential and natural, see the 
-`main.cpp <http://git.hpfem.org/hermes.git/blob/HEAD:/hermes2d/tutorial/P04-adaptivity/04-hcurl/main.cpp>`_ file.
+Boundary conditions: Combined essential and natural, see the file "main.cpp".
 
 Exact solution
 ~~~~~~~~~~~~~~
@@ -62,8 +61,8 @@ computer code, this reads:
       e1 = -t11*x*t14-2.0/3.0*t18*y*t20*t23;
     }  
 
-Here jv() is the Bessel function $\bfJ_{\alpha}$. For its source code see the 
-`definitions.cpp <http://git.hpfem.org/hermes.git/blob/HEAD:/hermes2d/tutorial/P04-adaptivity/05-hcurl/definitions.cpp>`_ file.
+Here jv() is the Bessel function $\bfJ_{\alpha}$. For its source code see the file
+"definitions.cpp".
 
 Weak forms
 ~~~~~~~~~~
@@ -266,7 +265,7 @@ Sample results
 
 Solution:
 
-.. figure:: 04-hcurl/solution.png
+.. figure:: 05-hcurl/solution.png
    :align: center
    :scale: 45% 
    :figclass: align-center
@@ -274,7 +273,7 @@ Solution:
 
 Final mesh (h-FEM with linear elements):
 
-.. figure:: 04-hcurl/mesh-h1.png
+.. figure:: 05-hcurl/mesh-h1.png
    :align: center
    :scale: 40% 
    :figclass: align-center
@@ -286,7 +285,7 @@ of approximation on element interfaces, not to polynomial degrees inside the ele
 
 Final mesh (h-FEM with quadratic elements):
 
-.. figure:: 04-hcurl/mesh-h2.png
+.. figure:: 05-hcurl/mesh-h2.png
    :align: center
    :scale: 40% 
    :figclass: align-center
@@ -294,7 +293,7 @@ Final mesh (h-FEM with quadratic elements):
 
 Final mesh (hp-FEM):
 
-.. figure:: 04-hcurl/mesh-hp.png
+.. figure:: 05-hcurl/mesh-hp.png
    :align: center
    :scale: 40% 
    :figclass: align-center
@@ -302,7 +301,7 @@ Final mesh (hp-FEM):
 
 DOF convergence graphs:
 
-.. figure:: 04-hcurl/conv_dof.png
+.. figure:: 05-hcurl/conv_dof.png
    :align: center
    :scale: 50% 
    :figclass: align-center
@@ -310,7 +309,7 @@ DOF convergence graphs:
 
 CPU time convergence graphs:
 
-.. figure:: 04-hcurl/conv_cpu.png
+.. figure:: 05-hcurl/conv_cpu.png
    :align: center
    :scale: 50% 
    :figclass: align-center

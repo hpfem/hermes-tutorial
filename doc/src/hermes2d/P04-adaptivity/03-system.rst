@@ -1,4 +1,4 @@
-Adaptive Multimesh hp-FEM Example (02-system)
+Adaptive Multimesh hp-FEM Example (03-system)
 ---------------------------------------------
 
 Model problem
@@ -60,13 +60,13 @@ The following two figures show the solutions $u$ and $v$. Notice their
 large qualitative differences: While $u$ is smooth in the entire domain, 
 $v$ has a thin boundary layer along the boundary:
 
-.. figure:: 02-system/solution_u.png
+.. figure:: 03-system/solution_u.png
    :align: center
    :scale: 40% 
    :figclass: align-center
    :alt: Solution
 
-.. figure:: 02-system/solution_v.png
+.. figure:: 03-system/solution_v.png
    :align: center
    :scale: 40% 
    :figclass: align-center
@@ -127,65 +127,11 @@ are not too bad either::
       double K;
     };
 
-The weak forms can be found in the 
-file `definitions.cpp <http://git.hpfem.org/hermes.git/blob/HEAD:/hermes2d/tutorial/P04-adaptivity/02-system/definitions.cpp>`_ and they are registered as follows::
 
 Weak forms
 ~~~~~~~~~~
 
-Weak formulation comprises default and custom forms:
-
-.. sourcecode::
-    .
-
-    class CustomWeakForm : public WeakForm
-    {
-    public:
-      CustomWeakForm(CustomRightHandSide1* g1, CustomRightHandSide2* g2) : WeakForm(2) 
-      {
-	// Jacobian.
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, HERMES_ANY, new HermesFunction(D_u * D_u)));
-	add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol(0, 0, HERMES_ANY, new HermesFunction(-1.0)));
-	add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol(0, 1, HERMES_ANY, new HermesFunction(g1->sigma), HERMES_NONSYM));
-	add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol(1, 0, HERMES_ANY, new HermesFunction(-1.0), HERMES_NONSYM));
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(1, 1, HERMES_ANY, new HermesFunction(D_v * D_v)));
-	add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol(1, 1, HERMES_ANY, new HermesFunction(1.0)));
-
-	// Residual.
-	add_vector_form(new CustomResidual1(D_u, g1->sigma, g1));
-	add_vector_form(new CustomResidual2(D_v, g2));
-      }
-    };
-
-.. latexcode::
-    .
-
-    class CustomWeakForm : public WeakForm
-    {
-    public:
-      CustomWeakForm(CustomRightHandSide1* g1, CustomRightHandSide2* g2)
-                     : WeakForm(2) 
-      {
-	// Jacobian.
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, HERMES_ANY,
-                        new HermesFunction(D_u * D_u)));
-	add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol(0, 0, HERMES_ANY, new 
-                        HermesFunction(-1.0)));
-	add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol(0, 1, HERMES_ANY, new
-                        HermesFunction(g1->sigma), HERMES_NONSYM));
-	add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol(1, 0, HERMES_ANY, new
-                        HermesFunction(-1.0), HERMES_NONSYM));
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(1, 1, HERMES_ANY,
-                        new HermesFunction(D_v * D_v)));
-	add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol(1, 1, HERMES_ANY, new
-                        HermesFunction(1.0)));
-
-	// Residual.
-	add_vector_form(new CustomResidual1(D_u, g1->sigma, g1));
-	add_vector_form(new CustomResidual2(D_v, g2));
-      }
-    };
-
+The weak forms can be found in the files definitions.h and definitions.cpp.
 Beware that although each of the forms is actually symmetric, one cannot use the 
 HERMES_SYM flag as in the elasticity equations, since it has a slightly different 
 meaning (see example `P01-linear/08-system <http://hpfem.org/hermes/doc/src/hermes2d/P01-linear/08-system.html>`_).
@@ -335,13 +281,13 @@ Now we can show some numerical results.
 First let us show the resulting meshes for $u$ and $v$ obtained using 
 conventional (single-mesh) hp-FEM: **9,330 DOF** (4665 for each solution component). 
 
-.. figure:: 02-system/mesh_single.png
+.. figure:: 03-system/mesh_single.png
    :align: center
    :scale: 40% 
    :figclass: align-center
    :alt: Mesh
 
-.. figure:: 02-system/mesh_single.png
+.. figure:: 03-system/mesh_single.png
    :align: center
    :scale: 40% 
    :figclass: align-center
@@ -354,13 +300,13 @@ conventional (single-mesh) hp-FEM: **9,330 DOF** (4665 for each solution compone
 Next we show the resulting meshes for $u$ and $v$ obtained using 
 the multimesh hp-FEM: **1,723 DOF** (49 DOF for $u$ and $1,673$ for $v$). 
 
-.. figure:: 02-system/mesh_multi_u.png
+.. figure:: 03-system/mesh_multi_u.png
    :align: center
    :scale: 40% 
    :figclass: align-center
    :alt: Mesh
 
-.. figure:: 02-system/mesh_multi_v.png
+.. figure:: 03-system/mesh_multi_v.png
    :align: center
    :scale: 40% 
    :figclass: align-center
@@ -375,7 +321,7 @@ for both cases:
 
 DOF convergence graphs:
 
-.. figure:: 02-system/conv_dof.png
+.. figure:: 03-system/conv_dof.png
    :align: center
    :scale: 50% 
    :figclass: align-center
@@ -383,7 +329,7 @@ DOF convergence graphs:
 
 CPU time convergence graphs:
 
-.. figure:: 02-system/conv_cpu.png
+.. figure:: 03-system/conv_cpu.png
    :align: center
    :scale: 50% 
    :figclass: align-center

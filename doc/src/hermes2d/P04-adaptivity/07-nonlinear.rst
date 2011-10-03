@@ -1,4 +1,4 @@
-Newton's Method and Adaptivity (06-nonlinear)
+Newton's Method and Adaptivity (07-nonlinear)
 ---------------------------------------------
 
 In this example we use the nonlinear model problem from example "P02-nonlinear/02-newton-spline",
@@ -118,7 +118,7 @@ illustrated in the following convergence comparisons.
 
 (1) Convergence in the number of DOF (with and without Newton solve on the new coarse mesh):
 
-.. figure:: 06-nonlinear/conv_dof_compar.png
+.. figure:: 07-nonlinear/conv_dof_compar.png
    :align: center
    :scale: 50% 
    :figclass: align-center
@@ -126,7 +126,7 @@ illustrated in the following convergence comparisons.
 
 (2) Convergence in CPU time (with and without Newton solve on coarse mesh):
 
-.. figure:: 06-nonlinear/conv_cpu_compar.png
+.. figure:: 07-nonlinear/conv_cpu_compar.png
    :align: center
    :scale: 50% 
    :figclass: align-center

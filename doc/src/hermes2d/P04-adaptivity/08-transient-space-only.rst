@@ -1,4 +1,4 @@
-Transient Problems I - Adaptivity in Space (07-transient-space-only)
+Transient Problems I - Adaptivity in Space (08-transient-space-only)
 --------------------------------------------------------------------
 
 Model problem
@@ -94,7 +94,7 @@ Sample results
 
 Initial condition and initial mesh:
 
-.. figure:: 07-transient-space-only/1.png
+.. figure:: 08-transient-space-only/1.png
    :align: center
    :scale: 75% 
    :figclass: align-center
@@ -102,7 +102,7 @@ Initial condition and initial mesh:
 
 Solution and mesh at t = 0.5:
 
-.. figure:: 07-transient-space-only/2.png
+.. figure:: 08-transient-space-only/2.png
    :align: center
    :scale: 75% 
    :figclass: align-center
@@ -110,7 +110,7 @@ Solution and mesh at t = 0.5:
 
 Solution and mesh at t = 1.0:
 
-.. figure:: 07-transient-space-only/3.png
+.. figure:: 08-transient-space-only/3.png
    :align: center
    :scale: 75% 
    :figclass: align-center
@@ -118,7 +118,7 @@ Solution and mesh at t = 1.0:
 
 Solution and mesh at t = 1.5:
 
-.. figure:: 07-transient-space-only/4.png
+.. figure:: 08-transient-space-only/4.png
    :align: center
    :scale: 75% 
    :figclass: align-center
@@ -126,7 +126,7 @@ Solution and mesh at t = 1.5:
 
 Solution and mesh at t = 2.0:
 
-.. figure:: 07-transient-space-only/5.png
+.. figure:: 08-transient-space-only/5.png
    :align: center
    :scale: 75% 
    :figclass: align-center

@@ -1,6 +1,5 @@
-Transient Problems III - Adaptivity in Space and Time (09-transient-space-and-time)
+Transient Problems III - Adaptivity in Space and Time (10-transient-space-and-time)
 -----------------------------------------------------------------------------------
-
 
 Model problem
 ~~~~~~~~~~~~~
@@ -26,7 +25,7 @@ Sample results
 
 Solution, mesh, temporal error, and spatial error at t = 0.05 s:
 
-.. figure:: 09-transient-space-and-time/Screenshot-9.png
+.. figure:: 10-transient-space-and-time/Screenshot-9.png
    :align: center
    :scale: 75% 
    :figclass: align-center
@@ -34,7 +33,7 @@ Solution, mesh, temporal error, and spatial error at t = 0.05 s:
 
 Solution, mesh, temporal error, and spatial error at t = 0.53 s:
 
-.. figure:: 09-transient-space-and-time/Screenshot-10.png
+.. figure:: 10-transient-space-and-time/Screenshot-10.png
    :align: center
    :scale: 75% 
    :figclass: align-center
@@ -42,7 +41,7 @@ Solution, mesh, temporal error, and spatial error at t = 0.53 s:
 
 Solution, mesh, temporal error, and spatial error at t = 0.83 s:
 
-.. figure:: 09-transient-space-and-time/Screenshot-11.png
+.. figure:: 10-transient-space-and-time/Screenshot-11.png
    :align: center
    :scale: 75% 
    :figclass: align-center

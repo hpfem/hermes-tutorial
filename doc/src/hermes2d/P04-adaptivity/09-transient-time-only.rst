@@ -1,4 +1,4 @@
-Transient Problems II - Adaptivity in Time (08-transient-time-only)
+Transient Problems II - Adaptivity in Time (09-transient-time-only)
 -------------------------------------------------------------------
 
 Model problem
@@ -125,7 +125,7 @@ Sample results
 
 Solution and temporal error at t = 0.105 s:
 
-.. figure:: 08-transient-time-only/Screenshot-1.png
+.. figure:: 09-transient-time-only/Screenshot-1.png
    :align: center
    :scale: 70% 
    :figclass: align-center
@@ -133,7 +133,7 @@ Solution and temporal error at t = 0.105 s:
 
 Solution and temporal error at t = 0.305 s:
 
-.. figure:: 08-transient-time-only/Screenshot-2.png
+.. figure:: 09-transient-time-only/Screenshot-2.png
    :align: center
    :scale: 70% 
    :figclass: align-center
@@ -141,7 +141,7 @@ Solution and temporal error at t = 0.305 s:
 
 Solution and temporal error at t = 0.572 s:
 
-.. figure:: 08-transient-time-only/Screenshot-3.png
+.. figure:: 09-transient-time-only/Screenshot-3.png
    :align: center
    :scale: 70% 
    :figclass: align-center
@@ -149,7 +149,7 @@ Solution and temporal error at t = 0.572 s:
 
 Solution and temporal error at t = 0.797 s:
 
-.. figure:: 08-transient-time-only/Screenshot-4.png
+.. figure:: 09-transient-time-only/Screenshot-4.png
    :align: center
    :scale: 70% 
    :figclass: align-center
@@ -157,7 +157,7 @@ Solution and temporal error at t = 0.797 s:
 
 Solution and temporal error at t = 1.226 s:
 
-.. figure:: 08-transient-time-only/Screenshot-5.png
+.. figure:: 09-transient-time-only/Screenshot-5.png
    :align: center
    :scale: 70% 
    :figclass: align-center
