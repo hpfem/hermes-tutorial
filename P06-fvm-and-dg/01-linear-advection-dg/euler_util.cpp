@@ -308,7 +308,7 @@ std::set<int>& KuzminDiscontinuityDetector::get_discontinuous_element_ids()
     if(!limit_all_orders_independently)
       if(this->second_order_discontinuous_element_ids.find(e->id) == this->second_order_discontinuous_element_ids.end())
         continue;
-    if(e->is_triangle())
+    if(e->get_num_surf() == 3)
       error("So far this limiter is implemented just for quads.");
     double u_c[1], u_dx_c[1], u_dy_c[1];
     find_centroid_values(e, u_c);
@@ -352,7 +352,7 @@ std::set<int>& KuzminDiscontinuityDetector::get_second_order_discontinuous_eleme
 
   for_all_active_elements(e, mesh)
   {
-    if(e->is_triangle())
+    if(e->get_num_surf() == 3)
       error("So far this limiter is implemented just for quads.");
     double u_dx_c[1], u_dy_c[1], u_dxx_c[1], u_dxy_c[1], u_dyy_c[1];
     find_centroid_derivatives(e, u_dx_c, u_dy_c);
