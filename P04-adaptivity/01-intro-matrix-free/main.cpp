@@ -190,7 +190,7 @@ int main(int argc, char* argv[])
 
     // Project the fine mesh solution on the coarse mesh.
     info("Projecting fine mesh solution to coarse mesh.");
-    OGProjectionNOX<double>::project_global(&space, &ref_sln, &sln);
+    Hermes::Hermes2D::OGProjectionNOX<double>::project_global(&space, &ref_sln, &sln);
 
     // Time measurement.
     cpu_time.tick();

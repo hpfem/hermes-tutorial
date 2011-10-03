@@ -1,6 +1,6 @@
 #include "definitions.h"
 
-CustomWeakForm::CustomWeakForm(double Le, double alpha, double beta, double kappa, double x1, double tau, bool JFNK, bool PRECOND, Filter<double>* omega, Filter<double>* omega_dt, Filter<double>* omega_dc, Solution<double>* t_prev_time_1, Solution<double>* c_prev_time_1, Solution<double>* t_prev_time_2, Solution<double>* c_prev_time_2) : WeakForm<double>(2, JFNK ? true : false), Le(Le), alpha(alpha), beta(beta), kappa(kappa), x1(x1)
+CustomWeakForm::CustomWeakForm(double Le, double alpha, double beta, double kappa, double x1, double tau, bool JFNK, bool PRECOND, Hermes::Hermes2D::Filter<double>* omega, Hermes::Hermes2D::Filter<double>* omega_dt, Hermes::Hermes2D::Filter<double>* omega_dc, Solution<double>* t_prev_time_1, Solution<double>* c_prev_time_1, Solution<double>* t_prev_time_2, Solution<double>* c_prev_time_2) : WeakForm<double>(2, JFNK ? true : false), Le(Le), alpha(alpha), beta(beta), kappa(kappa), x1(x1)
 {
   if (!JFNK || (JFNK && PRECOND == 1))
   {
