@@ -1,11 +1,13 @@
 Tutorial Part IV (Automatic Adaptivity)
 =======================================
 
-So far we have not paid much attention to the accuracy of results. In general, 
-a computation on a fixed mesh is not likely to be very accurate. There is a need 
-for *adaptive mesh refinement (AMR)* that improves the quality of the approximation 
-by refining mesh elements or increases the polynomial degree where the approximation 
-error is large.
+So far we have not paid any attention to the accuracy of results. In general, 
+computations on a fixed mesh are not very accurate and they should not be trusted. 
+Controlled accuracy can be achieved through *adaptive mesh refinement (AMR)*. 
+Advanced adaptive higher-order FEM (*hp*-FEM) is one of the main 
+strengths of Hermes. With eight modes of automatic *hp*-adaptivity, Hermes 
+excels at delivering highly accurate results with much lower numbers of degrees 
+of freedom than conventional FEM codes.
 
 .. toctree::
     :maxdepth: 2

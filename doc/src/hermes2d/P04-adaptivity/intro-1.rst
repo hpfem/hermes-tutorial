@@ -1,18 +1,22 @@
 Adaptive low-order FEM and hp-FEM
 ---------------------------------
 
-Since its very beginning, Hermes has been designed and developed as a library of 
-adaptive higher-order finite element methods (hp-FEM). Let us explain why.
+Our team has a passion for adaptive higher-order finite element methods
+because they are amazingly efficient compared to conventional low-order 
+FEM. These methods have been an integral part of Hermes since its origin. 
+Let us begin this tutorial chapter by explaining what gains 
+the user can expect when using adaptive *hp*-FEM instead of conventional
+adaptive low-order FEM.
 
 Low-order FEM is inefficient
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Adaptive low-order finite element methods are inefficient, and practitioners
-are rightfully unwilling to use them. The main reason is their extremely slow 
-convergence that makes large computations virtually freeze. 
-This is illustrated in the following graphs that compare typical convergences 
+are rightfully skeptical about them. The main reason is their slow 
+(algebraic) convergence rate that makes large computations virtually freeze.
+This is shown in the following graph that compares typical convergence rates
 of adaptive FEM with linear elements, adaptive FEM with quadratic elements, and 
-adaptive hp-FEM:
+adaptive *hp*-FEM:
 
 .. figure:: intro/conv_dof.png
    :align: center
