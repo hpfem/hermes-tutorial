@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
     if (as > 1)
     {
       info("Transferring previous fine mesh solution to new fine mesh.");
-      OGProjectionNOX<double>::project_global(ref_space_new, &ref_sln, coeff_vec);
+      Hermes::Hermes2D::OGProjectionNOX<double>::project_global(ref_space_new, &ref_sln, coeff_vec);
     }
 
     // Choose preconditioning.

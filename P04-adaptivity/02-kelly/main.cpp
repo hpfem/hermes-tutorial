@@ -176,7 +176,7 @@ int main(int argc, char* argv[])
                                         :
                                           new CustomInterfaceEstimatorScalingFunction);
     
-    adaptivity.add_error_estimator_surf(new BasicKellyAdapt<double>::ErrorEstimatorFormKelly);
+    adaptivity.add_error_estimator_surf(new Hermes::Hermes2D::BasicKellyAdapt<double>::ErrorEstimatorFormKelly());
     
     if (USE_RESIDUAL_ESTIMATOR) 
     {
