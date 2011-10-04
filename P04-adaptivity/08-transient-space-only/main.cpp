@@ -233,13 +233,17 @@ int main(int argc, char* argv[])
 
       // Clean up.
       delete adaptivity;
-      delete ref_space;
-      if(!done)
+      if(!done) {
+        delete ref_space;
         delete sln_time_new.get_mesh();
+      }
     }
     while (done == false);
 
     // Copy last reference solution into sln_time_prev.
+    if(ts == 2)
+      delete sln_time_prev.get_space();
+
     sln_time_prev.copy(&sln_time_new);
 
     // Increase current time and counter of time steps.
