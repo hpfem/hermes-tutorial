@@ -73,14 +73,6 @@ Setting a preconditioner
 
 See NOX documentation for more preconditioning choices.
 
-Reference Counted Pointers (RCP)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Note: RCP stands for Reference Counted Pointer (a sophisticated smart pointer
-management system). This is a very powerful tool provided by the Teuchos library, 
-whose usage greatly reduces memory corruption related segfaults. For more reading 
-we refer `here <http://trilinos.sandia.gov/packages/docs/r5.0/packages/teuchos/doc/html/group__RefCountPtr__stuff.html>`_.
-
 Calling NOX
 ~~~~~~~~~~~
 
