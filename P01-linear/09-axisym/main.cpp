@@ -16,7 +16,7 @@
 //
 // The following parameters can be changed:
 
-// Select whether you want to read the original or XML mesh file.
+// Read original or XML mesh file.
 const bool USE_XML_FORMAT = true;                 
 // Set to "false" to suppress Hermes OpenGL visualization. 
 const bool HERMES_VISUALIZATION = true;           
@@ -26,7 +26,7 @@ const bool VTK_VISUALIZATION = false;
 const int P_INIT = 4;                             
 // Number of initial uniform mesh refinements.
 const int INIT_REF_NUM = 2;                       
-// Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
 
@@ -37,7 +37,7 @@ const double T1 = 100.0;
 const double T0 = 0.0;        
 // Thermal conductivity.
 const double LAMBDA = 386;    
-// Heat_flux coefficient on Gamma_heat_flux.
+// Heat flux coefficient on Gamma_heat_flux.
 const double ALPHA = 20.0;    
 
 int main(int argc, char* argv[])

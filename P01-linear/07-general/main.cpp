@@ -17,13 +17,13 @@
 //
 //  The following parameters can be changed:
 
-// Select whether you want to read the original or XML mesh file.
+// Read the original or XML mesh file.
 const bool USE_XML_FORMAT = true;                 
 // Initial polynomial degree of all mesh elements.
 const int P_INIT = 3;                             
 // Number of initial uniform refinements.
 const int INIT_REF_NUM = 3;                       
-// Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
 

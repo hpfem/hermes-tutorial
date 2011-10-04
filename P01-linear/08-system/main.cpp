@@ -18,7 +18,7 @@
 //
 // The following parameters can be changed:
 
-// Select whether you want to read the original or XML mesh file.
+// Read original or XML mesh file.
 const bool USE_XML_FORMAT = true;                          
 // Initial polynomial degree of all elements.
 const int P_INIT = 6;                                      
@@ -26,7 +26,7 @@ const int P_INIT = 6;
 const double NEWTON_TOL = 1e-8;                            
 // Maximum allowed number of Newton iterations.
 const int NEWTON_MAX_ITER = 100;                           
-// Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;           
 

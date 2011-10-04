@@ -25,17 +25,17 @@
 //
 // The following parameters can be changed:
 
-// Select whether you want to read the original or XML mesh file.
+// Read the original or XML mesh file.
 const bool USE_XML_FORMAT = true;                 
 // Set to "false" to suppress Hermes OpenGL visualization. 
 const bool HERMES_VISUALIZATION = true;           
 // Set to "true" to enable VTK output.
-const bool VTK_VISUALIZATION = true;              
+const bool VTK_VISUALIZATION = false;              
 // Uniform polynomial degree of mesh elements.
 const int P_INIT = 5;                             
 // Number of initial uniform mesh refinements.
 const int INIT_REF_NUM = 0;                       
-// Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
 

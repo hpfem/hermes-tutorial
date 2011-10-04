@@ -22,7 +22,7 @@ using namespace Hermes::Hermes2D::Views;
 //           with "ref_square.mesh" and "ref_triangle.mesh" to visualize 
 //           reference element shape functions. 
 
-// Select whether you want to read the original or XML mesh file.
+// Read original or XML mesh file.
 const bool USE_XML_FORMAT = true;     
 // Initial polynomial degree of mesh elements.
 const int P_INIT = 3;
