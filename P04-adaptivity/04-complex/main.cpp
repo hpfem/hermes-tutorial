@@ -134,14 +134,16 @@ int main(int argc, char* argv[])
     std::complex<double>* coeff_vec = new std::complex<double>[ndof_ref];
     memset(coeff_vec, 0, ndof_ref * sizeof(std::complex<double>));
 
-    // Perform Newton's iteration and translate the resulting coefficient vector into a Solution.
     // For iterative solver.
     if (matrix_solver_type == SOLVER_AZTECOO)
     {
       newton.set_iterative_method(iterative_method);
       newton.set_preconditioner(preconditioner);
     }
-    try{
+
+    // Perform Newton's iteration.
+    try 
+    {
       newton.solve(coeff_vec);
     }
     catch(Hermes::Exceptions::Exception e)
@@ -149,6 +151,8 @@ int main(int argc, char* argv[])
       e.printMsg();
       error("Newton's iteration failed.");
     }
+
+    // Translate the resulting coefficient vector into a Solution.
     Hermes::Hermes2D::Solution<std::complex<double> >::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
 
     // Project the fine mesh solution onto the coarse mesh.

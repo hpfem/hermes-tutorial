@@ -4,7 +4,9 @@ Complex-Valued Problem (04-complex)
 This example shows how to define complex-valued weak forms, essential boundary conditions,
 spaces, solutions, discrete problem, and how to perform orthogonal projection and adaptivity 
 in complex mode. In addition, it shows how to use the AZTECOO matrix solver (other solvers
-including UMFPACK can be used as well).
+including UMFPACK can be used as well - use them if you do not have Trilinos installed).
+Installation of matrix solvers including Trilinos is described in detail in the library 
+documentation.
 
 Model problem
 ~~~~~~~~~~~~~
@@ -35,7 +37,7 @@ elsewhere.
 Complex-valued weak forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The weak formulation consists entirely of default forms, it's header looks as follows::
+The weak formulation consists entirely of default forms, its header looks as follows::
 
     class CustomWeakForm : public WeakForm<std::complex<double> >
     { 
@@ -47,58 +49,44 @@ The weak formulation consists entirely of default forms, it's header looks as fo
 
 For details see the files definitions.h and definitions.cpp.
 
+Defining complex essential BCs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is analogous to defining real-valued BCs, except that the type "std::complex<double>"
+is used in the template instead of "double"::
+
+    // Initialize boundary conditions.
+    Hermes::Hermes2D::DefaultEssentialBCConst<std::complex<double> > 
+      bc_essential("Dirichlet", std::complex<double>(0.0, 0.0));
+    EssentialBCs<std::complex<double> > bcs(&bc_essential);
+
+
+Defining a complex H1 space
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is analogous to defining a real-valued H1 space::
+
+    H1Space<std::complex<double> > space(&mesh, &bcs, P_INIT);
+
+All other templated objects are treated analogously, see the file main.cpp
+for more details.
+
 Initializing the AztecOO matrix solver
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The matrix solver is initialized as usual::
+Inside the adaptivity loop, the matrix solver is initialized as follows::
 
-    // Initialize matrix solver.
-    initialize_solution_environment(matrix_solver, argc, argv);
-    SparseMatrix* matrix = create_matrix(matrix_solver);
-    Vector* rhs = create_vector(matrix_solver);
-    Solver* solver = create_linear_solver(matrix_solver, matrix, rhs);
-
-When using AztecOO, we need to select an iterative method and preconditioner::
-
-    if (matrix_solver == SOLVER_AZTECOO) {
-      ((AztecOOSolver*) solver)->set_solver(iterative_method);
-      ((AztecOOSolver*) solver)->set_precond(preconditioner);
-      // Using default iteration parameters (see solver/aztecoo.h).
+    // For iterative solver.
+    if (matrix_solver_type == SOLVER_AZTECOO)
+    {
+      newton.set_iterative_method(iterative_method);
+      newton.set_preconditioner(preconditioner);
     }
 
 Here, "iterative_method" and "preconditioner" have been defined at the 
-beginning of the file main.cpp as
+beginning of the file main.cpp.
 
-.. sourcecode::
-    .
-
-    const char* iterative_method = "gmres";           // Name of the iterative method employed by AztecOO (ignored
-                                                      // by the other solvers). 
-                                                      // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
-    const char* preconditioner = "least-squares";     // Name of the preconditioner employed by AztecOO (ignored by
-                                                      // the other solvers).
-                                                      // Possibilities: none, jacobi, neumann, least-squares, or a
-                                                      // preconditioner from IFPACK (see solver/aztecoo.h)
-
-.. latexcode::
-    .
-
-    const char* iterative_method = "gmres";           // Name of the iterative method
-                                                      // employed by AztecOO (ignored
-                                                      // by the other solvers). 
-                                                      // Possibilities: gmres, cg, cgs,
-                                                      // tfqmr, bicgstab.
-    
-    const char* preconditioner = "least-squares";     // Name of the preconditioner
-                                                      // employed by AztecOO (ignored by
-                                                      // the other solvers).
-                                                      // Possibilities: none, jacobi,
-                                                      // neumann, least-squares, or a
-                                                      // preconditioner from IFPACK 
-                                                      // (see solver/aztecoo.h)
-
-Otherwise everything works in the same way as in example 
-"01-intro".
+Otherwise everything works as usual.
 
 Sample results
 ~~~~~~~~~~~~~~
@@ -111,9 +99,9 @@ Solution:
    :figclass: align-center
    :alt: Solution.
 
-Let us compare adaptive $h$-FEM with linear and quadratic elements and the $hp$-FEM.
+Let us compare adaptive *h*-FEM with linear and quadratic elements and the *hp*-FEM.
 
-Final mesh for $h$-FEM with linear elements: 18694 DOF, error = 1.02 \%
+Final mesh for *h*-FEM with linear elements: 18694 DOF, error = 1.02 \%
 
 .. figure:: 04-complex/mesh-h1.png
    :align: center
@@ -121,7 +109,7 @@ Final mesh for $h$-FEM with linear elements: 18694 DOF, error = 1.02 \%
    :figclass: align-center
    :alt: Mesh.
 
-Final mesh for $h$-FEM with quadratic elements: 46038 DOF, error = 0.018 \%
+Final mesh for *h*-FEM with quadratic elements: 46038 DOF, error = 0.018 \%
 
 .. figure:: 04-complex/mesh-h2.png
    :align: center
@@ -129,7 +117,7 @@ Final mesh for $h$-FEM with quadratic elements: 46038 DOF, error = 0.018 \%
    :figclass: align-center
    :alt: Mesh.
 
-Final mesh for $hp$-FEM: 4787 DOF, error = 0.00918 \%
+Final mesh for *hp*-FEM: 4787 DOF, error = 0.00918 \%
 
 .. figure:: 04-complex/mesh-hp.png
    :align: center
@@ -137,8 +125,8 @@ Final mesh for $hp$-FEM: 4787 DOF, error = 0.00918 \%
    :figclass: align-center
    :alt: Mesh.
 
-Convergence graphs of adaptive h-FEM with linear elements, h-FEM with quadratic elements
-and hp-FEM are shown below.
+Convergence graphs of adaptive *h*-FEM with linear elements, *h*-FEM with quadratic elements
+and *hp*-FEM are shown below.
 
 .. figure:: 04-complex/conv_compar_dof.png
    :align: center
