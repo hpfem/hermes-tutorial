@@ -77,20 +77,6 @@ int main(int argc, char **argv)
 
   // Initialize the linear discrete problem.
   DiscreteProblem<double> dp1(&wf1, &space);
-    
-  // Set up the solver, matrix, and rhs according to the solver selection.
-  SparseMatrix<double>* matrix = create_matrix<double>(matrix_solver);
-  Vector<double>* rhs = create_vector<double>(matrix_solver);
-  LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver, matrix, rhs);
-  
-#ifdef HAVE_AZTECOO
-    if (matrix_solver == SOLVER_AZTECOO) 
-    {
-      (dynamic_cast<AztecOOSolver<double>*>(solver))->set_solver(iterative_method);
-      (dynamic_cast<AztecOOSolver<double>*>(solver))->set_precond(preconditioner);
-      // Using default iteration parameters (see solver/aztecoo.h).
-    }    
-#endif
   
   // Begin time measurement of assembly.
   cpu_time.tick(HERMES_SKIP);
@@ -124,11 +110,6 @@ int main(int argc, char **argv)
   double rel_err_1 = Global<double>::calc_rel_error(&sln1, &exact, HERMES_H1_NORM) * 100;
   info("CPU time: %g s.", time);
   info("Exact H1 error: %g%%.", rel_err_1);
-
-  // Clean up.
-  delete(matrix);
-  delete(rhs);
-  delete(solver);
     
   // View the solution and mesh.
   ScalarView sview("Solution", new WinGeom(0, 0, 440, 350));
