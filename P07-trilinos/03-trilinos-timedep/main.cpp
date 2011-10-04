@@ -19,37 +19,52 @@ using namespace Hermes::Hermes2D::RefinementSelectors;
 //  BC: Dirichlet at the bottom, Newton du/dn = ALPHA*(TEMP_EXT - u) elsewhere.
 //
 
-const int INIT_REF_NUM = 4;       // Number of initial uniform mesh refinements.
-const int P_INIT = 1;             // Initial polynomial degree of all mesh elements.
-const double ALPHA = 10.0;        // Coefficient for the Nwwton boundary condition.
+// Number of initial uniform mesh refinements.
+const int INIT_REF_NUM = 4;       
+// Initial polynomial degree of all mesh elements.
+const int P_INIT = 1;             
+// Coefficient for the Nwwton boundary condition.
+const double ALPHA = 10.0;        
 const double LAMBDA = 1e5;
 const double HEATCAP = 1e6;
 const double RHO = 3000.0;
 const double TEMP_EXT = 20.0;
 const double TEMP_INIT = 10.0;
-const double TAU = 50.0;          // Time step.        
+// Time step.        
+const double TAU = 50.0;          
 
 // NOX parameters.
-const bool TRILINOS_JFNK = true;                  // true = Jacobian-free method (for NOX),
-                                                  // false = Newton (for NOX).
-const bool PRECOND = true;                        // Preconditioning by jacobian in case of JFNK (for NOX),
-                                                  // default ML preconditioner in case of Newton.
-const char* iterative_method = "GMRES";           // Name of the iterative method employed by AztecOO (ignored
-                                                  // by the other solvers). 
-                                                  // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
-const char* preconditioner = "AztecOO";           // Name of the preconditioner employed by AztecOO 
-                                                  // Possibilities: None" - No preconditioning. 
-                                                  // "AztecOO" - AztecOO internal preconditioner.
-                                                  // "New Ifpack" - Ifpack internal preconditioner.
-                                                  // "ML" - Multi level preconditione
+// true = Jacobian-free method (for NOX),
+// false = Newton (for NOX).
+const bool TRILINOS_JFNK = true;                 
+// Preconditioning by jacobian in case of JFNK (for NOX),
+// default ML preconditioner in case of Newton.
+const bool PRECOND = true;                        
+// Name of the iterative method employed by AztecOO (ignored
+// by the other solvers). 
+// Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
+const char* iterative_method = "GMRES";           
+// Name of the preconditioner employed by AztecOO 
+// Possibilities: None" - No preconditioning. 
+// "AztecOO" - AztecOO internal preconditioner.
+// "New Ifpack" - Ifpack internal preconditioner.
+// "ML" - Multi level preconditione
+const char* preconditioner = "AztecOO";           
+// NOX error messages, see NOX_Utils.h.
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
-                                                  // NOX error messages, see NOX_Utils.h.
-double ls_tolerance = 1e-5;                       // Tolerance for linear system.
-unsigned flag_absresid = 0;                       // Flag for absolute value of the residuum.
-double abs_resid = 1.0e-3;                        // Tolerance for absolute value of the residuum.
-unsigned flag_relresid = 1;                       // Flag for relative value of the residuum.
-double rel_resid = 1.0e-2;                        // Tolerance for relative value of the residuum.
-int max_iters = 100;                              // Max number of iterations.
+                                                  
+// Tolerance for linear system.
+double ls_tolerance = 1e-5;                       
+// Flag for absolute value of the residuum.
+unsigned flag_absresid = 0;                       
+// Tolerance for absolute value of the residuum.
+double abs_resid = 1.0e-3;                        
+// Flag for relative value of the residuum.
+unsigned flag_relresid = 1;                       
+// Tolerance for relative value of the residuum.
+double rel_resid = 1.0e-2;                        
+// Max number of iterations.
+int max_iters = 100;                              
 
 int main(int argc, char* argv[])
 {

@@ -21,64 +21,85 @@ using namespace Hermes::Hermes2D::RefinementSelectors;
 //
 //  The following parameters can be changed:
 
-const int P_INIT = 2;                      // Initial polynomial degree of all mesh elements.
-const int INIT_REF_NUM = 1;                // Number of initial uniform mesh refinements.
-const double THRESHOLD = 0.3;              // This is a quantitative parameter of the adapt(...) function and
-                                           // it has different meanings for various adaptive strategies (see below).
-const int STRATEGY = 0;                    // Adaptive strategy:
-                                           // STRATEGY = 0 ... refine elements until sqrt(THRESHOLD) times total
-                                           //   error is processed. If more elements have similar errors, refine
-                                           //   all to keep the mesh symmetric.
-                                           // STRATEGY = 1 ... refine all elements whose error is larger
-                                           //   than THRESHOLD times maximum element error.
-                                           // STRATEGY = 2 ... refine all elements whose error is larger
-                                           //   than THRESHOLD.
-                                           // More adaptive strategies can be created in adapt_ortho_h1.cpp.
-const CandList CAND_LIST = H2D_HP_ANISO_H; // Predefined list of element refinement candidates. Possible values are
-                                           // H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO,
-                                           // H2D_HP_ANISO_H, H2D_HP_ANISO_P, H2D_HP_ANISO.
-                                           // See User Documentation for details.
-const int MESH_REGULARITY = -1;            // Maximum allowed level of hanging nodes:
-                                           // MESH_REGULARITY = -1 ... arbitrary level hangning nodes (default),
-                                           // MESH_REGULARITY = 1 ... at most one-level hanging nodes,
-                                           // MESH_REGULARITY = 2 ... at most two-level hanging nodes, etc.
-                                           // Note that regular meshes are not supported, this is due to
-                                           // their notoriously bad performance.
-const double CONV_EXP = 0.5;               // Default value is 1.0. This parameter influences the selection of
-                                           // cancidates in hp-adaptivity. See get_optimal_refinement() for details.
-const double ERR_STOP = 1.0;               // Stopping criterion for adaptivity (rel. error tolerance between the
-                                           // fine mesh and coarse mesh solution in percent).
-const int NDOF_STOP = 60000;               // Adaptivity process stops when the number of degrees of freedom grows
-                                           // over this limit. This is to prevent h-adaptivity to go on forever.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-                                                  // This solver is used for projections only.
+// Initial polynomial degree of all mesh elements.
+const int P_INIT = 2;                      
+// Number of initial uniform mesh refinements.
+const int INIT_REF_NUM = 1;                
+// This is a quantitative parameter of the adapt(...) function and
+// it has different meanings for various adaptive strategies (see below).
+const double THRESHOLD = 0.3;              
+// Adaptive strategy:
+// STRATEGY = 0 ... refine elements until sqrt(THRESHOLD) times total
+//   error is processed. If more elements have similar errors, refine
+//   all to keep the mesh symmetric.
+// STRATEGY = 1 ... refine all elements whose error is larger
+//   than THRESHOLD times maximum element error.
+// STRATEGY = 2 ... refine all elements whose error is larger
+//   than THRESHOLD.
+// More adaptive strategies can be created in adapt_ortho_h1.cpp.
+const int STRATEGY = 0;                    
+// Predefined list of element refinement candidates. Possible values are
+// H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO,
+// H2D_HP_ANISO_H, H2D_HP_ANISO_P, H2D_HP_ANISO.
+// See User Documentation for details.
+const CandList CAND_LIST = H2D_HP_ANISO_H; 
+// Maximum allowed level of hanging nodes:
+// MESH_REGULARITY = -1 ... arbitrary level hangning nodes (default),
+// MESH_REGULARITY = 1 ... at most one-level hanging nodes,
+// MESH_REGULARITY = 2 ... at most two-level hanging nodes, etc.
+// Note that regular meshes are not supported, this is due to
+// their notoriously bad performance.
+const int MESH_REGULARITY = -1;            
+// Default value is 1.0. This parameter influences the selection of
+// cancidates in hp-adaptivity. See get_optimal_refinement() for details.
+const double CONV_EXP = 0.5;               
+// Stopping criterion for adaptivity (rel. error tolerance between the
+// fine mesh and coarse mesh solution in percent).
+const double ERR_STOP = 1.0;               
+// Adaptivity process stops when the number of degrees of freedom grows
+// over this limit. This is to prevent h-adaptivity to go on forever.
+const int NDOF_STOP = 60000;               
+// Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+// This solver is used for projections only.
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
 
 // Problem parameters.
-double slope = 60;                                // Slope of the layer inside the domain.
+// Slope of the layer inside the domain.
+double slope = 60;                                
 
 // NOX parameters.
-const bool TRILINOS_JFNK = true;                  // true = Jacobian-free method (for NOX),
-                                                  // false = Newton (for NOX).
-const bool PRECOND = true;                        // Preconditioning by jacobian in case of JFNK (for NOX),
-                                                  // default ML preconditioner in case of Newton.
-const char* iterative_method = "GMRES";           // Name of the iterative method employed by AztecOO (ignored
-                                                  // by the other solvers). 
-                                                  // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
-const char* preconditioner = "AztecOO";           // Name of the preconditioner employed by AztecOO 
-                                                  // Possibilities: None" - No preconditioning. 
-                                                  // "AztecOO" - AztecOO internal preconditioner.
-                                                  // "New Ifpack" - Ifpack internal preconditioner.
-                                                  // "ML" - Multi level preconditione
+// true = Jacobian-free method (for NOX),
+// false = Newton (for NOX).
+const bool TRILINOS_JFNK = true;                  
+// Preconditioning by jacobian in case of JFNK (for NOX),
+// default ML preconditioner in case of Newton.
+const bool PRECOND = true;                        
+// Name of the iterative method employed by AztecOO (ignored
+// by the other solvers). 
+// Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
+const char* iterative_method = "GMRES";           
+// Name of the preconditioner employed by AztecOO 
+// Possibilities: None" - No preconditioning. 
+// "AztecOO" - AztecOO internal preconditioner.
+// "New Ifpack" - Ifpack internal preconditioner.
+// "ML" - Multi level preconditioner.
+const char* preconditioner = "AztecOO";           
+// NOX error messages, see NOX_Utils.h.
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
-                                                  // NOX error messages, see NOX_Utils.h.
-double ls_tolerance = 1e-5;                       // Tolerance for linear system.
-unsigned flag_absresid = 0;                       // Flag for absolute value of the residuum.
-double abs_resid = 1.0e-3;                        // Tolerance for absolute value of the residuum.
-unsigned flag_relresid = 1;                       // Flag for relative value of the residuum.
-double rel_resid = 1.0e-2;                        // Tolerance for relative value of the residuum.
-int max_iters = 100;                              // Max number of iterations.
-
+                                                  
+// Tolerance for linear system.
+double ls_tolerance = 1e-5;                       
+// Flag for absolute value of the residuum.
+unsigned flag_absresid = 0;                       
+// Tolerance for absolute value of the residuum.
+double abs_resid = 1.0e-3;                        
+// Flag for relative value of the residuum.
+unsigned flag_relresid = 1;                       
+// Tolerance for relative value of the residuum.
+double rel_resid = 1.0e-2;                        
+// Max number of iterations.
+int max_iters = 100;                              
 
 int main(int argc, char* argv[])
 {
