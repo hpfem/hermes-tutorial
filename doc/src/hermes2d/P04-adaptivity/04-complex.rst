@@ -1,17 +1,15 @@
 Complex-Valued Problem (04-complex)
 -----------------------------------
 
-For this example we use the matrix solver AztecOO from the Trilinos package (other
-solvers including UMFPACK are usable as well). If you want to use AztecOO, 
-you need to have Trilinos installed on your system and enabled in your CMake.vars file::
-
-    set(WITH_TRILINOS YES)
-    set(TRILINOS_ROOT /opt/packages/trilinos)
+This example shows how to define complex-valued weak forms, essential boundary conditions,
+spaces, solutions, discrete problem, and how to perform orthogonal projection and adaptivity 
+in complex mode. In addition, it shows how to use the AZTECOO matrix solver (other solvers
+including UMFPACK can be used as well).
 
 Model problem
 ~~~~~~~~~~~~~
 
-This example solves a complex-valued vector potential problem
+We solve a complex-valued vector potential problem
 
 .. math::
 
@@ -37,72 +35,17 @@ elsewhere.
 Complex-valued weak forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The weak formulation consists entirely of default forms:
+The weak formulation consists entirely of default forms, it's header looks as follows::
 
-.. sourcecode::
-    .
-
-    class CustomWeakForm : public WeakForm
+    class CustomWeakForm : public WeakForm<std::complex<double> >
     { 
     public:
       CustomWeakForm(std::string mat_air,  double mu_air,
 		     std::string mat_iron, double mu_iron, double gamma_iron,
-		     std::string mat_wire, double mu_wire, scalar j_ext, double omega)
-      : WeakForm(1) 
-      {
-	scalar ii =  cplx(0.0, 1.0);
-
-	// Jacobian.
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, mat_air,  new HermesFunction(1.0/mu_air)));
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, mat_iron, new HermesFunction(1.0/mu_iron)));
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, mat_wire, new HermesFunction(1.0/mu_wire)));
-	add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol(0, 0, mat_iron, new HermesFunction(ii * omega * gamma_iron)));
-
-	// Residual.
-	add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, mat_air, new HermesFunction(1.0/mu_air)));
-	add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, mat_iron, new HermesFunction(1.0/mu_iron)));
-	add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, mat_wire, new HermesFunction(1.0/mu_wire)));
-	add_vector_form(new WeakFormsH1::DefaultVectorFormVol(0, mat_wire, new HermesFunction(-j_ext)));
-	add_vector_form(new WeakFormsH1::DefaultResidualVol(0, mat_iron, new HermesFunction(ii * omega * gamma_iron)));
-      };
+		     std::string mat_wire, double mu_wire, std::complex<double> j_ext, double omega);
     };
 
-.. latexcode::
-    .
-
-    class CustomWeakForm : public WeakForm
-    { 
-    public:
-      CustomWeakForm(std::string mat_air,  double mu_air,
-		     std::string mat_iron, double mu_iron, double gamma_iron,
-		     std::string mat_wire, double mu_wire, scalar j_ext, double omega)
-      : WeakForm(1) 
-      {
-	scalar ii =  cplx(0.0, 1.0);
-
-	// Jacobian.
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, mat_air,  new 
-                        HermesFunction(1.0/mu_air)));
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, mat_iron, new
-                        HermesFunction(1.0/mu_iron)));
-	add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0, mat_wire, new
-                        HermesFunction(1.0/mu_wire)));
-	add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol(0, 0, mat_iron, new
-                        HermesFunction(ii * omega * gamma_iron)));
-
-	// Residual.
-	add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, mat_air, new
-                        HermesFunction(1.0/mu_air)));
-	add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, mat_iron, new
-                        HermesFunction(1.0/mu_iron)));
-	add_vector_form(new WeakFormsH1::DefaultResidualDiffusion(0, mat_wire, new
-                        HermesFunction(1.0/mu_wire)));
-	add_vector_form(new WeakFormsH1::DefaultVectorFormVol(0, mat_wire, new
-                        HermesFunction(-j_ext)));
-	add_vector_form(new WeakFormsH1::DefaultResidualVol(0, mat_iron, new
-                        HermesFunction(ii * omega * gamma_iron)));
-      };
-    };
+For details see the files definitions.h and definitions.cpp.
 
 Initializing the AztecOO matrix solver
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
