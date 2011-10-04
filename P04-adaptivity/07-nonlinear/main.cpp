@@ -103,11 +103,6 @@ int main(int argc, char* argv[])
   // Initialize the FE problem.
   DiscreteProblem<double> dp_coarse(&wf, &space);
 
-  // Set up the solver, matrix, and rhs for the coarse mesh according to the solver selection.
-  SparseMatrix<double>* matrix_coarse = create_matrix<double>(matrix_solver);
-  Vector<double>* rhs_coarse = create_vector<double>(matrix_solver);
-  LinearSolver<double>* solver_coarse = create_linear_solver<double>(matrix_solver, matrix_coarse, rhs_coarse);
-
   // Create a selector which will select optimal candidate.
   H1ProjBasedSelector<double> selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
 
@@ -133,13 +128,14 @@ int main(int argc, char* argv[])
   InitialSolutionHeatTransfer init_sln(&mesh);
   OGProjection<double>::project_global(&space, &init_sln, coeff_vec_coarse, matrix_solver);
 
-  // Newton's loop on the coarse mesh. This is done to obtain a good
-  // starting point for the Newton's method on the reference mesh.
+  // Initialize Newton solver on coarse mesh.
   info("Solving on coarse mesh:");
   bool verbose = true;
   NewtonSolver<double> newton_coarse(&dp_coarse, matrix_solver);
   newton_coarse.set_verbose_output(verbose);
-  // Perform Newton's iteration.
+
+  // Perform initial Newton's iteration on coarse mesh, to obtain 
+  // good initial guess for the Newton's method on the fine mesh.
   try
   {
     newton_coarse.solve(coeff_vec_coarse, NEWTON_TOL_COARSE, NEWTON_MAX_ITER);
@@ -154,12 +150,9 @@ int main(int argc, char* argv[])
   Solution<double>::vector_to_solution(coeff_vec_coarse, &space, &sln);
 
   // Cleanup after the Newton loop on the coarse mesh.
-  delete matrix_coarse;
-  delete rhs_coarse;
-  delete solver_coarse;
   delete [] coeff_vec_coarse;
 
-  // Adapt<double>ivity loop:
+  // Adaptivity loop.
   int as = 1; bool done = false;
   do
   {
@@ -170,11 +163,6 @@ int main(int argc, char* argv[])
 
     // Initialize discrete problem on the reference mesh.
     DiscreteProblem<double> dp(&wf, ref_space);
-
-    // Initialize matrix solver.
-    SparseMatrix<double>* matrix = create_matrix<double>(matrix_solver);
-    Vector<double>* rhs = create_vector<double>(matrix_solver);
-    LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver, matrix, rhs);
 
     // Calculate initial coefficient vector on the reference mesh.
     double* coeff_vec = new double[Space<double>::get_num_dofs(ref_space)];
@@ -194,10 +182,12 @@ int main(int argc, char* argv[])
     // Now we can deallocate the previous fine mesh.
     if(as > 1) delete ref_sln.get_mesh();
 
-    // Newton's loop on the fine mesh.
+    // Initialize Newton solver on fine mesh.
+    info("Solving on fine mesh:");
     bool verbose = true;
     NewtonSolver<double> newton(&dp, matrix_solver);
     newton_coarse.set_verbose_output(verbose);
+
     // Perform Newton's iteration.
     try
     {
@@ -256,9 +246,6 @@ int main(int argc, char* argv[])
 
     // Clean up.
     delete [] coeff_vec;
-    delete solver;
-    delete matrix;
-    delete rhs;
     delete adaptivity;
     delete ref_space;
 

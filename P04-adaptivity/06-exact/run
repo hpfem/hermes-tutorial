@@ -1,4 +1,4 @@
 rm *~ 
-./P04-06-exact-adapt
+./P04-06-exact
 python plot_graph.py &
 
