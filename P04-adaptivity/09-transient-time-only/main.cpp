@@ -27,21 +27,33 @@ using namespace Views;
 //
 //  The following parameters can be changed:
 
-const int INIT_GLOB_REF_NUM = 3;                   // Number of initial uniform mesh refinements.
-const int INIT_BDY_REF_NUM = 4;                    // Number of initial refinements towards boundary.
-const int P_INIT = 2;                              // Initial polynomial degree.
-double time_step = 0.05;                           // Time step.
-const double T_FINAL = 5.0;                        // Time interval length.
-const double NEWTON_TOL = 1e-5;                    // Stopping criterion for the Newton's method.
-const int NEWTON_MAX_ITER = 100;                   // Maximum allowed number of Newton iterations.
-const double TIME_TOL_UPPER = 5.0;                 // If rel. temporal error is greater than this threshold, decrease time 
-                                                   // step size and repeat time step.
-const double TIME_TOL_LOWER = 0.5;                 // If rel. temporal error is less than this threshold, increase time step
-                                                   // but do not repeat time step (this might need further research).
-const double TIME_STEP_INC_RATIO = 1.1;            // Time step increase ratio (applied when rel. temporal error is too small).
-const double TIME_STEP_DEC_RATIO = 0.8;            // Time step decrease ratio (applied when rel. temporal error is too large).
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;   // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                   // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+// Number of initial uniform mesh refinements.
+const int INIT_GLOB_REF_NUM = 3;                   
+// Number of initial refinements towards boundary.
+const int INIT_BDY_REF_NUM = 4;                    
+// Initial polynomial degree.
+const int P_INIT = 2;                              
+// Time step.
+double time_step = 0.05;                           
+// Time interval length.
+const double T_FINAL = 5.0;                        
+// Stopping criterion for the Newton's method.
+const double NEWTON_TOL = 1e-5;                    
+// Maximum allowed number of Newton iterations.
+const int NEWTON_MAX_ITER = 100;                   
+// If rel. temporal error is greater than this threshold, decrease time 
+// step size and repeat time step.
+const double TIME_TOL_UPPER = 5.0;                 
+// If rel. temporal error is less than this threshold, increase time step
+// but do not repeat time step (this might need further research).
+const double TIME_TOL_LOWER = 0.5;                 
+// Time step increase ratio (applied when rel. temporal error is too small).
+const double TIME_STEP_INC_RATIO = 1.1;            
+// Time step decrease ratio (applied when rel. temporal error is too large).
+const double TIME_STEP_DEC_RATIO = 0.8;            
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;   
 
 // Choose one of the following time-integration methods, or define your own Butcher's table. The last number 
 // in the name of each method is its order. The one before last, if present, is the number of stages.
@@ -61,7 +73,8 @@ MatrixSolverType matrix_solver = SOLVER_UMFPACK;   // Possibilities: SOLVER_AMES
 ButcherTableType butcher_table_type = Implicit_SDIRK_CASH_3_23_embedded;
 
 // Problem parameters.
-const double alpha = 4.0;                         // For the nonlinear thermal conductivity.
+// Parameter for nonlinear thermal conductivity.
+const double alpha = 4.0;                         
 const double heat_src = 1.0;
 
 int main(int argc, char* argv[])
