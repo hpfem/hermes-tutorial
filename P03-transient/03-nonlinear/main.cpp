@@ -22,15 +22,23 @@ using namespace RefinementSelectors;
 //
 //  The following parameters can be changed:
 
-const int INIT_GLOB_REF_NUM = 3;                   // Number of initial uniform mesh refinements.
-const int INIT_BDY_REF_NUM = 4;                    // Number of initial refinements towards boundary.
-const int P_INIT = 2;                              // Initial polynomial degree.
-const double time_step = 0.2;                      // Time step.
-const double T_FINAL = 5.0;                        // Time interval length.
-const double NEWTON_TOL = 1e-5;                    // Stopping criterion for the Newton's method.
-const int NEWTON_MAX_ITER = 100;                   // Maximum allowed number of Newton iterations.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;   // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                   // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+// Number of initial uniform mesh refinements.
+const int INIT_GLOB_REF_NUM = 3;                   
+// Number of initial refinements towards boundary.
+const int INIT_BDY_REF_NUM = 4;                    
+// Initial polynomial degree.
+const int P_INIT = 2;                              
+// Time step.
+const double time_step = 0.2;                      
+// Time interval length.
+const double T_FINAL = 5.0;                        
+// Stopping criterion for the Newton's method.
+const double NEWTON_TOL = 1e-5;                    
+// Maximum allowed number of Newton iterations.
+const int NEWTON_MAX_ITER = 100;                   
+// Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;   
 
 // Choose one of the following time-integration methods, or define your own Butcher's table. The last number
 // in the name of each method is its order. The one before last, if present, is the number of stages.
@@ -50,7 +58,8 @@ MatrixSolverType matrix_solver = SOLVER_UMFPACK;   // Possibilities: SOLVER_AMES
 ButcherTableType butcher_table_type = Implicit_SDIRK_2_2;
 
 // Problem parameters.
-const double alpha = 4.0;                         // For the nonlinear thermal conductivity.
+// Parameter for nonlinear thermal conductivity.
+const double alpha = 4.0;                         
 const double heat_src = 1.0;
 
 // Main function.
@@ -118,7 +127,6 @@ int main(int argc, char* argv[])
     slns_time_prev.push_back(&sln_time_prev);
     Hermes::vector<Solution<double>*> slns_time_new;
     slns_time_new.push_back(&sln_time_new);
-
     try
     {
       runge_kutta.rk_time_step_newton(current_time, time_step, slns_time_prev, slns_time_new, 

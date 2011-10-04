@@ -23,20 +23,31 @@ using namespace RefinementSelectors;
 //
 //  The following parameters can be changed:
 
-const int P_INIT = 2;                             // Polynomial degree of all mesh elements.
-const int INIT_REF_NUM = 1;                       // Number of initial uniform mesh refinements.
-const int INIT_REF_NUM_BDY = 3;                   // Number of initial uniform mesh refinements towards the boundary.
-const double time_step = 300.0;                   // Time step in seconds.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+// Polynomial degree of mesh elements.
+const int P_INIT = 2;                             
+// Number of initial uniform mesh refinements.
+const int INIT_REF_NUM = 1;                       
+// Number of initial uniform mesh refinements towards the boundary.
+const int INIT_REF_NUM_BDY = 3;                   
+// Time step in seconds.
+const double time_step = 300.0;                   
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
 
 // Problem parameters.
-const double TEMP_INIT = 10;       // Temperature of the ground (also initial temperature).
-const double ALPHA = 10;           // Heat flux coefficient for Newton's boundary condition.
-const double LAMBDA = 1e2;         // Thermal conductivity of the material.
-const double HEATCAP = 1e2;        // Heat capacity.
-const double RHO = 3000;           // Material density.
-const double T_FINAL = 86400;      // Length of time interval (24 hours) in seconds.
+// Temperature of the ground (also initial temperature).
+const double TEMP_INIT = 10;       
+// Heat flux coefficient for Newton's boundary condition.
+const double ALPHA = 10;           
+// Thermal conductivity of the material.
+const double LAMBDA = 1e2;         
+// Heat capacity.
+const double HEATCAP = 1e2;        
+// Material density.
+const double RHO = 3000;           
+// Length of time interval (24 hours) in seconds.
+const double T_FINAL = 86400;      
 
 int main(int argc, char* argv[])
 {
