@@ -87,20 +87,6 @@ int main(int argc, char* argv[])
 
   // Initialize the discrete problem.
   DiscreteProblem<double> dp1(&wf1, &space);
-  
-  // Set up the solver, matrix, and rhs for the coarse mesh according to the solver selection.
-  SparseMatrix<double>* matrix = create_matrix<double>(matrix_solver);
-  Vector<double>* rhs = create_vector<double>(matrix_solver);
-  LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver, matrix, rhs);
-
-  #ifdef HAVE_AZTECOO
-    if (matrix_solver == SOLVER_AZTECOO) 
-    {
-      (dynamic_cast<AztecOOSolver<double>*>(solver))->set_solver(iterative_method);
-      (dynamic_cast<AztecOOSolver<double>*>(solver))->set_precond(preconditioner);
-      // Using default iteration parameters (see solver/aztecoo.h).
-    }    
-#endif
 
   // Project the initial condition on the FE space to obtain initial
   // coefficient vector for the Newton's method.
@@ -128,12 +114,8 @@ int main(int argc, char* argv[])
     error("Newton's iteration failed.");
   }
 
+  // Translate the solution vector into a Solution.
   Hermes::Hermes2D::Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln1);
-
-  // Cleanup.
-  delete(matrix);
-  delete(rhs);
-  delete(solver);
 
   // CPU time needed by UMFpack
   double time1 = cpu_time.tick().last();
@@ -148,7 +130,7 @@ int main(int argc, char* argv[])
   // Calculate error.
   CustomExactSolution ex(&mesh);
   double rel_err_1 = Global<double>::calc_rel_error(&sln1, &ex, HERMES_H1_NORM) * 100;
-  info("Solution<double> 1 (%s):  exact H1 error: %g%% (time %g s)", MatrixSolverNames[matrix_solver].c_str(), rel_err_1, time1);
+  info("Solution 1 (%s):  exact H1 error: %g%% (time %g s)", MatrixSolverNames[matrix_solver].c_str(), rel_err_1, time1);
 
   // TRILINOS PART:
 
@@ -212,7 +194,7 @@ int main(int argc, char* argv[])
 
   // Calculate error.
   double rel_err_2 = Global<double>::calc_rel_error(&sln2, &ex, HERMES_H1_NORM) * 100;
-  info("Solution<double> 2 (NOX): exact H1 error: %g%% (time %g + %g = %g [s])", rel_err_2, proj_time, time2, proj_time+time2);
+  info("Solution 2 (NOX): exact H1 error: %g%% (time %g + %g = %g [s])", rel_err_2, proj_time, time2, proj_time+time2);
 
   // Show NOX solution.
   ScalarView view2("Solution<double> 2", new WinGeom(510, 0, 500, 400));
