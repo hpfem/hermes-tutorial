@@ -25,20 +25,29 @@
 //
 // The following parameters can be changed:
 
-const bool USE_XML_FORMAT = true;                 // Select whether you want to read 
-                                                  // the original or XML mesh file.
-const bool HERMES_VISUALIZATION = true;           // Set to "false" to suppress Hermes OpenGL visualization. 
-const bool VTK_VISUALIZATION = true;              // Set to "true" to enable VTK output.
-const int P_INIT = 5;                             // Uniform polynomial degree of mesh elements.
-const int INIT_REF_NUM = 0;                       // Number of initial uniform mesh refinements.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+// Select whether you want to read the original or XML mesh file.
+const bool USE_XML_FORMAT = true;                 
+// Set to "false" to suppress Hermes OpenGL visualization. 
+const bool HERMES_VISUALIZATION = true;           
+// Set to "true" to enable VTK output.
+const bool VTK_VISUALIZATION = true;              
+// Uniform polynomial degree of mesh elements.
+const int P_INIT = 5;                             
+// Number of initial uniform mesh refinements.
+const int INIT_REF_NUM = 0;                       
+// Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
 
 // Problem parameters.
-const double LAMBDA_AL = 236.0;            // Thermal cond. of Al for temperatures around 20 deg Celsius.
-const double LAMBDA_CU = 386.0;            // Thermal cond. of Cu for temperatures around 20 deg Celsius.
-const double VOLUME_HEAT_SRC = 5e3;        // Volume heat sources generated (for example) by electric current.        
-const double FIXED_BDY_TEMP = 20.0;        // Fixed temperature on the boundary.
+// Thermal cond. of Al for temperatures around 20 deg Celsius.
+const double LAMBDA_AL = 236.0;            
+// Thermal cond. of Cu for temperatures around 20 deg Celsius.
+const double LAMBDA_CU = 386.0;            
+// Volume heat sources generated (for example) by electric current. 
+const double VOLUME_HEAT_SRC = 5e3;               
+// Fixed temperature on the boundary.
+const double FIXED_BDY_TEMP = 20.0;        
 
 int main(int argc, char* argv[])
 {
@@ -62,12 +71,13 @@ int main(int argc, char* argv[])
     mesh.refine_all_elements();
 
   // Initialize the weak formulation.
-  CustomWeakFormPoisson wf("Aluminum", new Hermes1DFunction<double>(LAMBDA_AL), "Copper", 
-                           new Hermes1DFunction<double>(LAMBDA_CU), new Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
+  CustomWeakFormPoisson wf("Aluminum", new Hermes1DFunction<double>(LAMBDA_AL), 
+                           "Copper", new Hermes1DFunction<double>(LAMBDA_CU), 
+                           new Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
   
   // Initialize essential boundary conditions.
-  DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"), 
-                                               FIXED_BDY_TEMP);
+  DefaultEssentialBCConst<double> bc_essential(
+      Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"), FIXED_BDY_TEMP);
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.

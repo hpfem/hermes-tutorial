@@ -18,22 +18,31 @@
 //
 // The following parameters can be changed:
 
-const bool USE_XML_FORMAT = true;                          // Select whether you want to read 
-                                                           // the original or XML mesh file.
-const int P_INIT = 6;                                      // Initial polynomial degree of all elements.
-const double NEWTON_TOL = 1e-8;                            // Stopping criterion for the Newton's method.
-const int NEWTON_MAX_ITER = 100;                           // Maximum allowed number of Newton iterations.
-
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;           // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                           // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+// Select whether you want to read the original or XML mesh file.
+const bool USE_XML_FORMAT = true;                          
+// Initial polynomial degree of all elements.
+const int P_INIT = 6;                                      
+// Stopping criterion for the Newton's method.
+const double NEWTON_TOL = 1e-8;                            
+// Maximum allowed number of Newton iterations.
+const int NEWTON_MAX_ITER = 100;                           
+// Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;           
 
 // Problem parameters.
-const double E  = 200e9;                                   // Young modulus (steel).
-const double nu = 0.3;                                     // Poisson ratio.
-const double rho = 8000.0;                                 // Density.
-const double g1 = -9.81;                                   // Gravitational acceleration.
-const double f0  = 0;                                      // Surface force in x-direction.
-const double f1  = 8e4;                                    // Surface force in y-direction.
+// Young modulus (steel).
+const double E  = 200e9;                                   
+// Poisson ratio.
+const double nu = 0.3;                                     
+// Density.
+const double rho = 8000.0;                                 
+// Gravitational acceleration.
+const double g1 = -9.81;                                   
+// Surface force in x-direction.
+const double f0  = 0;                                      
+// Surface force in y-direction.
+const double f1  = 8e4;                                    
 
 int main(int argc, char* argv[])
 {
@@ -101,8 +110,10 @@ int main(int argc, char* argv[])
   
   // Visualize the solution.
   ScalarView view("Von Mises stress [Pa]", new WinGeom(590, 0, 700, 400));
-  double lambda = (E * nu) / ((1 + nu) * (1 - 2*nu));  // First Lame constant.
-  double mu = E / (2*(1 + nu));                        // Second Lame constant.
+  // First Lame constant.
+  double lambda = (E * nu) / ((1 + nu) * (1 - 2*nu));  
+  // Second Lame constant.
+  double mu = E / (2*(1 + nu));                        
   VonMisesFilter stress(Hermes::vector<MeshFunction<double> *>(&u1_sln, &u2_sln), lambda, mu);
   view.show_mesh(false);
   view.show(&stress, HERMES_EPS_HIGH, H2D_FN_VAL_0, &u1_sln, &u2_sln, 1.5e5);

@@ -22,11 +22,12 @@ using namespace Hermes::Hermes2D::Views;
 //           with "ref_square.mesh" and "ref_triangle.mesh" to visualize 
 //           reference element shape functions. 
 
-const bool USE_XML_FORMAT = true;     // Select whether you want to read 
-                                      // the original or XML mesh file.
-const int P_INIT = 3;                 // Initial polynomial degree of mesh elements.
-
-
+// Select whether you want to read the original or XML mesh file.
+const bool USE_XML_FORMAT = true;     
+// Initial polynomial degree of mesh elements.
+const int P_INIT = 3;
+       
+// Text message with hints.
 static char text[] = "\
 Click into the image window and:\n\
   press 'f' to make the color scale finer/coarser,\n\
@@ -62,8 +63,10 @@ int main(int argc, char* argv[])
 
   // The following can be used to view higher-order shape functions
   // on reference domains (disable uniform mesh refinememts for that).
-  //mloader.load("ref_square.mesh", &mesh);      // Reference square,
-  //mloader.load("ref_triangle.mesh", &mesh);    // Reference triangle,
+  // Reference square.
+  //mloader.load("ref_square.mesh", &mesh);      
+  // Reference triangle.
+  //mloader.load("ref_triangle.mesh", &mesh);    
 
   // Refine all elements (optional).
   mesh.refine_all_elements();

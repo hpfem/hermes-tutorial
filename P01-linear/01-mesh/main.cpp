@@ -10,9 +10,10 @@ using namespace Hermes::Hermes2D::Views;
 //
 // Geometry: L-Shape domain (see file domain.mesh and domain.xml).
 
-const bool USE_XML_FORMAT = true;     // Select whether you want to read 
-                                      // the original or XML mesh file.
+// Select whether you want to read the original or XML mesh file.
+const bool USE_XML_FORMAT = true;     
 
+// Text message with hints.
 static char text[] = "\
 Click into the image window and:\n\
   press 'm' to show/hide element material markers,\n\
@@ -48,17 +49,22 @@ int main(int argc, char* argv[])
   mesh.refine_all_elements();          
 
   // Refine towards a mesh vertex (optional).
-  mesh.refine_towards_vertex(3, 4);    // Four refinements towards vertex no. 3.
+  // Four refinements towards vertex no. 3.  
+  mesh.refine_towards_vertex(3, 4);    
 
   // Refine towards boundary (optional).
-  mesh.refine_towards_boundary("Outer", 4);  // Four successive refinements towards 
-                                             // boundary with marker "Outer".
+  // Four successive refinements towards boundary with marker "Outer".
+  mesh.refine_towards_boundary("Outer", 4);  
 
   // Refine individual elements (optional).
-  mesh.refine_element_id(86, 0);          // 0... isotropic refinement.
-  mesh.refine_element_id(112, 0);         // 0... isotropic refinement.
-  mesh.refine_element_id(84, 2);          // 2... anisotropic refinement.
-  mesh.refine_element_id(114, 1);         // 1... anisotropic refinement.
+  // 0... isotropic refinement.
+  mesh.refine_element_id(86, 0);          
+  // 0... isotropic refinement.
+  mesh.refine_element_id(112, 0);         
+  // 2... anisotropic refinement.
+  mesh.refine_element_id(84, 2);          
+  // 1... anisotropic refinement.
+  mesh.refine_element_id(114, 1);         
 
   // Display the mesh.
   // (0, 0) is the upper left corner position, 
