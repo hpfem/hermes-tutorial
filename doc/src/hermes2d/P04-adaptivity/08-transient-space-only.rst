@@ -39,10 +39,10 @@ damage.
 
 There are three ways to perform global mesh derefinement in Hermes:
 
-  (1) Reset the mesh to basemesh and reset polynomial orders to P_INIT,
-  (2) remove last layer of refinement from all elements, and reset 
-      polynomial orders to P_INIT,
-  (3) remove last layer of refinement from all elements, and decrease
+  (1) Reset the mesh to basemesh and reset polynomial orders to P_INIT.
+  (2) Remove last layer of refinement from all elements, and reset 
+      polynomial orders to P_INIT.
+  (3) Remove last layer of refinement from all elements, and decrease
       polynomial orders by one.
 
 The derefinement frequency is set by the user via the 
@@ -60,12 +60,13 @@ parameter UNREF_FREQ::
                 space.set_uniform_order(P_INIT);
                 break;
         case 3: mesh.unrefine_all_elements();
+                //space.adjust_element_order(-1, P_INIT);
                 space.adjust_element_order(-1, -1, P_INIT, P_INIT);
                 break;
         default: error("Wrong global derefinement method.");
       }
 
-      ndof_coarse = Space::get_num_dofs(&space);
+      ndof_coarse = Space<double>::get_num_dofs(&space);
     }
 
 Option #1 is cleanest from the mathematics point of view since the
@@ -73,17 +74,22 @@ mesh on the new time level will not be influenced by the mesh from
 the last step, but in practice we prefer the last option because 
 it takes less CPU time. 
 
-The adaptivity loop in space is standard. The rk_time_step()
+The adaptivity loop in space is standard. The rk_time_step_newton()
 method is called in each adaptivity step::
 
       // Perform one Runge-Kutta time step according to the selected Butcher's table.
       info("Runge-Kutta time step (t = %g s, tau = %g s, stages: %d).",
            current_time, time_step, bt.get_size());
       bool verbose = true;
-      if (!runge_kutta.rk_time_step(current_time, time_step, &sln_time_prev, &sln_time_new, 
-                                    true, verbose, NEWTON_TOL, NEWTON_MAX_ITER)) 
+      try
       {
-        error("Runge-Kutta time step failed, try to decrease time step size.");
+        runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, &sln_time_new, 
+                                    true, verbose, NEWTON_TOL, NEWTON_MAX_ITER);
+      }
+      catch(Exceptions::Exception& e)
+      {
+        e.printMsg();
+        error("Runge-Kutta time step failed");
       }
 
 The value of current_time and the previous time level solution 

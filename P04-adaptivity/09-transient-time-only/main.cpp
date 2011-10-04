@@ -121,7 +121,6 @@ int main(int argc, char* argv[])
     info("Runge-Kutta time step (t = %g, tau = %g, stages: %d).", 
          current_time, time_step, bt.get_size());
     bool verbose = true;
-    
     try
     {
       runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, 
@@ -138,7 +137,8 @@ int main(int argc, char* argv[])
     char title[100];
     sprintf(title, "Temporal error, t = %g", current_time);
     eview.set_title(title);
-    eview.show(&time_error_fn, HERMES_EPS_VERYHIGH);
+    AbsFilter abs_tef(&time_error_fn);
+    eview.show(&abs_tef, HERMES_EPS_VERYHIGH);
 
     // Calculate relative time stepping error and decide whether the 
     // time step can be accepted. If not, then the time step size is 

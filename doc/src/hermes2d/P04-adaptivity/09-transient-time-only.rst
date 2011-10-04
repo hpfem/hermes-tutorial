@@ -10,7 +10,7 @@ embedded Runge-Kutta method can be used. By embedded we mean that the
 Butcher's table contains two B rows. The two B rows are used to calculate 
 two different approximations $Y_{n+1}$ on the next time level, with different 
 orders of accuracy. The difference between these two solutions is used 
-to adapt the time step.
+as an error estimate, to adapt the time step.
 
 Selecting an embedded Runge-Kutta method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -38,7 +38,7 @@ We usually use the SDIRK methods by Cash as they work really well.
 Obtaining temporal error estimate
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When the Butcher's table is an embedded one, the method rk_time_step()
+When the Butcher's table is an embedded one, the method rk_time_step_newton()
 provides an error estimate on the next time level (difference of the 
 two approximations with different orders of accuracy)::
 
@@ -46,11 +46,16 @@ two approximations with different orders of accuracy)::
     info("Runge-Kutta time step (t = %g, tau = %g, stages: %d).", 
          current_time, time_step, bt.get_size());
     bool verbose = true;
-    bool jacobian_changed = true;
-    if (!runge_kutta.rk_time_step(current_time, time_step, &sln_time_prev, 
-                                  &sln_time_new, &time_error_fn, jacobian_changed, verbose, 
-                                  NEWTON_TOL, NEWTON_MAX_ITER)) {
-      error("Runge-Kutta time step failed, try to decrease time step size.");
+    try
+    {
+      runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, 
+                                &sln_time_new, &time_error_fn, false, false, verbose, 
+                                NEWTON_TOL, NEWTON_MAX_ITER);
+    }
+    catch(Exceptions::Exception& e)
+    {
+      e.printMsg();
+      error("Runge-Kutta time step failed");
     }
 
 The solution sln_time_new contains the more accurate of the two solutions.
@@ -61,8 +66,8 @@ Calculating relative temporal error
 This is done by calculating the norm of the error function and
 dividing it by the norm of the solution::
 
-    double rel_err_time = hermes2d.calc_norm(&time_error_fn, HERMES_H1_NORM) / 
-                          hermes2d.calc_norm(&sln_time_new, HERMES_H1_NORM) * 100;
+    double rel_err_time = Global<double>::calc_norm(&time_error_fn, HERMES_H1_NORM) / 
+                          Global<double>::calc_norm(&sln_time_new, HERMES_H1_NORM) * 100;
 
 Adapting the time step
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -91,8 +96,9 @@ step is decreased and vice versa. The code is very simple:
     .
 
     if (rel_err_time > TIME_TOL_UPPER) {
-      info("rel_err_time above upper limit %g%% -> decreasing time step from %g to %g and
-           repeating time step.", TIME_TOL_UPPER, time_step, time_step * TIME_STEP_DEC_RATIO);
+      info("rel_err_time above upper limit %g%% -> decreasing time step from %g to %g 
+            and repeating time step.", 
+           TIME_TOL_UPPER, time_step, time_step * TIME_STEP_DEC_RATIO);
       time_step *= TIME_STEP_DEC_RATIO;
       continue;
     }
@@ -118,7 +124,6 @@ is what matters, it may be a good idea to use an AbsFilter::
 
 Here, the option HERMES_EPS_VERYHIGH is used to render accurately a function
 that has very small values.
-
 
 Sample results
 ~~~~~~~~~~~~~~

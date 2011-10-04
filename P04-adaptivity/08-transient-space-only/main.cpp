@@ -30,14 +30,14 @@ const int P_INIT = 2;                             // Initial polynomial degree o
 const double time_step = 0.5;                     // Time step. 
 const double T_FINAL = 2.0;                       // Time interval length.
 
-// Adapt<double>ivity
+// Adaptivity
 const int UNREF_FREQ = 1;                         // Every UNREF_FREQth time step the mesh is derefined.
 const int UNREF_METHOD = 3;                       // 1... mesh reset to basemesh and poly degrees to P_INIT.   
                                                   // 2... one ref. layer shaved off, poly degrees reset to P_INIT.
                                                   // 3... one ref. layer shaved off, poly degrees decreased by one. 
 const double THRESHOLD = 0.3;                     // This is a quantitative parameter of the adapt(...) function and
                                                   // it has different meanings for various adaptive strategies (see below).
-const int STRATEGY = 0;                           // Adapt<double>ive strategy:
+const int STRATEGY = 0;                           // Adaptive strategy:
                                                   // STRATEGY = 0 ... refine elements until sqrt(THRESHOLD) times total
                                                   //   error is processed. If more elements have similar errors, refine
                                                   //   all to keep the mesh symmetric.
@@ -60,7 +60,7 @@ const double CONV_EXP = 1.0;                      // Default value is 1.0. This 
                                                   // cancidates in hp-adaptivity. See get_optimal_refinement() for details.
 const double ERR_STOP = 1.0;                      // Stopping criterion for adaptivity (rel. error tolerance between the
                                                   // fine mesh and coarse mesh solution in percent).
-const int NDOF_STOP = 60000;                      // Adapt<double>ivity process stops when the number of degrees of freedom grows
+const int NDOF_STOP = 60000;                      // Adaptivity process stops when the number of degrees of freedom grows
                                                   // over this limit. This is to prevent h-adaptivity to go on forever.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
                                                   // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
@@ -182,7 +182,6 @@ int main(int argc, char* argv[])
       info("Runge-Kutta time step (t = %g s, tau = %g s, stages: %d).",
            current_time, time_step, bt.get_size());
       bool verbose = true;
-      
       try
       {
         runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, &sln_time_new, 
