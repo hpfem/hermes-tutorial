@@ -18,7 +18,7 @@
 
 const int INIT_REF_NUM = 6;                       // Number of initial uniform mesh refinements.
 const int P_INIT = 3;                             // Initial polynomial degree of all mesh elements.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+MatrixSolverType matrix_solver = SOLVER_AZTECOO;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
                                                   // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
 // NOX parameters.
@@ -114,6 +114,7 @@ int main(int argc, char **argv)
     error("Newton's iteration failed.");
   }
 
+  // Translate solution vector into a Solution.
   Hermes::Hermes2D::Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln1);
 
   // CPU time measurement.
@@ -124,6 +125,7 @@ int main(int argc, char **argv)
   info("CPU time: %g s.", time);
   info("Exact H1 error: %g%%.", rel_err_1);
 
+  // Clean up.
   delete(matrix);
   delete(rhs);
   delete(solver);
@@ -147,19 +149,19 @@ int main(int argc, char **argv)
   // Time measurement.
   cpu_time.tick(HERMES_SKIP);
 
-  // Set initial vector for NOX.
-  // NOTE: Using zero vector was causing convergence problems.
+  // Calculate initial vector for NOX.
   info("Projecting to obtain initial vector for the Newton's method.");
   ZeroSolution init_sln(&mesh);
+  OGProjection<double>::project_global(&space, &init_sln, coeff_vec);
 
-  // Initialize the NOX solver with the vector "coeff_vec".
+  // Initialize the NOX solver.
   info("Initializing NOX.");
   NewtonSolverNOX<double> nox_solver(&dp2);
   nox_solver.set_output_flags(message_type);
 
+  // Set various NOX parameters.
   nox_solver.set_ls_type(iterative_method);
   nox_solver.set_ls_tolerance(ls_tolerance);
-
   nox_solver.set_conv_iters(max_iters);
   if (flag_absresid)
     nox_solver.set_conv_abs_resid(abs_resid);
@@ -175,8 +177,6 @@ int main(int argc, char **argv)
   }
 
   // Assemble and solve using NOX.
-  Solution<double> sln2;
-  OGProjection<double>::project_global(&space, &init_sln, coeff_vec);
   try
   {
     nox_solver.solve(coeff_vec);
@@ -187,6 +187,8 @@ int main(int argc, char **argv)
     error("NOX failed.");
   }
 
+  // Convert resulting coefficient vector into a Solution.
+  Solution<double> sln2;
   Solution<double>::vector_to_solution(nox_solver.get_sln_vector(), &space, &sln2);
 
   info("Number of nonlin iterations: %d (norm of residual: %g)", 

@@ -24,28 +24,39 @@ with an exact solution
 
 The first part (UMFpack) needs not be discussed, let's proceed directly to NOX: 
 
-Calculating initial condition for NOX
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Calculate initial vector for NOX
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As NOX is iterative, the initial condition matters::
 
-    // Set initial vector for NOX.
-    // NOTE: Using zero vector was causing convergence problems.
+    // Calculate initial vector for NOX.
     info("Projecting to obtain initial vector for the Newton's method.");
-    Solution init_sln(&mesh, 0.0);
-    OGProjection::project_global(&space, &init_sln, coeff_vec);
+    ZeroSolution init_sln(&mesh);
+    OGProjection<double>::project_global(&space, &init_sln, coeff_vec);
 
 Initializing NOX
 ~~~~~~~~~~~~~~~~
 
 ::
 
-    // Initialize the NOX solver with the vector "coeff_vec".
+    // Initialize the NOX solver.
     info("Initializing NOX.");
-    // "" stands for preconditioning that is set later.
-    NoxSolver nox_solver(&dp2, message_type, iterative_method, "Newton", ls_tolerance, "", 
-                         flag_absresid, abs_resid, flag_relresid, rel_resid, max_iters);
-    nox_solver.set_init_sln(coeff_vec);
+    NewtonSolverNOX<double> nox_solver(&dp2);
+    nox_solver.set_output_flags(message_type);
+
+Setting additional parameters for NOX
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+    // Set various NOX parameters.
+    nox_solver.set_ls_type(iterative_method);
+    nox_solver.set_ls_tolerance(ls_tolerance);
+    nox_solver.set_conv_iters(max_iters);
+    if (flag_absresid)
+      nox_solver.set_conv_abs_resid(abs_resid);
+    if (flag_relresid)
+      nox_solver.set_conv_rel_resid(rel_resid);
 
 Setting a preconditioner
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -53,7 +64,7 @@ Setting a preconditioner
 ::
 
     // Choose preconditioning.
-    RCP<Precond> pc = rcp(new MlPrecond("sa"));
+    MlPrecond<double> pc("sa");
     if (PRECOND)
     {
       if (TRILINOS_JFNK) nox_solver.set_precond(pc);
@@ -73,40 +84,28 @@ we refer `here <http://trilinos.sandia.gov/packages/docs/r5.0/packages/teuchos/d
 Calling NOX
 ~~~~~~~~~~~
 
-Now we are ready to call the NOX solver to assemble the discrete problem and solve it:
-
-.. sourcecode::
-    .
+Now we are ready to call the NOX solver to assemble the discrete problem and solve it::
 
     // Assemble and solve using NOX.
-    Solution sln2;
-    if (nox_solver.solve())
+    try
     {
-      Solution::vector_to_solution(nox_solver.get_solution(), &space, &sln2);
-
-      info("Number of nonlin iterations: %d (norm of residual: %g)", 
-        nox_solver.get_num_iters(), nox_solver.get_residual());
-      info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
-        nox_solver.get_num_lin_iters(), nox_solver.get_achieved_tol());
+      nox_solver.solve(coeff_vec);
     }
-    else error("NOX failed");
-
-.. latexcode::
-    .
-
-    // Assemble and solve using NOX.
-    Solution sln2;
-    if (nox_solver.solve())
+    catch(Hermes::Exceptions::Exception e)
     {
-      Solution::vector_to_solution(nox_solver.get_solution(), &space, &sln2);
-
-      info("Number of nonlin iterations: %d (norm of residual: %g)", 
-        nox_solver.get_num_iters(), nox_solver.get_residual());
-      info("Total number of iterations in linsolver: %d (achieved tolerance in the last 
-           step: %g)", 
-        nox_solver.get_num_lin_iters(), nox_solver.get_achieved_tol());
+      e.printMsg();
+      error("NOX failed.");
     }
-    else error("NOX failed");
+
+Collecting output info
+~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+    info("Number of nonlin iterations: %d (norm of residual: %g)", 
+      nox_solver.get_num_iters(), nox_solver.get_residual());
+    info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
+      nox_solver.get_num_lin_iters(), nox_solver.get_achieved_tol());
 
 Sample results
 ~~~~~~~~~~~~~~
