@@ -22,17 +22,29 @@ using namespace RefinementSelectors;
 //
 //  The following parameters can be changed:
 
-const int P_INIT = 2;                             // Initial polynomial degree.
-const int INIT_GLOB_REF_NUM = 3;                  // Number of initial uniform mesh refinements.
-const int INIT_BDY_REF_NUM = 5;                   // Number of initial refinements towards boundary.
-const double INIT_COND_CONST = 3.0;               // Value for custom constant initial condition.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+// Initial polynomial degree.
+const int P_INIT = 2;                             
+// Number of initial uniform mesh refinements.
+const int INIT_GLOB_REF_NUM = 3;                  
+// Number of initial refinements towards boundary.
+const int INIT_BDY_REF_NUM = 5;                   
+// Value for custom constant initial condition.
+const double INIT_COND_CONST = 3.0;               
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
+
 // Picard's method.
-const int PICARD_NUM_LAST_ITER_USED = 4;          // Number of last iterations used.
-const double PICARD_ANDERSON_BETA = 0.2;          // 0 <= beta <= 1, parameter for the Anderson acceleration. 
-const double PICARD_TOL = 1e-3;                   // Stopping criterion for the Picard's method.
-const int PICARD_MAX_ITER = 100;                  // Maximum allowed number of Picard iterations.
+// Number of last iterations used. 
+// 1... standard fixed point.
+// >1... Anderson acceleration.
+const int PICARD_NUM_LAST_ITER_USED = 4;          
+// 0 <= beta <= 1... parameter for the Anderson acceleration. 
+const double PICARD_ANDERSON_BETA = 0.2;          
+// Stopping criterion for the Picard's method.
+const double PICARD_TOL = 1e-3;                   
+// Maximum allowed number of Picard iterations.
+const int PICARD_MAX_ITER = 100;                  
 
 // Problem parameters.
 double heat_src = 1.0;
@@ -73,7 +85,7 @@ int main(int argc, char* argv[])
 
   // Perform the Picard's iteration (Anderson acceleration on by default).
   if (!picard.solve(PICARD_TOL, PICARD_MAX_ITER, PICARD_NUM_LAST_ITER_USED, 
-                      PICARD_ANDERSON_BETA)) error("Picard's iteration failed.");
+                    PICARD_ANDERSON_BETA)) error("Picard's iteration failed.");
 
   // Translate the coefficient vector into a Solution. 
   Solution<double> sln;

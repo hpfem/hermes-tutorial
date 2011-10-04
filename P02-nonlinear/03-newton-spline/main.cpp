@@ -17,13 +17,19 @@
 //
 //  The following parameters can be changed:
 
-const int P_INIT = 2;                             // Initial polynomial degree.
-const double NEWTON_TOL = 1e-8;                   // Stopping criterion for the Newton's method.
-const int NEWTON_MAX_ITER = 100;                  // Maximum allowed number of Newton iterations.
-const int INIT_GLOB_REF_NUM = 3;                  // Number of initial uniform mesh refinements.
-const int INIT_BDY_REF_NUM = 4;                   // Number of initial refinements towards boundary.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+// Initial polynomial degree.
+const int P_INIT = 2;                             
+// Stopping criterion for the Newton's method.
+const double NEWTON_TOL = 1e-8;                   
+// Maximum allowed number of Newton iterations.
+const int NEWTON_MAX_ITER = 100;                  
+// Number of initial uniform mesh refinements.
+const int INIT_GLOB_REF_NUM = 3;                  
+// Number of initial refinements towards boundary.
+const int INIT_BDY_REF_NUM = 4;                   
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
 
 // Problem parameters.
 double heat_src = 1.0;
@@ -48,8 +54,9 @@ int main(int argc, char* argv[])
   CubicSpline lambda(lambda_pts, lambda_val, bc_left, bc_right, first_der_left, first_der_right,
                      extrapolate_der_left, extrapolate_der_right);
   info("Saving cubic spline into a Pylab file spline.dat.");
-  double interval_extension = 3.0; // The interval of definition of the spline will be 
-                                   // extended by "interval_extension" on both sides.
+  // The interval of definition of the spline will be 
+  // extended by "interval_extension" on both sides.
+  double interval_extension = 3.0; 
   lambda.plot("spline.dat", interval_extension);
 
   // Load the mesh.
