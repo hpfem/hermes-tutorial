@@ -1,7 +1,7 @@
 Tutorial Part VII (Using Trilinos)
 ==================================
 
-This section shows how to use Trilinos solvers.
+This section shows how to use Trilinos and in particular the NOX solver.
 
 .. toctree::
     :maxdepth: 2

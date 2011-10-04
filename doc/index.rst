@@ -26,7 +26,6 @@ Solving 2D Problems
     src/hermes2d/P02-nonlinear
     src/hermes2d/P03-transient
     src/hermes2d/P04-adaptivity
-    src/hermes2d/P05-eigenproblems
     src/hermes2d/P06-fvm-and-dg
     src/hermes2d/P07-trilinos
     src/hermes2d/P08-miscellaneous
@@ -40,3 +39,10 @@ Selected 1D problems are part of the repository "hermes-examples". To clone it, 
 
 The repository contains a folder doc/ with Sphinx documentation. To build the docs,
 type "make html" in that directory. 
+
+Solving Eigenproblems
+---------------------
+
+Eigenproblems are supported in the legacy code but not in Version 1.0,
+because of their Python dependency (PySparse). Implementation of a C++
+eigensolver class is scheduled for the next release.
