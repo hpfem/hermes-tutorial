@@ -186,12 +186,12 @@ int main(int argc, char* argv[])
     info("Solving on fine mesh:");
     bool verbose = true;
     NewtonSolver<double> newton(&dp, matrix_solver);
-    newton_coarse.set_verbose_output(verbose);
+    newton.set_verbose_output(verbose);
 
     // Perform Newton's iteration.
     try
     {
-      newton_coarse.solve(coeff_vec, NEWTON_TOL_FINE, NEWTON_MAX_ITER);
+      newton.solve(coeff_vec, NEWTON_TOL_FINE, NEWTON_MAX_ITER);
     }
     catch(Hermes::Exceptions::Exception e)
     {
