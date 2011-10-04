@@ -29,7 +29,7 @@ const int P_INIT = 2;
 // Number of initial uniform mesh refinements.
 const int INIT_REF_NUM = 1;
 // This is a quantitative parameter of the adapt(...) function and
-// it has different meanings for various adaptive strategies (see below).
+// it has different meanings for various adaptive strategies.
 const double THRESHOLD = 0.3;
 // Adaptive strategy:
 // STRATEGY = 0 ... refine elements until sqrt(THRESHOLD) times total
@@ -44,7 +44,6 @@ const int STRATEGY = 1;
 // Predefined list of element refinement candidates. Possible values are
 // H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO,
 // H2D_HP_ANISO_H, H2D_HP_ANISO_P, H2D_HP_ANISO.
-// See User Documentation for details.
 const CandList CAND_LIST = H2D_HP_ANISO;
 // Maximum allowed level of hanging nodes:
 // MESH_REGULARITY = -1 ... arbitrary level hangning nodes (default),
@@ -53,16 +52,15 @@ const CandList CAND_LIST = H2D_HP_ANISO;
 // Note that regular meshes are not supported, this is due to
 // their notoriously bad performance.
 const int MESH_REGULARITY = -1;
-// Default value is 1.0. This parameter influences the selection of
-// cancidates in hp-adaptivity. See get_optimal_refinement() for details.
+// This parameter influences the selection of
+// candidates in hp-adaptivity. Default value is 1.0. 
 const double CONV_EXP = 1.0;
-// Stopping criterion for adaptivity (rel. error tolerance between the
-// reference mesh and coarse mesh solution in percent).
+// Stopping criterion for adaptivity.
 const double ERR_STOP = 1.0;
 // Adaptivity process stops when the number of degrees of freedom grows
 // over this limit. This is to prevent h-adaptivity to go on forever.
 const int NDOF_STOP = 60000;
-// Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 MatrixSolverType matrix_solver_type = SOLVER_UMFPACK;
 
@@ -80,8 +78,10 @@ int main(int argc, char* argv[])
   // Load the mesh.
   Mesh mesh;
   MeshReaderH2D mloader;
-  mloader.load("lshape3q.mesh", &mesh);    // quadrilaterals
-  //mloader.load("lshape3t.mesh", &mesh);  // triangles
+  // Quadrilateral mesh.
+  mloader.load("lshape3q.mesh", &mesh);    
+  // Triangular mesh.
+  //mloader.load("lshape3t.mesh", &mesh);  
 
   // Perform initial mesh refinemets.
   for (int i = 0; i < INIT_REF_NUM; i++)  mesh.refine_all_elements();
@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
     std::complex<double>* coeff_vec = new std::complex<double>[ndof_ref];
     memset(coeff_vec, 0, ndof_ref * sizeof(std::complex<double>));
 
-    // Perform Newton's iteration and translate the resulting coefficient vector into a Solution.
+    // Perform Newton's iteration.
     Hermes::Hermes2D::NewtonSolver<std::complex<double> > newton(&dp, matrix_solver_type);
 
     try{
@@ -149,6 +149,8 @@ int main(int argc, char* argv[])
       e.printMsg();
       error("Newton's iteration failed.");
     }
+
+    // Translate the resulting coefficient vector into a Solution.    
     Hermes::Hermes2D::Solution<std::complex<double> >::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
 
     // Time measurement.

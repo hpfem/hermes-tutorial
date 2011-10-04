@@ -3,8 +3,8 @@
 
 // This example shows how to run adaptive h-FEM driven by the Kelly estimator and
 // set its basic control parameters. The underlying problem is the same as in 
-// P04-adaptivity/01-intro, i.e. a planar model of an electrostatic micromotor 
-// (MEMS).
+// P04-adaptivity/01-intro, i.e., a planar model of an electrostatic micromotor (MEMS).
+//
 // In this example, adaptive mesh refinement is not based on comparing solutions on 
 // coarse and refined meshes as in previous tutorial, but rather on evaluating an
 // error estimate for each element. The basic error estimator developed by Kelly and
@@ -14,12 +14,15 @@
 // solution accross element edges. In order to fully conform to the theory, it may 
 // also optionally include the L2 norm of the equation residual (variable 
 // USE_RESIDUAL_ESTIMATOR).
+//
 // Elements with highest error estimates will be refined according to the selected 
 // strategy (variables THRESHOLD and STRATEGY). See the User Documentation for more 
 // details. 
+//
 // Uniform initial polynomial degree of mesh elements can be set using the variable 
 // P_INIT. Additional control parameters are available, these will be demonstrated
 // in the following tutorial examples. 
+//
 // In this example, two types of convergence graphs are created -- error estimate 
 // wrt. the number of degrees of freedom (DOF), and error estimate wrt. CPU time. 
 // Later we will show how to output the error wrt. exact solution when exact
@@ -34,34 +37,44 @@
 //
 // The following parameters can be changed:
 
-const bool HERMES_VISUALIZATION = true;           // Set to "false" to suppress Hermes OpenGL visualization. 
-const bool VTK_VISUALIZATION = false;             // Set to "true" to enable VTK output.
-const int P_INIT = 2;                             // Initial polynomial degree of all mesh elements.
-const double THRESHOLD = 0.3;                     // This is a quantitative parameter of the adapt(...) function and
-                                                  // it has different meanings for various adaptive strategies (see below).
-const int STRATEGY = 0;                           // Adaptive strategy:
-                                                  // STRATEGY = 0 ... refine elements until sqrt(THRESHOLD) times total
-                                                  //   error is processed. If more elements have similar errors, refine
-                                                  //   all to keep the mesh symmetric.
-                                                  // STRATEGY = 1 ... refine all elements whose error is larger
-                                                  //   than THRESHOLD times maximum element error.
-                                                  // STRATEGY = 2 ... refine all elements whose error is larger
-                                                  //   than THRESHOLD.
-const bool USE_RESIDUAL_ESTIMATOR = false;          // Add also the norm of residual to the error estimate of each element.
-const bool USE_EPS_IN_INTERFACE_ESTIMATOR = true;   // If true, the interface estimator is defined by jumps of fluxes; otherwise
-                                                    // jumps of normal derivatives are used.
-const int MESH_REGULARITY = -1;                   // Maximum allowed level of hanging nodes:
-                                                  // MESH_REGULARITY = -1 ... arbitrary level hangning nodes (default),
-                                                  // MESH_REGULARITY = 1 ... at most one-level hanging nodes,
-                                                  // MESH_REGULARITY = 2 ... at most two-level hanging nodes, etc.
-                                                  // Note that regular meshes are not supported, this is due to
-                                                  // their notoriously bad performance.
-const double ERR_STOP = 5e-6;                        // Stopping criterion for adaptivity (rel. error tolerance between the
-                                                  // reference mesh and coarse mesh solution in percent).
-const int NDOF_STOP = 60000;                      // Adaptivity process stops when the number of degrees of freedom grows
-                                                  // over this limit. This is to prevent h-adaptivity to go on forever.
-MatrixSolverType matrix_solver_type = SOLVER_UMFPACK; // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                                      // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+// Set to "false" to suppress Hermes OpenGL visualization. 
+const bool HERMES_VISUALIZATION = true;           
+// Set to "true" to enable VTK output.
+const bool VTK_VISUALIZATION = false;             
+// Initial polynomial degree of mesh elements.
+const int P_INIT = 2;                             
+// This is a quantitative parameter of the adapt(...) function and
+// it has different meanings for various adaptive strategies.
+const double THRESHOLD = 0.3;                     
+// Adaptive strategy:
+// STRATEGY = 0 ... refine elements until sqrt(THRESHOLD) times total
+//   error is processed. If more elements have similar errors, refine
+//   all to keep the mesh symmetric.
+// STRATEGY = 1 ... refine all elements whose error is larger
+//   than THRESHOLD times maximum element error.
+// STRATEGY = 2 ... refine all elements whose error is larger
+//   than THRESHOLD.
+const int STRATEGY = 0;                           
+// Add also the norm of residual to the error estimate of each element.
+const bool USE_RESIDUAL_ESTIMATOR = false;          
+// If true, the interface estimator is defined by jumps of fluxes; otherwise
+// jumps of normal derivatives are used.
+const bool USE_EPS_IN_INTERFACE_ESTIMATOR = true;   
+// Maximum allowed level of hanging nodes:
+// MESH_REGULARITY = -1 ... arbitrary level hangning nodes (default),
+// MESH_REGULARITY = 1 ... at most one-level hanging nodes,
+// MESH_REGULARITY = 2 ... at most two-level hanging nodes, etc.
+// Note that regular meshes are not supported, this is due to
+// their notoriously bad performance.
+const int MESH_REGULARITY = -1;                   
+// Stopping criterion for adaptivity.
+const double ERR_STOP = 5e-6;                     
+// Adaptivity process stops when the number of degrees of freedom grows
+// over this limit. This is to prevent h-adaptivity to go on forever.
+const int NDOF_STOP = 60000;                      
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+MatrixSolverType matrix_solver_type = SOLVER_UMFPACK; 
                                                   
 // Problem parameters.
 const double EPS0 = 8.863e-12;
