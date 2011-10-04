@@ -10,10 +10,8 @@ using namespace Hermes::Hermes2D;
 // Domain: Rectangle (0, 2) x (0, 1) where the upper edge is a NURBS
 //         (see the end of the mesh file for details).
 //
-// Choose one of the following mesh files:
 
 const int INIT_REF_NUM = 2;
-
 const char* mesh_file = "domain-4.mesh";
 
 int main(int argc, char* argv[])
@@ -26,6 +24,7 @@ int main(int argc, char* argv[])
   // Perform initial mesh refinements (optional).
   for (int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
 
+  // Show the mesh.
   Views::MeshView mview("Nurbs", new Views::WinGeom(0, 0, 350, 350));
   mview.show(&mesh);
 	

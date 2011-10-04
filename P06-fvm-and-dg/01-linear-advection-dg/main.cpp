@@ -1,6 +1,4 @@
-#define HERMES_REPORT_WARN
-#define HERMES_REPORT_INFO
-#define HERMES_REPORT_VERBOSE
+#define HERMES_REPORT_ALL
 #include "definitions.h"
 
 //  This example solves a linear advection equation using Dicontinuous Galerkin (DG) method and standard continuous Finite Element Method. Shows the comparison.
@@ -9,18 +7,19 @@
 //
 //  Domain: Square (0, 1) x (0, 1).
 //
-//  BC:		Dirichlet, u = 1 where \Beta(x) \cdot n(x) < 0, that is on [0,0.5] x {0}, and g = 0 anywhere else.
+//  BC:	Dirichlet, u = 1 where \Beta(x) \cdot n(x) < 0, that is on [0,0.5] x {0}, and g = 0 anywhere else.
 //				
 //  The following parameters can be changed:
 
-const int INIT_REF = 5;                           // Number of initial uniform mesh refinements.
-const int P_INIT = 1;                             // Initial polynomial degrees of mesh elements in vertical and horizontal
-                                                  // directions.
-
-const bool DG_SHOCK_CAPTURING = false;            // Use schock capturing for DG.
-
-MatrixSolverType matrix_solver_type = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+// Number of initial uniform mesh refinements.
+const int INIT_REF = 5;                           
+// Initial polynomial degrees of mesh elements in vertical and horizontal directions.
+const int P_INIT = 1;                             
+// Use shock capturing for DG.
+const bool DG_SHOCK_CAPTURING = false;            
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+MatrixSolverType matrix_solver_type = SOLVER_UMFPACK;  
 
 // Boundary markers.
 const std::string BDY_BOTTOM_LEFT = "1";
@@ -109,7 +108,7 @@ int main(int argc, char* args[])
   delete matrix;
   delete rhs;
   
-  // wait for keyboard or mouse input
+  // Wait for keyboard or mouse input.
   View::wait();
   return 0;
 }

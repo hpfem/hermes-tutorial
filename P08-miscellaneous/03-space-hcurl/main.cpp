@@ -15,8 +15,10 @@ using namespace Hermes::Hermes2D::Views;
 //
 // The following parameters can be changed:
 
-int INIT_REF_NUM = 2;      // Initial uniform mesh refinement.
-int P_INIT = 3;            // Polynomial degree of mesh elements.
+// Initial uniform mesh refinement.
+int INIT_REF_NUM = 2;      
+// Polynomial degree of mesh elements.
+int P_INIT = 3;            
 
 int main(int argc, char* argv[])
 {
@@ -28,6 +30,7 @@ int main(int argc, char* argv[])
   // Initial mesh refinement.
   for (int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
 
+  // Create an Hcurl space with default shapeset.
   HcurlSpace<double> space(&mesh, P_INIT);
 
   // Visualize FE basis.

@@ -12,19 +12,23 @@ using namespace Hermes::Hermes2D;
 //
 // Domain: Rectangle (0, 2) x (0, 1) where the upper edge is a NURBS
 //         (see the end of the mesh file for details).
-//
-// Choose one of the following mesh files:
 
-//const char* mesh_file = "domain-1.mesh";            // One control point.
-const char* mesh_file = "domain-2.mesh";          // Two control points.
-//const char* mesh_file = "domain-3.mesh";          // Three control points.
+// Choose one of the following mesh files:
+// Mesh containing NURBS with one control point.
+//const char* mesh_file = "domain-1.mesh";            
+// Mesh containing NURBS with two control points.
+const char* mesh_file = "domain-2.mesh";          
+// Mesh containing NURBS with three control points.
+//const char* mesh_file = "domain-3.mesh";          
 
 // The following parameters can be also changed:
-
-const int P_INIT = 3;                             // Uniform polynomial degree of mesh elements.
-const int INIT_REF_NUM = 2;                       // Number of initial uniform mesh refinements.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+// Uniform polynomial degree of mesh elements.
+const int P_INIT = 3;                             
+// Number of initial uniform mesh refinements.
+const int INIT_REF_NUM = 2;                       
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
 
 // Problem parameters.
 const double const_f = 1.0;  
@@ -49,7 +53,8 @@ int main(int argc, char* argv[])
   info("ndof = %d", ndof);
 
   // Initialize the weak formulation.
-  WeakFormsH1::DefaultWeakFormPoisson<double> wf(HERMES_ANY, new Hermes1DFunction<double>(1.0), new Hermes2DFunction<double>(-const_f));
+  WeakFormsH1::DefaultWeakFormPoisson<double> wf(HERMES_ANY, 
+      new Hermes1DFunction<double>(1.0), new Hermes2DFunction<double>(-const_f));
 
   // Initialize the FE problem.
   DiscreteProblem<double> dp(&wf, &space);

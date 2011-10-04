@@ -12,10 +12,13 @@ using namespace Hermes::Hermes2D::Views;
 //
 // The following parameters can be changed:
 
-const int INIT_REF_NUM = 1;                       // Number of initial uniform mesh refinements.
-const int P_INIT = 3;                             // Polynomial degree of mesh elements.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+// Number of initial uniform mesh refinements.
+const int INIT_REF_NUM = 1;                       
+// Polynomial degree of mesh elements.
+const int P_INIT = 3;                            
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
 
 int main(int argc, char* argv[])
 {
@@ -39,9 +42,10 @@ int main(int argc, char* argv[])
   Solution<double> sln;
   CustomExactSolution sln_exact(&mesh);
 
+  // Project the exact function on the FE space.
   OGProjection<double>::project_global(&space, &sln_exact, &sln, matrix_solver);
 
-  // Visualize the solution.
+  // Visualize the projection.
   ScalarView view1("Projection", new WinGeom(610, 0, 600, 500));
   view1.show(&sln);
 
