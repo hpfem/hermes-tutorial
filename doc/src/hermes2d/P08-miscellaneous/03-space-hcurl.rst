@@ -1,7 +1,7 @@
-Space H(curl) (05-space-hcurl)
+Space H(curl) (03-space-hcurl)
 ------------------------------
 
-In the tutorial example "P01-linear/02-space" we first saw how a finite element space over a mesh is created. That was an $H^1$ space suitable for continuous approximations. Another widely used Sobolev space, H(curl), is typically present in Maxwell's problems of electromagnetics. H(curl) approximations are discontinuous, elementwise polynomial vector fields that behave like gradients of $H^1$ functions. (Recall that in electrostatics $E = - \nabla \varphi$.) In particular, H(curl) functions have continuous tangential components along all mesh edges. For the application of the H(curl) space check examples related to Maxwell's equations in the previous sections. Below is a simple code that shows how to set up an H(curl) space and visualize its finite element basis functions:
+In the tutorial example "P01-linear/02-space" we first saw how a finite element space over a mesh is created. That was an H1 space suitable for continuous approximations. Another widely used Sobolev space, H(curl), is typically present in Maxwell's problems of electromagnetics. H(curl) approximations are discontinuous, elementwise polynomial vector fields that behave like gradients of H1 functions. Recall that in electrostatics $E = - \nabla \varphi.$ In particular, H(curl) functions have continuous tangential components along all mesh edges. For the application of the H(curl) space check examples related to Maxwell's equations in the previous sections. Below is a simple code that shows how to set up an H(curl) space and visualize its finite element basis functions:
 
 ::
 
@@ -12,16 +12,16 @@ In the tutorial example "P01-linear/02-space" we first saw how a finite element 
     {
       // Load the mesh.
       Mesh mesh;
-      H2DReader mloader;
+      MeshReaderH2D mloader;
       mloader.load("square.mesh", &mesh);
 
       // Initial mesh refinement.
       for (int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
 
-      HcurlSpace space(&mesh, P_INIT);
+      HcurlSpace<double> space(&mesh, P_INIT);
 
       // Visualize FE basis.
-      VectorBaseView bview("VectorBaseView", new WinGeom(0, 0, 700, 600));
+      VectorBaseView<double> bview("VectorBaseView", new WinGeom(0, 0, 700, 600));
       bview.show(&space);
 
       // Wait for all views to be closed.
@@ -36,25 +36,25 @@ sample basis functions (higher-order bubble functions) are
 shown below. The color shows magnitude of the vector field, 
 arrows show its direction.
 
-.. figure:: 05-space-hcurl/fn0.png
+.. figure:: 03-space-hcurl/fn0.png
    :align: center
    :scale: 35% 
    :figclass: align-center
    :alt: Sample basis function
 
-.. figure:: 05-space-hcurl/fn1.png
+.. figure:: 03-space-hcurl/fn1.png
    :align: center
    :scale: 35% 
    :figclass: align-center
    :alt: Sample basis function
 
-.. figure:: 05-space-hcurl/fn2.png
+.. figure:: 03-space-hcurl/fn2.png
    :align: center
    :scale: 35% 
    :figclass: align-center
    :alt: Sample basis function
 
-.. figure:: 05-space-hcurl/fn3.png
+.. figure:: 03-space-hcurl/fn3.png
    :align: center
    :scale: 35% 
    :figclass: align-center

@@ -14,9 +14,7 @@ using namespace Hermes::Hermes2D;
 
 const int INIT_REF_NUM = 2;
 
-//const char* mesh_file = "domain-1.mesh";            // One control point.
-//const char* mesh_file = "domain-2.mesh";          // Two control points.
-const char* mesh_file = "domain-4.mesh";          // Three control points.
+const char* mesh_file = "domain-4.mesh";
 
 int main(int argc, char* argv[])
 {

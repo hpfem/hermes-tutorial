@@ -1,8 +1,8 @@
-Space H(div) (10-space-hdiv)
+Space H(div) (04-space-hdiv)
 ----------------------------
 
 The space H(div) in 2D is very similar in nature to the space H(curl), except its functions 
-behave like (vector-valued) divergences of $H^1$ functions. Finite element basis functions 
+behave like (vector-valued) divergences of H1 functions. Finite element basis functions 
 in the space H(div) are discontinuous across element interfaces but their normal components 
 are continuous. The following code shows how to set up an H(div) space and visualize
 its basis functions: 
@@ -16,7 +16,7 @@ its basis functions:
     {
       // Load the mesh.
       Mesh mesh;
-      H2DReader mloader;
+      MeshReaderH2D mloader;
       mloader.load("square.mesh", &mesh);
 
       // Initial mesh refinement.
@@ -24,10 +24,10 @@ its basis functions:
 
       // Create an Hdiv space with default shapeset.
       // (BC types and essential BC values not relevant.)
-      HdivSpace space(&mesh, P_INIT);
+      HdivSpace<double> space(&mesh, P_INIT);
 
       // Visualise the FE basis.
-      VectorBaseView bview("VectorBaseView", new WinGeom(0, 0, 700, 600));
+      VectorBaseView<double> bview("VectorBaseView", new WinGeom(0, 0, 700, 600));
       bview.show(&space);
 
       // Wait for all views to be closed.
@@ -38,25 +38,25 @@ its basis functions:
 Sample edge functions of polynomial degrees 1, 2, 3, and 4 
 corresponding to a boundary edge are shown below:
 
-.. figure:: 10-space-hdiv/fn0.png
+.. figure:: 04-space-hdiv/fn0.png
    :align: center
    :scale: 35% 
    :figclass: align-center
    :alt: Sample basis function
 
-.. figure:: 10-space-hdiv/fn1.png
+.. figure:: 04-space-hdiv/fn1.png
    :align: center
    :scale: 35% 
    :figclass: align-center
    :alt: Sample basis function
 
-.. figure:: 10-space-hdiv/fn2.png
+.. figure:: 04-space-hdiv/fn2.png
    :align: center
    :scale: 35% 
    :figclass: align-center
    :alt: Sample basis function
 
-.. figure:: 10-space-hdiv/fn3.png
+.. figure:: 04-space-hdiv/fn3.png
    :align: center
    :scale: 35% 
    :figclass: align-center
