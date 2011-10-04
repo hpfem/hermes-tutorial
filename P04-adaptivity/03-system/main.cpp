@@ -184,9 +184,6 @@ int main(int argc, char* argv[])
     Solution<double>::vector_to_solutions(newton.get_sln_vector(), *ref_spaces, 
                                           Hermes::vector<Solution<double> *>(&u_ref_sln, &v_ref_sln));
 
-    // Translate the resulting coefficient vector into the Solution sln.
-    Solution<double>::vector_to_solutions(coeff_vec, *ref_spaces, Hermes::vector<Solution<double> *>(&u_ref_sln, &v_ref_sln));
-
     // Project the fine mesh solution onto the coarse mesh.
     info("Projecting reference solution on coarse mesh.");
     OGProjection<double>::project_global(Hermes::vector<Space<double> *>(&u_space, &v_space), 

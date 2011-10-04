@@ -1,5 +1,5 @@
-Adaptive Multimesh hp-FEM Example (03-system)
----------------------------------------------
+Adaptive Multimesh *hp*-FEM Example (03-system)
+-----------------------------------------------
 
 Model problem
 ~~~~~~~~~~~~~
@@ -77,202 +77,54 @@ Manufactured right-hand side
 
 The source functions $g_1$ and $g_2$ are obtained by inserting $u$ and $v$ 
 into the PDE system. These functions are not extremely pretty, but they 
-are not too bad either::
-
-    class CustomExactFunction1
-    {
-    public:
-      CustomExactFunction1() 
-      { 
-      };
-
-      double val(double x) 
-      {
-	return cos(M_PI*x/2);
-      }
-      
-      double dx(double x) 
-      {
-	return -sin(M_PI*x/2)*(M_PI/2.);
-      }
-      
-      double ddxx(double x) 
-      {
-	return -cos(M_PI*x/2)*(M_PI/2.)*(M_PI/2.);
-      }
-    };
-
-    class CustomExactFunction2
-    {
-    public:
-      CustomExactFunction2(double K) : K(K) 
-      {
-      };
-
-      double val(double x) 
-      {
-	return 1. - (exp(K*x) + exp(-K*x))/(exp(K) + exp(-K));
-      }
-      
-      double dx(double x) 
-      {
-	return -K*(exp(K*x) - exp(-K*x))/(exp(K) + exp(-K));
-      }
-      
-      double ddxx(double x) 
-      {
-	return -K*K*(exp(K*x) + exp(-K*x))/(exp(K) + exp(-K));
-      }
-
-      double K;
-    };
-
+are not too bad either - see files definitions.h and definitions.cpp.
 
 Weak forms
 ~~~~~~~~~~
 
 The weak forms can be found in the files definitions.h and definitions.cpp.
 Beware that although each of the forms is actually symmetric, one cannot use the 
-HERMES_SYM flag as in the elasticity equations, since it has a slightly different 
-meaning (see example `P01-linear/08-system <http://hpfem.org/hermes/doc/src/hermes2d/P01-linear/08-system.html>`_).
+HERMES_SYM flag as in the elasticity equations, since it has a different 
+meaning.
 
 Adaptivity loop
 ~~~~~~~~~~~~~~~
 
-The adaptivity workflow is standard, first we construct the reference spaces::
+The adaptivity workflow is standard. First we construct the reference spaces::
 
     // Construct globally refined reference mesh and setup reference space.
-    Hermes::vector<Space *>* ref_spaces = 
-      Space::construct_refined_spaces(Hermes::vector<Space *>(&u_space, &v_space));
+    Hermes::vector<Space<double> *>* ref_spaces = 
+      Space<double>::construct_refined_spaces(Hermes::vector<Space<double> *>(&u_space, &v_space));
 
-Then we initialize matrix solver::
+Next we initialize the discrete problem on the fine meshes::
 
-    // Initialize matrix solver.
-    SparseMatrix* matrix = create_matrix(matrix_solver);
-    Vector* rhs = create_vector(matrix_solver);
-    Solver* solver = create_linear_solver(matrix_solver, matrix, rhs);
+    // Initialize reference problem.
+    DiscreteProblem<double> dp(&wf, *ref_spaces);
 
-Solve the discrete problem using the Newton's method::
+Then we initialize the Newton solver::
+
+    NewtonSolver<double> newton(&dp, matrix_solver);
+    newton.set_verbose_output(false);
+
+And we solve the problem using the Newton's method::
 
     // Perform Newton's iteration.
-    bool jacobian_changed = true;
-    bool verbose = true;
-    if (!hermes2d.solve_newton(coeff_vec, &dp, solver, matrix, rhs, jacobian_changed, 
-                               1e-8, 100, verbose)) error("Newton's iteration failed.");
-
-Translate the coefficient vector into the two Solutions:
-
-.. sourcecode::
-    .
-
-    // Translate the resulting coefficient vector into Solutions.
-    Solution::vector_to_solutions(coeff_vec, *ref_spaces, Hermes::vector<Solution *>(&u_ref_sln, &v_ref_sln));
-
-.. latexcode::
-    .
-
-    // Translate the resulting coefficient vector into Solutions.
-    Solution::vector_to_solutions(coeff_vec, *ref_spaces, Hermes::vector<Solution *>
-                                  (&u_ref_sln, &v_ref_sln));
-
-Project reference solutions to the coarse meshes::
-
-    // Project the fine mesh solution onto the coarse mesh.
-    info("Projecting reference solution on coarse mesh.");
-    OGProjection::project_global(Hermes::vector<Space *>(&u_space, &v_space), 
-                                 Hermes::vector<Solution *>(&u_ref_sln, &v_ref_sln), 
-                                 Hermes::vector<Solution *>(&u_sln, &v_sln), 
-                                                            matrix_solver); 
-
-Calculate error estimates:
-
-.. sourcecode::
-    .
-
-    // Calculate error estimate for each solution component and the total error estimate.
-    Hermes::vector<double> err_est_rel;
-    double err_est_rel_total = adaptivity->calc_err_est(Hermes::vector<Solution *>(&u_sln, &v_sln), 
-                               Hermes::vector<Solution *>(&u_ref_sln, &v_ref_sln), 
-                               &err_est_rel) * 100;
-
-.. latexcode::
-    .
-
-    // Calculate error estimate for each solution component and the total error estimate.
-    Hermes::vector<double> err_est_rel;
-    double err_est_rel_total = adaptivity->calc_err_est(Hermes::vector<Solution *>
-                               (&u_sln, &v_sln), Hermes::vector<Solution *>
-                               (&u_ref_sln, &v_ref_sln), &err_est_rel) * 100;
-
-Calculate exact errors (optional):
-
-.. sourcecode::
-    .
-
-    // Calculate exact error for each solution component and the total exact error.
-    Hermes::vector<double> err_exact_rel;
-    bool solutions_for_adapt = false;
-    double err_exact_rel_total = adaptivity->calc_err_exact(Hermes::vector<Solution *>(&u_sln, &v_sln), 
-                                                            Hermes::vector<Solution *>(&exact_u, &exact_v), 
-                                                            &err_exact_rel, solutions_for_adapt) * 100;
-
-.. latexcode::
-    .
-
-    // Calculate exact error for each solution component and the total exact error.
-    Hermes::vector<double> err_exact_rel;
-    bool solutions_for_adapt = false;
-    double err_exact_rel_total = adaptivity->calc_err_exact(Hermes::vector<Solution *>
-                                 (&u_sln, &v_sln), Hermes::vector<Solution *>
-                                 (&exact_u, &exact_v), &err_exact_rel,
-                                  solutions_for_adapt) * 100;
-
-Adapt the coarse meshes:
-
-.. sourcecode::
-    .
-
-    // If err_est too large, adapt the mesh.
-    if (err_est_rel_total < ERR_STOP) 
-      done = true;
-    else 
+    try
     {
-      info("Adapting coarse mesh.");
-      done = adaptivity->adapt(Hermes::vector<RefinementSelectors::Selector *>(&selector, &selector), 
-                               THRESHOLD, STRATEGY, MESH_REGULARITY);
+      newton.solve(coeff_vec);
     }
-    if (Space::get_num_dofs(Hermes::vector<Space *>(&u_space, &v_space)) >= NDOF_STOP) done = true;
-
-.. latexcode::
-    .
-
-    // If err_est too large, adapt the mesh.
-    if (err_est_rel_total < ERR_STOP) 
-      done = true;
-    else 
+    catch(Hermes::Exceptions::Exception e)
     {
-      info("Adapting coarse mesh.");
-      done = adaptivity->adapt(Hermes::vector<RefinementSelectors::Selector *>
-                               (&selector, &selector), THRESHOLD, STRATEGY,
-                               MESH_REGULARITY);
+      e.printMsg();
+      error("Newton's iteration failed.");
     }
-    if (Space::get_num_dofs(Hermes::vector<Space *>(&u_space, &v_space)) >= NDOF_STOP)
-        done = true;
 
-Clean up::
+Next we translate the coefficient vector into the two Solutions,
+project reference solutions to the coarse meshes, calculate error 
+estimates, calculate exact errors (optional), and 
+adapt the coarse meshes. For details on the last steps see
+the filemain.cpp.
 
-    // Clean up.
-    delete solver;
-    delete matrix;
-    delete rhs;
-    delete adaptivity;
-    for(int i = 0; i < ref_spaces->size(); i++)
-      delete (*ref_spaces)[i]->get_mesh();
-    delete ref_spaces;
-    delete dp;
-    
-    // Increase counter.
-    as++;
 
 Sample results
 ~~~~~~~~~~~~~~
@@ -286,6 +138,10 @@ conventional (single-mesh) hp-FEM: **9,330 DOF** (4665 for each solution compone
    :scale: 40% 
    :figclass: align-center
    :alt: Mesh
+
+.. raw:: html
+
+   <hr style="clear: both; visibility: hidden;">
 
 .. figure:: 03-system/mesh_single.png
    :align: center
@@ -305,6 +161,10 @@ the multimesh hp-FEM: **1,723 DOF** (49 DOF for $u$ and $1,673$ for $v$).
    :scale: 40% 
    :figclass: align-center
    :alt: Mesh
+
+.. raw:: html
+
+   <hr style="clear: both; visibility: hidden;">
 
 .. figure:: 03-system/mesh_multi_v.png
    :align: center
