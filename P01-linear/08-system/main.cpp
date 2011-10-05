@@ -23,7 +23,7 @@ const bool USE_XML_FORMAT = true;
 // Initial polynomial degree of all elements.
 const int P_INIT = 6;                                      
 // Stopping criterion for the Newton's method.
-const double NEWTON_TOL = 1e-8;                            
+const double NEWTON_TOL = 1e-7;                            
 // Maximum allowed number of Newton iterations.
 const int NEWTON_MAX_ITER = 100;                           
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
