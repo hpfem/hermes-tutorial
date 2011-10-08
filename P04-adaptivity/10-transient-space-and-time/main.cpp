@@ -7,7 +7,7 @@ using namespace Views;
 
 //  This example is analogous to the previous two, and it combines spatial adaptivity 
 //  with adaptive time stepping. If an embedded method is used, temporal error is 
-//  measured and visualized. Adapt<double>ive time stepping can be turned on or 
+//  measured and visualized. Adaptive time stepping can be turned on or 
 //  off using the flag ADAPTIVE_TIME_STEP_ON. An embedded R-K method must be 
 //  used if ADAPTIVE_TIME_STEP_ON == true.
 //
