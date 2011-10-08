@@ -20,7 +20,7 @@
 const int INIT_REF_NUM = 6;                       
 // Initial polynomial degree of all mesh elements.
 const int P_INIT = 3;                             
-// Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 MatrixSolverType matrix_solver = SOLVER_AZTECOO;  
 

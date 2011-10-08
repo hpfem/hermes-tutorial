@@ -32,7 +32,7 @@ const int P_INIT = 3;
 const double NEWTON_TOL = 1e-6;                   
 // Maximum allowed number of Newton iterations.
 const int NEWTON_MAX_ITER = 100;                  
-// Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
+// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
 
