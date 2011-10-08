@@ -37,9 +37,6 @@ Selected 1D problems are part of the repository "hermes-examples". To clone it, 
 
     git clone git://github.com/hpfem/hermes-examples.git
 
-The repository contains a folder doc/ with Sphinx documentation. To build the docs,
-type "make html" in that directory. 
-
 Solving Eigenproblems
 ---------------------
 
