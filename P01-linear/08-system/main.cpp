@@ -2,7 +2,6 @@
 #define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
 
-
 // This example explains how to create multiple spaces over a mesh and use them
 // to solve a simple problem of linear elasticity. Note how Tuples are used, 
 // they replace variable-length argument lists. At the end, VonMises filter is 
@@ -106,7 +105,7 @@ int main(int argc, char* argv[])
   // Translate the resulting coefficient vector into the Solution sln.
   Solution<double> u1_sln, u2_sln;
   Solution<double>::vector_to_solutions(coeff_vec, Hermes::vector<Space<double> *>(&u1_space, &u2_space), 
-                                        Hermes::vector<Solution<double> *>(&u1_sln, &u2_sln));
+      Hermes::vector<Solution<double> *>(&u1_sln, &u2_sln));
   
   // Visualize the solution.
   ScalarView view("Von Mises stress [Pa]", new WinGeom(590, 0, 700, 400));
