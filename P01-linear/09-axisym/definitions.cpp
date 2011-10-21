@@ -1,7 +1,7 @@
 #include "definitions.h"
 
 CustomWeakFormPoissonNewton::CustomWeakFormPoissonNewton(double lambda, double alpha, double T0, 
-                                                         std::string bdy_heat_flux) : WeakForm(1)
+                                                         std::string bdy_heat_flux) : WeakForm<double>(1)
 {
   // Jacobian form - volumetric.
   add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(0, 0, HERMES_ANY, new Hermes1DFunction<double>(lambda),

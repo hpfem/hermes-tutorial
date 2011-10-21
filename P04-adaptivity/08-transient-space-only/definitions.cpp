@@ -1,6 +1,6 @@
 #include "definitions.h"
 
-CustomNonlinearity::CustomNonlinearity(double alpha): Hermes1DFunction()
+CustomNonlinearity::CustomNonlinearity(double alpha): Hermes1DFunction<double>()
 {
   this->is_const = false;
   this->alpha = alpha;
