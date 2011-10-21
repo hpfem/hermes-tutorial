@@ -71,7 +71,7 @@ and its constructor in definitions.cpp::
     CustomWeakFormPoissonNewton::CustomWeakFormPoissonNewton(std::string mat_al, Hermes1DFunction<double>* lambda_al,
 							     std::string mat_cu, Hermes1DFunction<double>* lambda_cu,
 							     Hermes2DFunction<double>* vol_src_term, std::string bdy_heat_flux,
-							     double alpha, double t_exterior) : WeakForm(1)
+							     double alpha, double t_exterior) : WeakForm<double>(1)
     {
       // Jacobian forms - volumetric.
       add_matrix_form(new DefaultJacobianDiffusion<double>(0, 0, mat_al, lambda_al));
@@ -97,7 +97,7 @@ and its constructor in definitions.cpp::
                                  std::string mat_al, Hermes1DFunction<double>* lambda_al,
 				 std::string mat_cu, Hermes1DFunction<double>* lambda_cu,
 				 Hermes2DFunction<double>* vol_src_term, std::string bdy_heat_flux,
-				 double alpha, double t_exterior) : WeakForm(1)
+				 double alpha, double t_exterior) : WeakForm<double>(1)
     {
       // Jacobian forms - volumetric.
       add_matrix_form(new DefaultJacobianDiffusion<double>(0, 0, mat_al, lambda_al));
