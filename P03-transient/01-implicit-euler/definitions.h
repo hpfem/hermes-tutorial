@@ -39,7 +39,7 @@ private:
   {
   public:
     CustomVectorFormVol(int i, double time_step)
-          : VectorFormVol(i), time_step(time_step) {};
+          : VectorFormVol<double>(i), time_step(time_step) {};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
 
@@ -54,7 +54,7 @@ private:
   public:
     CustomVectorFormSurf(int i, std::string area, double alpha, double rho, double heatcap,
                          double time_step, double* current_time_ptr, double temp_init, double t_final)
-          : VectorFormSurf(i, area), alpha(alpha), rho(rho), heatcap(heatcap), time_step(time_step), current_time_ptr(current_time_ptr),
+          : VectorFormSurf<double>(i, area), alpha(alpha), rho(rho), heatcap(heatcap), time_step(time_step), current_time_ptr(current_time_ptr),
                                      temp_init(temp_init), t_final(t_final) {};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;

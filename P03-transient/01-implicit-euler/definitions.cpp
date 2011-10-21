@@ -18,7 +18,7 @@ Ord CustomInitialCondition::ord(Ord x, Ord y) const
 
 CustomWeakFormHeatRK1::CustomWeakFormHeatRK1(std::string bdy_air, double alpha, double lambda, double heatcap, double rho,
                                              double time_step, double* current_time_ptr, double temp_init, double t_final,
-                                             Solution<double>* prev_time_sln) : WeakForm(1)
+                                             Solution<double>* prev_time_sln) : WeakForm<double>(1)
 {
   /* Jacobian */
   // Contribution of the time derivative term.
