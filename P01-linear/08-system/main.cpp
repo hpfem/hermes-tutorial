@@ -106,6 +106,8 @@ int main(int argc, char* argv[])
   Solution<double> u1_sln, u2_sln;
   Solution<double>::vector_to_solutions(coeff_vec, Hermes::vector<Space<double> *>(&u1_space, &u2_space), 
       Hermes::vector<Solution<double> *>(&u1_sln, &u2_sln));
+  //Solution<double>::vector_to_solution(coeff_vec, &u1_space, &u1_sln);
+  //Solution<double>::vector_to_solution(coeff_vec, &u2_space, &u2_sln, true, u1_space.get_num_dofs());
   
   // Visualize the solution.
   ScalarView view("Von Mises stress [Pa]", new WinGeom(590, 0, 700, 400));
