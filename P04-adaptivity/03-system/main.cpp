@@ -78,7 +78,10 @@ const double CONV_EXP = 1;
 const double ERR_STOP = 0.1;                      
 // Adaptivity process stops when the number of degrees of freedom grows over
 // this limit. This is mainly to prevent h-adaptivity to go on forever.
-const int NDOF_STOP = 60000;                      
+const int NDOF_STOP = 60000;
+// Newton's method.
+double NEWTON_TOL = 1e-5;
+int NEWTON_MAX_ITER = 10;
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
@@ -171,7 +174,7 @@ int main(int argc, char* argv[])
     DiscreteProblem<double> dp(&wf, *ref_spaces);
 
     NewtonSolver<double> newton(&dp, matrix_solver);
-    newton.set_verbose_output(false);
+    //newton.set_verbose_output(false);
 
     // Time measurement.
     cpu_time.tick();
@@ -183,7 +186,7 @@ int main(int argc, char* argv[])
     // Perform Newton's iteration.
     try
     {
-      newton.solve(coeff_vec);
+      newton.solve(coeff_vec, NEWTON_TOL, NEWTON_MAX_ITER);
     }
     catch(Hermes::Exceptions::Exception e)
     {
