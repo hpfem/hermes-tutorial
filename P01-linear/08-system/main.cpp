@@ -21,10 +21,6 @@
 const bool USE_XML_FORMAT = true;                          
 // Initial polynomial degree of all elements.
 const int P_INIT = 6;                                      
-// Stopping criterion for the Newton's method.
-const double NEWTON_TOL = 1e-7;                            
-// Maximum allowed number of Newton iterations.
-const int NEWTON_MAX_ITER = 100;                           
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;           
@@ -83,10 +79,6 @@ int main(int argc, char* argv[])
   // Initialize the FE problem.
   DiscreteProblem<double> dp(&wf, Hermes::vector<Space<double> *>(&u1_space, &u2_space));
 
-  // Initial coefficient vector for the Newton's method.  
-  double* coeff_vec = new double[ndof];
-  memset(coeff_vec, 0, ndof*sizeof(double));
-
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp, matrix_solver);
   newton.set_verbose_output(true);
@@ -94,7 +86,8 @@ int main(int argc, char* argv[])
   // Perform Newton's iteration.
   try
   {
-    newton.solve(coeff_vec, NEWTON_TOL, NEWTON_MAX_ITER);
+    // NULL = start from zero initial vector, 1e-7 = tolerance.
+    newton.solve(NULL, 1e-7);
   }
   catch(Hermes::Exceptions::Exception e)
   {
@@ -104,11 +97,8 @@ int main(int argc, char* argv[])
 
   // Translate the resulting coefficient vector into the Solution sln.
   Solution<double> u1_sln, u2_sln;
-  Solution<double>::vector_to_solutions(coeff_vec, Hermes::vector<Space<double> *>(&u1_space, &u2_space), 
+  Solution<double>::vector_to_solutions(newton.get_sln_vector(), Hermes::vector<Space<double> *>(&u1_space, &u2_space), 
       Hermes::vector<Solution<double> *>(&u1_sln, &u2_sln));
-  // Another way of doing the same:
-  //Solution<double>::vector_to_solution(coeff_vec, &u1_space, &u1_sln);
-  //Solution<double>::vector_to_solution(coeff_vec, &u2_space, &u2_sln, true, u1_space.get_num_dofs());
   
   // Visualize the solution.
   ScalarView view("Von Mises stress [Pa]", new WinGeom(590, 0, 700, 400));
@@ -122,9 +112,6 @@ int main(int argc, char* argv[])
 
   // Wait for the view to be closed.
   View::wait();
-
-  // Clean up.
-  delete [] coeff_vec;
 
   return 0;
 }

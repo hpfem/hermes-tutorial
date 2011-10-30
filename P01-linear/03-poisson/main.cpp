@@ -88,17 +88,16 @@ int main(int argc, char* argv[])
   // Initialize the FE problem.
   DiscreteProblem<double> dp(&wf, &space);
 
-  // Initial coefficient vector for the Newton's method.  
-  double* coeff_vec = new double[ndof];
-  memset(coeff_vec, 0, ndof*sizeof(double));
-
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp, matrix_solver);
 
   // Perform Newton's iteration.
   try
   {
-    newton.solve(coeff_vec);
+    // When newton.solve() is used without any parameters, this means that the initial coefficient 
+    // vector will be the zero vector, tolerance will be 1e-8, maximum allowed number of iterations 
+    // will be 100, and residual will be measured using Euclidean vector norm.
+    newton.solve();
   }
   catch(Hermes::Exceptions::Exception e)
   {
@@ -140,9 +139,6 @@ int main(int argc, char* argv[])
     view.show(&sln, HERMES_EPS_HIGH);
     View::wait();
   }
-
-  // Clean up.
-  delete [] coeff_vec;
 
   return 0;
 }
