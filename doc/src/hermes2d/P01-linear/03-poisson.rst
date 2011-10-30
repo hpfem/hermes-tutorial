@@ -400,8 +400,6 @@ example 02-space::
 
     // Create an H1 space with default shapeset.
     H1Space<double> space(&mesh, &bcs, P_INIT);
-    int ndof = space.get_num_dofs();
-    info("ndof = %d", ndof);
 
 Here P_INIT is a uniform polynomial degree of mesh elements (an integer number 
 between 1 and 10).
@@ -419,28 +417,27 @@ class::
 Initializing Newton solver
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Newton's method needs an initial guess. In this case we use
-the zero vector::
-
-    // Initial coefficient vector for the Newton's method.  
-    double* coeff_vec = new double[ndof];
-    memset(coeff_vec, 0, ndof*sizeof(double));
-
 The Newton solver class is initialized using a pointer to DiscreteProblem and 
 the matrix solver::
 
     // Initialize Newton solver.
     NewtonSolver<double> newton(&dp, matrix_solver);
 
-Solving the discrete problem
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Performing the Newton's iteration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Next, the Newton's method is employed in an exception-safe way::
+Next, the Newton's method is employed in an exception-safe way. For a linear 
+problem, it usually only takes one step, but sometimes it may take more if 
+the matrix is ill-conditioned or if for any other reason the residual after
+the first step is not under the prescribed tolerance. If all arguments 
+are skipped in newton.solve(), this means that the Newton's method will start 
+from a zero initial vector, with a default tolerance 1e-8, and with a default 
+maximum allowed number of 100 iterations::
 
     // Perform Newton's iteration.
     try
     {
-      newton.solve(coeff_vec);
+      newton.solve();
     }
     catch(Hermes::Exceptions::Exception e)
     {
@@ -448,16 +445,16 @@ Next, the Newton's method is employed in an exception-safe way::
       error("Newton's iteration failed.");
     }
 
-The method solve() comes in several versions::
+The method solve() comes in two basic versions::
 
-    virtual void solve(Scalar* coeff_vec);
-    virtual void solve(Scalar* coeff_vec, bool residual_as_function);
-    void solve(Scalar* coeff_vec, double newton_tol, int newton_max_iter, bool residual_as_function = false);
-    void solve_keep_jacobian(Scalar* coeff_vec, bool residual_as_function = false);
-    void solve_keep_jacobian(Scalar* coeff_vec, double newton_tol, int newton_max_iter, bool residual_as_function = false);
+    void solve(Scalar* coeff_vec = NULL, double newton_tol = 1e-8, 
+        int newton_max_iter = 100, bool residual_as_function = false);
+    void solve_keep_jacobian(Scalar* coeff_vec = NULL, double newton_tol = 1e-8, 
+        int newton_max_iter = 100, bool residual_as_function = false);
 
-For their detailed description, as well as for additional useful methods of the NewtonSolver class,
-we refer to Doxygen documentation.
+The latter keeps the Jacobian constant during the Newton's iteration loop. Their 
+detailed description, as well as additional useful methods of the NewtonSolver class,
+are described in the Doxygen documentation.
 
 Translating the coefficient vector into a solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
