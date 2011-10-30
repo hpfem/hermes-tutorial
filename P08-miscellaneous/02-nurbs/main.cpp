@@ -64,16 +64,12 @@ int main(int argc, char* argv[])
   Vector<double>* rhs = create_vector<double>(matrix_solver);
   LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver, matrix, rhs);
 
-  // Initial coefficient vector for the Newton's method.  
-  double* coeff_vec = new double[ndof];
-  memset(coeff_vec, 0, ndof*sizeof(double));
-
   // Perform Newton's iteration.
   Hermes::Hermes2D::Solution<double> sln;
   Hermes::Hermes2D::NewtonSolver<double> newton(&dp, matrix_solver);
   try
   {
-    newton.solve(coeff_vec);
+    newton.solve();
   }
   catch(Hermes::Exceptions::Exception e)
   {

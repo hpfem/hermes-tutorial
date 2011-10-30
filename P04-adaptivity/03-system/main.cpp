@@ -179,14 +179,10 @@ int main(int argc, char* argv[])
     // Time measurement.
     cpu_time.tick();
     
-    // Initial coefficient vector for the Newton's method.  
-    double* coeff_vec = new double[ndof_ref];
-    memset(coeff_vec, 0, ndof_ref * sizeof(double));
-
     // Perform Newton's iteration.
     try
     {
-      newton.solve(coeff_vec, NEWTON_TOL, NEWTON_MAX_ITER);
+      newton.solve(NULL, NEWTON_TOL, NEWTON_MAX_ITER);
     }
     catch(Hermes::Exceptions::Exception e)
     {
@@ -283,7 +279,6 @@ int main(int argc, char* argv[])
     if (Space<double>::get_num_dofs(Hermes::vector<Space<double> *>(&u_space, &v_space)) >= NDOF_STOP) done = true;
 
     // Clean up.
-    delete [] coeff_vec;
     delete adaptivity;
     for(unsigned int i = 0; i < ref_spaces->size(); i++)
       delete (*ref_spaces)[i]->get_mesh();

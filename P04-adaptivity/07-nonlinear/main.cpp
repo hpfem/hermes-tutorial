@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
   // Project the initial condition on the FE space to obtain initial
   // coefficient vector for the Newton's method.
   info("Projecting initial condition to obtain initial vector on the coarse mesh.");
-  double* coeff_vec_coarse = new double[Space<double>::get_num_dofs(&space)] ;
+  double* coeff_vec_coarse = new double[space.get_num_dofs()];
   InitialSolutionHeatTransfer init_sln(&mesh);
   OGProjection<double>::project_global(&space, &init_sln, coeff_vec_coarse, matrix_solver);
 
@@ -177,7 +177,7 @@ int main(int argc, char* argv[])
     DiscreteProblem<double> dp(&wf, ref_space);
 
     // Calculate initial coefficient vector on the reference mesh.
-    double* coeff_vec = new double[Space<double>::get_num_dofs(ref_space)];
+    double* coeff_vec = new double[ref_space->get_num_dofs()];
     if (as == 1)
     {
       // In the first step, project the coarse mesh solution.

@@ -131,15 +131,13 @@ int main(int argc, char* argv[])
     NewtonSolver<double> newton(&dp, matrix_solver);
     newton.set_verbose_output(false);
 
-    // Initial coefficient vector for the Newton's method.  
+    // Initial ndof.
     int ndof = space.get_num_dofs();
-    double* coeff_vec = new double[ndof];
-    memset(coeff_vec, 0, ndof * sizeof(double));
 
     // Perform Newton's iteration.
     try
     {
-      newton.solve(coeff_vec);
+      newton.solve();
     }
     catch(Hermes::Exceptions::Exception e)
     {
@@ -237,9 +235,6 @@ int main(int argc, char* argv[])
     }
     if (space.get_num_dofs() >= NDOF_STOP) 
       done = true;
-
-    // Clean up.
-    delete [] coeff_vec;
   }
   while (done == false);
 

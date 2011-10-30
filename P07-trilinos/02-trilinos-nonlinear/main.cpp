@@ -103,17 +103,6 @@ int main(int argc, char* argv[])
   // Initialize the discrete problem.
   DiscreteProblem<double> dp1(&wf1, &space);
 
-  // Project the initial condition on the FE space to obtain initial
-  // coefficient vector for the Newton's method.
-  double* coeff_vec = new double[ndof];
-  // We can start with a zero vector.
-  memset(coeff_vec, 0, ndof * sizeof(double));
-  // Or we can project the initial condition to obtain the initial
-  // coefficient vector.
-  //info("Projecting to obtain initial vector for the Newton's method.");
-  //CustomInitialSolution sln_tmp(&mesh);
-  //OGProjection<double>::project_global(&space, &sln_tmp, coeff_vec, matrix_solver);
-
   // Initialize the Newton solver.
   Hermes::Hermes2D::NewtonSolver<double> newton(&dp1, matrix_solver);
 
@@ -121,7 +110,7 @@ int main(int argc, char* argv[])
   Hermes::Hermes2D::Solution<double> sln1;
   try
   {
-    newton.solve(coeff_vec);
+    newton.solve();
   }
   catch(Hermes::Exceptions::Exception e)
   {
@@ -152,6 +141,7 @@ int main(int argc, char* argv[])
   // Project the initial condition to obtain the initial
   // coefficient vector.
   info("Projecting to obtain initial vector for the Newton's method.");
+  double* coeff_vec = new double[ndof];
   CustomInitialSolution sln_tmp(&mesh);
   OGProjection<double>::project_global(&space, &sln_tmp, coeff_vec, matrix_solver);
 
