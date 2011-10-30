@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
   }
 
   // Translate the resulting coefficient vector into the Solution<double> sln.
-  Solution<double>::vector_to_solution(coeff_vec_coarse, &space, &sln);
+  Solution<double>::vector_to_solution(newton_coarse.get_sln_vector(), &space, &sln);
 
   // Cleanup after the Newton loop on the coarse mesh.
   delete [] coeff_vec_coarse;
@@ -212,7 +212,7 @@ int main(int argc, char* argv[])
     }
 
     // Translate the resulting coefficient vector into the Solution<double> ref_sln.
-    Solution<double>::vector_to_solution(coeff_vec, ref_space, &ref_sln);
+    Solution<double>::vector_to_solution(newton_coarse.get_sln_vector(), ref_space, &ref_sln);
 
     // Project the fine mesh solution on the coarse mesh.
     if (as > 1) {

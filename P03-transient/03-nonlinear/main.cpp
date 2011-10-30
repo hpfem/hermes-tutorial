@@ -130,9 +130,8 @@ int main(int argc, char* argv[])
     try
     {
       runge_kutta.rk_time_step_newton(current_time, time_step, slns_time_prev, slns_time_new, 
-                                        freeze_jacobian, block_diagonal_jacobian, verbose, NEWTON_TOL, 
-                                        NEWTON_MAX_ITER, damping_coeff,
-                                        max_allowed_residual_norm);
+          freeze_jacobian, block_diagonal_jacobian, verbose, NEWTON_TOL, 
+          NEWTON_MAX_ITER, damping_coeff, max_allowed_residual_norm);
     }
     catch(Exceptions::Exception& e)
     {
