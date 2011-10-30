@@ -74,7 +74,7 @@ const double ERR_STOP = 5e-6;
 const int NDOF_STOP = 60000;                      
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver_type = SOLVER_UMFPACK; 
+MatrixSolverType matrix_solver = SOLVER_UMFPACK; 
                                                   
 // Problem parameters.
 const double EPS0 = 8.863e-12;
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
     info("Solving.");
     DiscreteProblem<double> dp(&wf, &space);
     
-    NewtonSolver<double> newton(&dp, matrix_solver_type);
+    NewtonSolver<double> newton(&dp, matrix_solver);
     newton.set_verbose_output(false);
 
     // Initial coefficient vector for the Newton's method.  

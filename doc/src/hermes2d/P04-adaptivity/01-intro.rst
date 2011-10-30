@@ -147,7 +147,7 @@ Next we initialize the discrete problem on the refined mesh::
 
 The Newton solver is initialized and optionally, the output is muted::
 
-    NewtonSolver<double> newton(&dp, matrix_solver_type);
+    NewtonSolver<double> newton(&dp, matrix_solver);
     newton.set_verbose_output(false);
 
 The Newton's method is used to solve the fine mesh problem::
@@ -173,7 +173,7 @@ part for error calculation::
 
     // Project the fine mesh solution onto the coarse mesh.
     info("Projecting fine mesh solution on coarse mesh.");
-    OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver_type);
+    OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver);
 
 The function project_global() is very general, and it can accept multiple 
 spaces, multiple functions, and various projection norms as parameters. For more details,

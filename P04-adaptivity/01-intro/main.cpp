@@ -73,7 +73,7 @@ const double CONV_EXP = 1.0;
 const int NDOF_STOP = 60000;                      
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver_type = SOLVER_UMFPACK; 
+MatrixSolverType matrix_solver = SOLVER_UMFPACK; 
                                                   
 // Problem parameters.
 const double EPS0 = 8.863e-12;
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
     info("Solving on fine mesh.");
     DiscreteProblem<double> dp(&wf, ref_space);
     
-    NewtonSolver<double> newton(&dp, matrix_solver_type);
+    NewtonSolver<double> newton(&dp, matrix_solver);
     newton.set_verbose_output(false);
 
     // Initial coefficient vector for the Newton's method.  
@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
     
     // Project the fine mesh solution onto the coarse mesh.
     info("Projecting fine mesh solution on coarse mesh.");
-    OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver_type);
+    OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver);
 
     // Time measurement.
     cpu_time.tick();
