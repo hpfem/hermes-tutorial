@@ -81,11 +81,11 @@ int main(int argc, char* argv[])
   // DOF and CPU convergence graphs.
   SimpleGraph graph_dof, graph_cpu;
 
-  // Adapt<double>ivity loop:
+  // Adaptivity loop:
   int as = 1; bool done = false;
   do
   {
-    info("---- Adapt<double>ivity step %d:", as);
+    info("---- Adaptivity step %d:", as);
 
     // Construct globally refined reference mesh and setup reference space.
     Space<double>* ref_space = Space<double>::construct_refined_space(&space);

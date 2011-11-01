@@ -14,9 +14,9 @@
 // Number of initial uniform mesh refinements.
 const int INIT_REF_NUM = 2;         
 // Initial polynomial degree of all mesh elements.
-const int P_INIT = 2;               
+const int P_INIT = 1;               
 // Time step.
-const double TAU = 0.05;            
+const double TAU = 0.5;            
 // Time interval length.
 const double T_FINAL = 60.0;        
 
@@ -32,11 +32,11 @@ const double x1    = 9.0;
 const bool TRILINOS_OUTPUT = true;                
 // true = Jacobian-free method (for NOX),
 // false = Newton (for NOX).
-const bool TRILINOS_JFNK = true;                  
+const bool TRILINOS_JFNK = true;
 // Preconditioning by jacobian (1) (less GMRES iterations, more time to create precond)
 // or by approximation of jacobian (2) (less time for precond creation, more GMRES iters).
 // in case of jfnk, default Ifpack proconditioner in case of Newton.
-const int PRECOND = 2;                            
+const int PRECOND = 1;                            
 // Name of the iterative method employed by AztecOO (ignored by the other solvers). 
 // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
 const char* iterative_method = "GMRES";           
@@ -45,7 +45,7 @@ const char* iterative_method = "GMRES";
 // "AztecOO" - AztecOO internal preconditioner.
 // "New Ifpack" - Ifpack internal preconditioner.
 // "ML" - Multi level preconditione
-const char* preconditioner = "AztecOO";           
+const char* preconditioner = "ML";           
 // NOX error messages, see NOX_Utils.h.
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
                                                   

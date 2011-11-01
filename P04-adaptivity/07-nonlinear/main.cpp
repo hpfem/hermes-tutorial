@@ -168,7 +168,7 @@ int main(int argc, char* argv[])
   int as = 1; bool done = false;
   do
   {
-    info("---- Adapt<double>ivity step %d:", as);
+    info("---- Adaptivity step %d:", as);
 
     // Construct globally refined reference mesh and setup reference space.
     Space<double>* ref_space = Space<double>::construct_refined_space(&space);
