@@ -189,10 +189,9 @@ int main(int argc, char* argv[])
       // In all other steps, project the previous fine mesh solution.
       info("Projecting previous fine mesh solution to obtain initial vector on new fine mesh.");
       OGProjection<double>::project_global(ref_space, &ref_sln, coeff_vec, matrix_solver);
+      delete ref_sln.get_space();
+      delete ref_sln.get_mesh();
     }
-
-    // Now we can deallocate the previous fine mesh.
-    if(as > 1) delete ref_sln.get_mesh();
 
     // Initialize Newton solver on fine mesh.
     info("Solving on fine mesh:");
@@ -212,13 +211,11 @@ int main(int argc, char* argv[])
     }
 
     // Translate the resulting coefficient vector into the Solution<double> ref_sln.
-    Solution<double>::vector_to_solution(newton_coarse.get_sln_vector(), ref_space, &ref_sln);
+    Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
 
     // Project the fine mesh solution on the coarse mesh.
-    if (as > 1) {
-      info("Projecting reference solution on new coarse mesh for error calculation.");
-      OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver);
-    }
+    info("Projecting reference solution on new coarse mesh for error calculation.");
+    OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver);
 
     // Calculate element errors and total error estimate.
     info("Calculating error estimate.");
@@ -259,7 +256,6 @@ int main(int argc, char* argv[])
     // Clean up.
     delete [] coeff_vec;
     delete adaptivity;
-    delete ref_space;
 
     as++;
   }
