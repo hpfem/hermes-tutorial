@@ -70,14 +70,14 @@ int main(int argc, char* argv[])
   // Create x- and y- displacement space using the default H1 shapeset.
   H1Space<double> u1_space(&mesh, &bcs, P_INIT);
   H1Space<double> u2_space(&mesh, &bcs, P_INIT);
-  int ndof = Space<double>::get_num_dofs(Hermes::vector<Space<double> *>(&u1_space, &u2_space));
+  int ndof = Space<double>::get_num_dofs(Hermes::vector<const Space<double> *>(&u1_space, &u2_space));
   info("ndof = %d", ndof);
 
   // Initialize the weak formulation.
   CustomWeakFormLinearElasticity wf(E, nu, rho*g1, "Top", f0, f1);
 
   // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, Hermes::vector<Space<double> *>(&u1_space, &u2_space));
+  DiscreteProblem<double> dp(&wf, Hermes::vector<const Space<double> *>(&u1_space, &u2_space));
 
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp, matrix_solver);
@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
 
   // Translate the resulting coefficient vector into the Solution sln.
   Solution<double> u1_sln, u2_sln;
-  Solution<double>::vector_to_solutions(newton.get_sln_vector(), Hermes::vector<Space<double> *>(&u1_space, &u2_space), 
+  Solution<double>::vector_to_solutions(newton.get_sln_vector(), Hermes::vector<const Space<double> *>(&u1_space, &u2_space), 
       Hermes::vector<Solution<double> *>(&u1_sln, &u2_sln));
   
   // Visualize the solution.

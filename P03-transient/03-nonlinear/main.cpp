@@ -100,11 +100,8 @@ int main(int argc, char* argv[])
   // Next time level solution.
   Solution<double> sln_time_new(&mesh);
 
-  // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, &space);
-
   // Initialize Runge-Kutta time stepping.
-  RungeKutta<double> runge_kutta(&dp, &bt, matrix_solver);
+  RungeKutta<double> runge_kutta(&wf, &space, &bt, matrix_solver);
 
   // Initialize views.
   ScalarView sview("Solution", new WinGeom(0, 0, 500, 400));

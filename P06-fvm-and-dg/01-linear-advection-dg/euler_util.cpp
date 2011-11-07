@@ -2,7 +2,7 @@
 #include "limits.h"
 #include <limits>
 
-DiscontinuityDetector::DiscontinuityDetector(Hermes::vector<Space<double>*> spaces, 
+DiscontinuityDetector::DiscontinuityDetector(Hermes::vector<const Space<double>*> spaces, 
   Hermes::vector<Solution<double>*> solutions) : spaces(spaces), solutions(solutions)
 {
 };
@@ -10,7 +10,7 @@ DiscontinuityDetector::DiscontinuityDetector(Hermes::vector<Space<double>*> spac
 DiscontinuityDetector::~DiscontinuityDetector()
 {};
 
-KrivodonovaDiscontinuityDetector::KrivodonovaDiscontinuityDetector(Hermes::vector<Space<double>*> spaces, 
+KrivodonovaDiscontinuityDetector::KrivodonovaDiscontinuityDetector(Hermes::vector<const Space<double>*> spaces, 
   Hermes::vector<Solution<double>*> solutions) : DiscontinuityDetector(spaces, solutions)
 {
   // A check that all meshes are the same in the spaces.
@@ -285,7 +285,7 @@ void KrivodonovaDiscontinuityDetector::calculate_norms(Element* e, int edge_i, d
   delete energy;
 };
 
-KuzminDiscontinuityDetector::KuzminDiscontinuityDetector(Hermes::vector<Space<double>*> spaces, 
+KuzminDiscontinuityDetector::KuzminDiscontinuityDetector(Hermes::vector<const Space<double>*> spaces, 
   Hermes::vector<Solution<double>*> solutions, bool limit_all_orders_independently) : DiscontinuityDetector(spaces, solutions), limit_all_orders_independently(limit_all_orders_independently)
 {
   // A check that all meshes are the same in the spaces.
@@ -694,7 +694,7 @@ void KuzminDiscontinuityDetector::find_alpha_i_second_order(double u_d_i_min[1][
   }
 }
 
-FluxLimiter::FluxLimiter(FluxLimiter::LimitingType type, double* solution_vector, Hermes::vector<Space<double>*> spaces, bool Kuzmin_limit_all_orders_independently) : solution_vector(solution_vector), spaces(spaces)
+FluxLimiter::FluxLimiter(FluxLimiter::LimitingType type, double* solution_vector, Hermes::vector<const Space<double>*> spaces, bool Kuzmin_limit_all_orders_independently) : solution_vector(solution_vector), spaces(spaces)
 {
   for(unsigned int sol_i = 0; sol_i < spaces.size(); sol_i++)
     limited_solutions.push_back(new Hermes::Hermes2D::Solution<double>(spaces[sol_i]->get_mesh()));
@@ -711,7 +711,7 @@ FluxLimiter::FluxLimiter(FluxLimiter::LimitingType type, double* solution_vector
   }
 };
 
-FluxLimiter::FluxLimiter(FluxLimiter::LimitingType type, double* solution_vector, Space<double>* space, bool Kuzmin_limit_all_orders_independently) : solution_vector(solution_vector)
+FluxLimiter::FluxLimiter(FluxLimiter::LimitingType type, double* solution_vector, const Space<double>* space, bool Kuzmin_limit_all_orders_independently) : solution_vector(solution_vector)
 {
   spaces.push_back(space);
 

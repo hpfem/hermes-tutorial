@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
   // Create H1 spaces with default shapesets.
   H1Space<double>* t_space = new H1Space<double>(&mesh, &bcs_t, P_INIT);
   H1Space<double>* c_space = new H1Space<double>(&mesh, &bcs_c, P_INIT);
-  int ndof = Space<double>::get_num_dofs(Hermes::vector<Space<double>*>(t_space, c_space));
+  int ndof = Space<double>::get_num_dofs(Hermes::vector<const Space<double>*>(t_space, c_space));
   info("ndof = %d.", ndof);
 
   // Define initial conditions.
@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
   // in order to obtain initial vector for NOX. 
   info("Projecting initial solutions on the FE meshes.");
   double* coeff_vec = new double[ndof];
-  OGProjection<double>::project_global(Hermes::vector<Space<double> *>(t_space, c_space), 
+  OGProjection<double>::project_global(Hermes::vector<const Space<double> *>(t_space, c_space), 
                                        Hermes::vector<MeshFunction<double>*>(&t_prev_time_1, &c_prev_time_1),
                                        coeff_vec);
 
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
   double proj_time = cpu_time.tick().last();
 
   // Initialize finite element problem.
-  DiscreteProblem<double> dp(&wf, Hermes::vector<Space<double>*>(t_space, c_space));
+  DiscreteProblem<double> dp(&wf, Hermes::vector<const Space<double>*>(t_space, c_space));
 
   // Initialize NOX solver and preconditioner.
   NewtonSolverNOX<double> solver(&dp);
@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
       error("NOX failed.");
     }
 
-    Solution<double>::vector_to_solutions(solver.get_sln_vector(), Hermes::vector<Space<double> *>(t_space, c_space), 
+    Solution<double>::vector_to_solutions(solver.get_sln_vector(), Hermes::vector<const Space<double> *>(t_space, c_space), 
               Hermes::vector<Solution<double> *>(&t_prev_newton, &c_prev_newton));
 
     cpu_time.tick();

@@ -118,16 +118,13 @@ int main(int argc, char* argv[])
   int ndof = space.get_num_dofs();
   info("ndof = %d", ndof);
 
-  // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, &space);
-
   // Initialize views.
   ScalarView Tview("Temperature", new WinGeom(0, 0, 450, 600));
   Tview.set_min_max_range(0,20);
   Tview.fix_scale_width(30);
 
   // Initialize Runge-Kutta time stepping.
-  RungeKutta<double> runge_kutta(&dp, &bt, matrix_solver);
+  RungeKutta<double> runge_kutta(&wf, &space, &bt, matrix_solver);
 
   // Time stepping loop:
   int ts = 1;

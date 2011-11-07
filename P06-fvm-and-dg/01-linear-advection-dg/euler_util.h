@@ -10,7 +10,7 @@ class DiscontinuityDetector
 {
 public:
   /// Constructor.
-  DiscontinuityDetector(Hermes::vector<Space<double> *> spaces, 
+  DiscontinuityDetector(Hermes::vector<const Space<double> *> spaces, 
                         Hermes::vector<Solution<double> *> solutions);
 
   /// Destructor.
@@ -21,7 +21,7 @@ public:
 
 protected:
   /// Members.
-  Hermes::vector<Space<double> *> spaces;
+  Hermes::vector<const Space<double> *> spaces;
   Hermes::vector<Solution<double> *> solutions;
   std::set<int> discontinuous_element_ids;
   Mesh* mesh;
@@ -31,7 +31,7 @@ class KrivodonovaDiscontinuityDetector : public DiscontinuityDetector
 {
 public:
   /// Constructor.
-  KrivodonovaDiscontinuityDetector(Hermes::vector<Space<double> *> spaces, 
+  KrivodonovaDiscontinuityDetector(Hermes::vector<const Space<double> *> spaces, 
                         Hermes::vector<Solution<double> *> solutions);
 
   /// Destructor.
@@ -59,7 +59,7 @@ class KuzminDiscontinuityDetector : public DiscontinuityDetector
 {
 public:
   /// Constructor.
-  KuzminDiscontinuityDetector(Hermes::vector<Space<double> *> spaces, 
+  KuzminDiscontinuityDetector(Hermes::vector<const Space<double> *> spaces, 
                         Hermes::vector<Solution<double> *> solutions, bool limit_all_orders_independently = false);
 
   /// Destructor.
@@ -110,8 +110,8 @@ public:
     Kuzmin
   };
   /// Constructor.
-  FluxLimiter(LimitingType type, double* solution_vector, Hermes::vector<Space<double> *> spaces, bool Kuzmin_limit_all_orders_independently = false);
-  FluxLimiter(LimitingType type, double* solution_vector, Space<double> * space, bool Kuzmin_limit_all_orders_independently = false);
+  FluxLimiter(LimitingType type, double* solution_vector, Hermes::vector<const Space<double> *> spaces, bool Kuzmin_limit_all_orders_independently = false);
+  FluxLimiter(LimitingType type, double* solution_vector, const Space<double> * space, bool Kuzmin_limit_all_orders_independently = false);
 
   /// Destructor.
    ~FluxLimiter();
@@ -128,7 +128,7 @@ public:
 protected:
   /// Members.
   double* solution_vector;
-  Hermes::vector<Space<double> *> spaces;
+  Hermes::vector<const Space<double> *> spaces;
   DiscontinuityDetector* detector;
   Hermes::vector<Solution<double>*> limited_solutions;
 };
