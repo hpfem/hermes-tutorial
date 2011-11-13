@@ -109,9 +109,6 @@ int main(int argc, char* argv[])
   Solution<double> sln;
   Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);
 
-  // Get info about time spent during assembling in its respective parts.
-  dp.get_all_profiling_output(std::cout);
-
   // VTK output.
   if (VTK_VISUALIZATION) 
   {
