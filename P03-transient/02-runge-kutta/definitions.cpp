@@ -17,7 +17,7 @@ Ord CustomInitialCondition::ord(Ord x, Ord y) const
 }
 
 CustomWeakFormHeatRK::CustomWeakFormHeatRK(std::string bdy_air, double alpha, double lambda, double heatcap, double rho,
-                                           double* current_time_ptr, double temp_init, double t_final) : WeakForm(1)
+                                           double* current_time_ptr, double temp_init, double t_final) : WeakForm<double>(1)
 {
   // Jacobian volumetric part.
   add_matrix_form(new DefaultJacobianDiffusion<double>(0, 0, HERMES_ANY, new Hermes1DFunction<double>(-lambda / (heatcap * rho))));
