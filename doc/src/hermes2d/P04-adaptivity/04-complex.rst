@@ -77,7 +77,7 @@ Initializing the AztecOO matrix solver
 Inside the adaptivity loop, the matrix solver is initialized as follows::
 
     // For iterative solver.
-    if (matrix_solver_type == SOLVER_AZTECOO)
+    if (matrix_solver == SOLVER_AZTECOO)
     {
       newton.set_iterative_method(iterative_method);
       newton.set_preconditioner(preconditioner);

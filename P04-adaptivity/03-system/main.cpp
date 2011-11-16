@@ -78,7 +78,10 @@ const double CONV_EXP = 1;
 const double ERR_STOP = 0.1;                      
 // Adaptivity process stops when the number of degrees of freedom grows over
 // this limit. This is mainly to prevent h-adaptivity to go on forever.
-const int NDOF_STOP = 60000;                      
+const int NDOF_STOP = 60000;
+// Newton's method.
+double NEWTON_TOL = 1e-5;
+int NEWTON_MAX_ITER = 10;
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
@@ -164,26 +167,25 @@ int main(int argc, char* argv[])
       Space<double>::construct_refined_spaces(Hermes::vector<Space<double> *>(&u_space, &v_space));
     Space<double>* u_ref_space = (*ref_spaces)[0];
     Space<double>* v_ref_space = (*ref_spaces)[1];
-    int ndof_ref = Space<double>::get_num_dofs(*ref_spaces);
+
+    Hermes::vector<const Space<double> *> ref_spaces_const((*ref_spaces)[0], (*ref_spaces)[1]);
+
+    int ndof_ref = Space<double>::get_num_dofs(ref_spaces_const);
 
     // Initialize reference problem.
     info("Solving on reference mesh.");
-    DiscreteProblem<double> dp(&wf, *ref_spaces);
+    DiscreteProblem<double> dp(&wf, ref_spaces_const);
 
     NewtonSolver<double> newton(&dp, matrix_solver);
-    newton.set_verbose_output(false);
+    //newton.set_verbose_output(false);
 
     // Time measurement.
     cpu_time.tick();
     
-    // Initial coefficient vector for the Newton's method.  
-    double* coeff_vec = new double[ndof_ref];
-    memset(coeff_vec, 0, ndof_ref * sizeof(double));
-
     // Perform Newton's iteration.
     try
     {
-      newton.solve(coeff_vec);
+      newton.solve(NULL, NEWTON_TOL, NEWTON_MAX_ITER);
     }
     catch(Hermes::Exceptions::Exception e)
     {
@@ -192,12 +194,12 @@ int main(int argc, char* argv[])
     }
 
     // Translate the resulting coefficient vector into the instance of Solution.
-    Solution<double>::vector_to_solutions(newton.get_sln_vector(), *ref_spaces, 
+    Solution<double>::vector_to_solutions(newton.get_sln_vector(), ref_spaces_const, 
                                           Hermes::vector<Solution<double> *>(&u_ref_sln, &v_ref_sln));
 
     // Project the fine mesh solution onto the coarse mesh.
     info("Projecting reference solution on coarse mesh.");
-    OGProjection<double>::project_global(Hermes::vector<Space<double> *>(&u_space, &v_space), 
+    OGProjection<double>::project_global(Hermes::vector<const Space<double> *>(&u_space, &v_space), 
                                  Hermes::vector<Solution<double> *>(&u_ref_sln, &v_ref_sln), 
                                  Hermes::vector<Solution<double> *>(&u_sln, &v_sln), matrix_solver); 
    
@@ -240,8 +242,8 @@ int main(int argc, char* argv[])
          v_space.get_num_dofs(), v_ref_space->get_num_dofs());
     info("err_est_rel[1]: %g%%, err_exact_rel[1]: %g%%", err_est_rel[1]*100, err_exact_rel[1]*100);
     info("ndof_coarse_total: %d, ndof_fine_total: %d",
-         Space<double>::get_num_dofs(Hermes::vector<Space<double> *>(&u_space, &v_space)), 
-         Space<double>::get_num_dofs(*ref_spaces));
+         Space<double>::get_num_dofs(Hermes::vector<const Space<double> *>(&u_space, &v_space)), 
+         Space<double>::get_num_dofs(ref_spaces_const));
     info("err_est_rel_total: %g%%, err_est_exact_total: %g%%", err_est_rel_total, err_exact_rel_total);
 #else
     info("ndof_coarse[0]: %d, ndof_fine[0]: %d", u_space.get_num_dofs(), u_ref_space->get_num_dofs());
@@ -255,13 +257,13 @@ int main(int argc, char* argv[])
 #endif
 
     // Add entry to DOF and CPU convergence graphs.
-    graph_dof_est.add_values(Space<double>::get_num_dofs(Hermes::vector<Space<double> *>(&u_space, &v_space)), 
+    graph_dof_est.add_values(Space<double>::get_num_dofs(Hermes::vector<const Space<double> *>(&u_space, &v_space)), 
                              err_est_rel_total);
     graph_dof_est.save("conv_dof_est.dat");
     graph_cpu_est.add_values(cpu_time.accumulated(), err_est_rel_total);
     graph_cpu_est.save("conv_cpu_est.dat");
 #ifdef WITH_EXACT_SOLUTION
-    graph_dof_exact.add_values(Space<double>::get_num_dofs(Hermes::vector<Space<double> *>(&u_space, &v_space)), 
+    graph_dof_exact.add_values(Space<double>::get_num_dofs(Hermes::vector<const Space<double> *>(&u_space, &v_space)), 
                                err_exact_rel_total);
     graph_dof_exact.save("conv_dof_exact.dat");
     graph_cpu_exact.add_values(cpu_time.accumulated(), err_exact_rel_total);
@@ -277,10 +279,9 @@ int main(int argc, char* argv[])
       done = adaptivity->adapt(Hermes::vector<RefinementSelectors::Selector<double> *>(&selector, &selector), 
                                THRESHOLD, STRATEGY, MESH_REGULARITY);
     }
-    if (Space<double>::get_num_dofs(Hermes::vector<Space<double> *>(&u_space, &v_space)) >= NDOF_STOP) done = true;
+    if (Space<double>::get_num_dofs(Hermes::vector<const Space<double> *>(&u_space, &v_space)) >= NDOF_STOP) done = true;
 
     // Clean up.
-    delete [] coeff_vec;
     delete adaptivity;
     for(unsigned int i = 0; i < ref_spaces->size(); i++)
       delete (*ref_spaces)[i]->get_mesh();

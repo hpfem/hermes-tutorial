@@ -30,7 +30,7 @@ const int INIT_REF_NUM = 2;
 // Initial polynomial degree of all mesh elements.
 const int P_INIT = 2;                             
 // Time step. 
-const double time_step = 0.5;                     
+double time_step = 0.05;                           
 // Time interval length.
 const double T_FINAL = 2.0;                       
 
@@ -186,11 +186,8 @@ int main(int argc, char* argv[])
       Space<double>* ref_space = Space<double>::construct_refined_space(&space);
       int ndof_ref = Space<double>::get_num_dofs(ref_space);
 
-      // Initialize discrete problem on reference mesh.
-      DiscreteProblem<double> dp(&wf, ref_space);
-
       // Initialize Runge-Kutta time stepping.
-      RungeKutta<double> runge_kutta(&dp, &bt, matrix_solver);
+      RungeKutta<double> runge_kutta(&wf, ref_space, &bt, matrix_solver);
 
       // Perform one Runge-Kutta time step according to the selected Butcher's table.
       info("Runge-Kutta time step (t = %g s, tau = %g s, stages: %d).",
@@ -199,7 +196,7 @@ int main(int argc, char* argv[])
       try
       {
         runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, &sln_time_new, 
-                                    true, verbose, NEWTON_TOL, NEWTON_MAX_ITER);
+                                    false, true, verbose, NEWTON_TOL, NEWTON_MAX_ITER);
       }
       catch(Exceptions::Exception& e)
       {

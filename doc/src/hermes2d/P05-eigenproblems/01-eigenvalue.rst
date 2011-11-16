@@ -63,7 +63,7 @@ The matrix weak forms on the right- and left-hand side are standard:
 .. sourcecode::
     .
 
-    WeakFormEigenLeft::WeakFormEigenLeft() : WeakForm(1) 
+    WeakFormEigenLeft::WeakFormEigenLeft() : WeakForm<double>(1) 
     {
       add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0));
       add_matrix_form(new MatrixFormPotential(0, 0));
@@ -96,7 +96,7 @@ The matrix weak forms on the right- and left-hand side are standard:
     }
 
 
-    WeakFormEigenRight::WeakFormEigenRight() : WeakForm(1) 
+    WeakFormEigenRight::WeakFormEigenRight() : WeakForm<double>(1) 
     {
       add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol(0, 0));
     }
@@ -104,7 +104,7 @@ The matrix weak forms on the right- and left-hand side are standard:
 .. latexcode::
     .
 
-    WeakFormEigenLeft::WeakFormEigenLeft() : WeakForm(1) 
+    WeakFormEigenLeft::WeakFormEigenLeft() : WeakForm<double>(1) 
     {
       add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion(0, 0));
       add_matrix_form(new MatrixFormPotential(0, 0));
@@ -140,7 +140,7 @@ The matrix weak forms on the right- and left-hand side are standard:
     }
 
 
-    WeakFormEigenRight::WeakFormEigenRight() : WeakForm(1) 
+    WeakFormEigenRight::WeakFormEigenRight() : WeakForm<double>(1) 
     {
       add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol(0, 0));
     }

@@ -74,7 +74,7 @@ const double ERR_STOP = 5e-6;
 const int NDOF_STOP = 60000;                      
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver_type = SOLVER_UMFPACK; 
+MatrixSolverType matrix_solver = SOLVER_UMFPACK; 
                                                   
 // Problem parameters.
 const double EPS0 = 8.863e-12;
@@ -128,18 +128,16 @@ int main(int argc, char* argv[])
     info("Solving.");
     DiscreteProblem<double> dp(&wf, &space);
     
-    NewtonSolver<double> newton(&dp, matrix_solver_type);
+    NewtonSolver<double> newton(&dp, matrix_solver);
     newton.set_verbose_output(false);
 
-    // Initial coefficient vector for the Newton's method.  
+    // Initial ndof.
     int ndof = space.get_num_dofs();
-    double* coeff_vec = new double[ndof];
-    memset(coeff_vec, 0, ndof * sizeof(double));
 
     // Perform Newton's iteration.
     try
     {
-      newton.solve(coeff_vec);
+      newton.solve();
     }
     catch(Hermes::Exceptions::Exception e)
     {
@@ -237,9 +235,6 @@ int main(int argc, char* argv[])
     }
     if (space.get_num_dofs() >= NDOF_STOP) 
       done = true;
-
-    // Clean up.
-    delete [] coeff_vec;
   }
   while (done == false);
 

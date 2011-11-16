@@ -171,13 +171,6 @@ discrete problem::
     // Initialize the FE problem.
     DiscreteProblem<double> dp(&wf, Hermes::vector<Space<double> *>(&u1_space, &u2_space));
 
-The length of the coefficient vector must be the sum of the dimensions 
-of both displacement spaces::
-
-    // Initial coefficient vector for the Newton's method.  
-    double* coeff_vec = new double[ndof];
-    memset(coeff_vec, 0, ndof*sizeof(double));
-
 Next we initialize the Newton solver and perform the Newton's iteration::
 
     // Initialize Newton solver.
@@ -187,7 +180,8 @@ Next we initialize the Newton solver and perform the Newton's iteration::
     // Perform Newton's iteration.
     try
     {
-      newton.solve(coeff_vec, NEWTON_TOL, NEWTON_MAX_ITER);
+      // NULL = zero initial coefficient vector.
+      newton.solve(NULL, NEWTON_TOL, NEWTON_MAX_ITER);
     }
     catch(Hermes::Exceptions::Exception e)
     {
@@ -208,8 +202,8 @@ Last, the coefficient vector is translated into two displacement solutions::
 
     // Translate the resulting coefficient vector into the Solution sln.
     Solution<double> u1_sln, u2_sln;
-    Solution<double>::vector_to_solutions(coeff_vec, Hermes::vector<Space<double> *>(&u1_space, &u2_space), 
-					  Hermes::vector<Solution<double> *>(&u1_sln, &u2_sln));
+    Solution<double>::vector_to_solutions(newton.get_sln_vector(), Hermes::vector<Space<double> *>(&u1_space, &u2_space), 
+        Hermes::vector<Solution<double> *>(&u1_sln, &u2_sln));
 
 Visualizing the Von Mises stress
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

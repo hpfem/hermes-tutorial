@@ -26,7 +26,7 @@ const bool WANT_DG = true;
 const bool WANT_FEM = false;
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver_type = SOLVER_UMFPACK;
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;
 
 // Boundary markers.
 const std::string BDY_BOTTOM_LEFT = "1";
@@ -60,9 +60,9 @@ int main(int argc, char* args[])
   m.show(&mesh);
 
   // Set up the solver, matrix, and rhs according to the solver selection.
-  SparseMatrix<double>* matrix = create_matrix<double>(matrix_solver_type);
-  Vector<double>* rhs = create_vector<double>(matrix_solver_type);
-  LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver_type, matrix, rhs);
+  SparseMatrix<double>* matrix = create_matrix<double>(matrix_solver);
+  Vector<double>* rhs = create_vector<double>(matrix_solver);
+  LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver, matrix, rhs);
 
   ScalarView view1("Solution - Discontinuous Galerkin FEM", new WinGeom(900, 0, 450, 350));
   ScalarView view2("Solution - Standard continuous FEM", new WinGeom(900, 400, 450, 350));
@@ -124,9 +124,9 @@ int main(int argc, char* args[])
     DiscreteProblem<double> dp_h1(&wf_h1, &space_h1);
     
     // Set up the solver, matrix, and rhs according to the solver selection.
-    SparseMatrix<double>* matrix = create_matrix<double>(matrix_solver_type);
-    Vector<double>* rhs = create_vector<double>(matrix_solver_type);
-    LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver_type, matrix, rhs);
+    SparseMatrix<double>* matrix = create_matrix<double>(matrix_solver);
+    Vector<double>* rhs = create_vector<double>(matrix_solver);
+    LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver, matrix, rhs);
 
     info("Assembling Continuous FEM (nelem: %d, ndof: %d).", mesh.get_num_active_elements(), space_h1.get_num_dofs());
     dp_h1.assemble(matrix, rhs);

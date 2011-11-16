@@ -41,7 +41,7 @@ Then we solve the problem on the coarse mesh::
 The resulting coefficient vector is translated into a coarse mesh solution::
 
     // Translate the resulting coefficient vector into the Solution<double> sln.
-    Solution<double>::vector_to_solution(coeff_vec_coarse, &space, &sln);
+    Solution<double>::vector_to_solution(newton_coarse.get_sln_vector(), &space, &sln);
 
 Calculating initial coefficient vector on the reference mesh
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

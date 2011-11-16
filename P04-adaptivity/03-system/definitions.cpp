@@ -50,7 +50,7 @@ double CustomRightHandSide1::value(double x, double y) const
 
 Ord CustomRightHandSide1::value(Ord x, Ord y) const 
 {
-  return Ord(10);
+  return Ord(16);
 }
 
 CustomRightHandSide1::~CustomRightHandSide1() 
@@ -77,7 +77,7 @@ double CustomRightHandSide2::value(double x, double y) const
 
 Ord CustomRightHandSide2::value(Ord x, Ord y) const 
 {
-  return Ord(10);
+  return Ord(16);
 }
 
 CustomRightHandSide2::~CustomRightHandSide2() 
@@ -106,7 +106,7 @@ void ExactSolutionFitzHughNagumo1::derivatives(double x, double y, double& dx, d
 
 Ord ExactSolutionFitzHughNagumo1::ord(Ord x, Ord y) const 
 {
-  return Ord(10);
+  return Ord(16);
 }
 
 ExactSolutionFitzHughNagumo1::~ExactSolutionFitzHughNagumo1() 
@@ -133,7 +133,7 @@ void ExactSolutionFitzHughNagumo2::derivatives(double x, double y, double& dx, d
 
 Ord ExactSolutionFitzHughNagumo2::ord(Ord x, Ord y) const 
 {
-  return Ord(10);
+  return Ord(16);
 }
 
 ExactSolutionFitzHughNagumo2::~ExactSolutionFitzHughNagumo2() 
@@ -160,17 +160,7 @@ double CustomResidual1::value(int n, double *wt, Func<double> *u_ext[], Func<dou
 Ord CustomResidual1::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
                          Geom<Ord> *e, ExtData<Ord> *ext) const 
 {
-   Ord result = Ord(0);
-   for (int i = 0; i < n; i++) 
-   {
-     result += wt[i] * (    d_u*d_u * (u_ext[0]->dx[i]*v->dx[i] + u_ext[0]->dy[i]*v->dy[i]) 
-                          - u_ext[0]->val[i]*v->val[i] 
-                          + sigma*u_ext[1]->val[i]*v->val[i]
-                          - g1->value(e->x[i], e->y[i])*v->val[i]
-                        );
-   }
-
-   return result;
+  return Ord(16);
 }
 
 VectorFormVol<double>* CustomResidual1::clone() 
@@ -195,19 +185,9 @@ double CustomResidual2::value(int n, double *wt, Func<double> *u_ext[], Func<dou
   }
 
 Ord CustomResidual2::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
-                                 Geom<Ord> *e, ExtData<Ord> *ext) const 
+                         Geom<Ord> *e, ExtData<Ord> *ext) const 
 {
-   Ord result = Ord(0);
-   for (int i = 0; i < n; i++) 
-   {
-     result += wt[i] * (    d_v*d_v * (u_ext[1]->dx[i]*v->dx[i] + u_ext[1]->dy[i]*v->dy[i]) 
-                          - u_ext[0]->val[i]*v->val[i] 
-                          + u_ext[1]->val[i]*v->val[i]
-                          - g2->value(e->x[i], e->y[i])*v->val[i]
-                        );
-   }
-
-  return result;
+  return Ord(16);
 } 
 
 VectorFormVol<double>* CustomResidual2::clone() 

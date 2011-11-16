@@ -226,10 +226,7 @@ int main(int argc, char* argv[])
       // Construct globally refined reference mesh and setup reference space.
       Space<double>* ref_space = Space<double>::construct_refined_space(&space);
 
-      // Initialize discrete problem on reference mesh.
-      DiscreteProblem<double>* ref_dp = new DiscreteProblem<double>(&wf, ref_space);
-      
-      RungeKutta<double> runge_kutta(ref_dp, &bt, matrix_solver);
+      RungeKutta<double> runge_kutta(&wf, ref_space, &bt, matrix_solver);
 
       // Runge-Kutta step on the fine mesh.
       info("Runge-Kutta time step on fine mesh (t = %g s, tau = %g s, stages: %d).", 
@@ -275,7 +272,6 @@ int main(int argc, char* argv[])
                time_step, time_step * TIME_STEP_DEC_RATIO);
           time_step *= TIME_STEP_DEC_RATIO;
           delete ref_space;
-          delete ref_dp;
           continue;
         }
         else if (rel_err_time < TIME_ERR_TOL_LOWER) {
@@ -283,7 +279,6 @@ int main(int argc, char* argv[])
           info("Increasing tau from %g to %g s.", time_step, time_step * TIME_STEP_INC_RATIO);
           time_step *= TIME_STEP_INC_RATIO;
           delete ref_space;
-          delete ref_dp;
           continue;
         }
         else {
@@ -339,7 +334,6 @@ int main(int argc, char* argv[])
       // Clean up.
       delete adaptivity;
       delete ref_space;
-      delete ref_dp;
       delete space_error_fn;
     }
     while (done == false);

@@ -66,17 +66,13 @@ int main(int argc, char* argv[])
   // Initialize the FE problem.
   DiscreteProblem<double> dp(&wf, &space);
 
-  // Initial coefficient vector for the Newton's method.  
-  double* coeff_vec = new double[ndof];
-  memset(coeff_vec, 0, ndof*sizeof(double));
-
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp, matrix_solver);
 
   // Perform Newton's iteration.
   try
   {
-    newton.solve(coeff_vec);
+    newton.solve();
   }
   catch(Hermes::Exceptions::Exception e)
   {
@@ -90,9 +86,6 @@ int main(int argc, char* argv[])
 
   // Time measurement.
   cpu_time.tick();
-
-  // Clean up.
-  delete [] coeff_vec;
 
   // View the solution and mesh.
   ScalarView sview("Solution", new WinGeom(0, 0, 440, 350));

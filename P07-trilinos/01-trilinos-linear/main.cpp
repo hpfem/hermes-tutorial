@@ -95,10 +95,6 @@ int main(int argc, char **argv)
   // Begin time measurement of assembly.
   cpu_time.tick(HERMES_SKIP);
 
-  // Initial coefficient vector for the Newton's method.  
-  double* coeff_vec = new double[ndof];
-  memset(coeff_vec, 0, ndof*sizeof(double));
-
   // Initialize the Newton solver.
   Hermes::Hermes2D::NewtonSolver<double> newton(&dp1, matrix_solver);
 
@@ -106,7 +102,7 @@ int main(int argc, char **argv)
   Hermes::Hermes2D::Solution<double> sln1;
   try
   {
-    newton.solve(coeff_vec);
+    newton.solve();
   }
   catch(Hermes::Exceptions::Exception e)
   {
@@ -147,7 +143,8 @@ int main(int argc, char **argv)
   // Calculate initial vector for NOX.
   info("Projecting to obtain initial vector for the Newton's method.");
   ZeroSolution init_sln(&mesh);
-  OGProjection<double>::project_global(&space, &init_sln, coeff_vec);
+  double* coeff_vec = new double[ndof];
+  memset(coeff_vec, 0, ndof*sizeof(double));
 
   // Initialize the NOX solver.
   info("Initializing NOX.");
