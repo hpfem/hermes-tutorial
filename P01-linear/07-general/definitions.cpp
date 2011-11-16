@@ -50,7 +50,7 @@ double CustomEssentialBCNonConst::value(double x, double y, double n_x, double n
 
 /* Weak forms */
 
-CustomWeakFormGeneral::CustomWeakFormGeneral(std::string bdy_vertical) : WeakForm(1)
+CustomWeakFormGeneral::CustomWeakFormGeneral(std::string bdy_vertical) : WeakForm<double>(1)
 {
   // Jacobian forms - volumetric.
   add_matrix_form(new MatrixFormVolGeneral(0, 0));
