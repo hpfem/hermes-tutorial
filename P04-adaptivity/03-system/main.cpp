@@ -34,7 +34,7 @@
 // single-mesh using the MULTI parameter.
 
 // If defined, error wrt. exact solution will be calculated.
-#define WITH_EXACT_SOLUTION                       
+//#define WITH_EXACT_SOLUTION                       
 // Initial polynomial degree for u.
 const int P_INIT_U = 2;                           
 // Initial polynomial degree for v.
@@ -251,8 +251,8 @@ int main(int argc, char* argv[])
     info("ndof_coarse[1]: %d, ndof_fine[1]: %d", v_space.get_num_dofs(), v_ref_space->get_num_dofs());
     info("err_est_rel[1]: %g%%", err_est_rel[1]*100);
     info("ndof_coarse_total: %d, ndof_fine_total: %d",
-         Space<double>::get_num_dofs(Hermes::vector<Space<double> *>(&u_space, &v_space)), 
-         Space<double>::get_num_dofs(*ref_spaces));
+         Space<double>::get_num_dofs(Hermes::vector<const Space<double> *>(&u_space, &v_space)), 
+         Space<double>::get_num_dofs(ref_spaces_const));
     info("err_est_rel_total: %g%%", err_est_rel_total);
 #endif
 
