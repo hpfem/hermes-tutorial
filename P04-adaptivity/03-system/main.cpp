@@ -73,12 +73,12 @@ const int MESH_REGULARITY = -1;
 // candidates in hp-adaptivity. Default value is 1.0. 
 const double CONV_EXP = 1;                        
 // Stopping criterion for adaptivity.
-const double ERR_STOP = 0.1;                      
+const double ERR_STOP = 1.0;                      
 // Adaptivity process stops when the number of degrees of freedom grows over
 // this limit. This is mainly to prevent h-adaptivity to go on forever.
 const int NDOF_STOP = 60000;
 // Newton's method.
-double NEWTON_TOL = 1e-5;
+double NEWTON_TOL_FINE = 1e-0;
 int NEWTON_MAX_ITER = 10;
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
     // Perform Newton's iteration.
     try
     {
-      newton.solve(NULL, NEWTON_TOL, NEWTON_MAX_ITER);
+      newton.solve(NULL, NEWTON_TOL_FINE, NEWTON_MAX_ITER);
     }
     catch(Hermes::Exceptions::Exception e)
     {
