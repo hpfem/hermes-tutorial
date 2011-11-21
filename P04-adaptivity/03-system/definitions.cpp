@@ -101,7 +101,7 @@ double ExactSolutionFitzHughNagumo1::value(double x, double y) const
 void ExactSolutionFitzHughNagumo1::derivatives(double x, double y, double& dx, double& dy) const 
 {
   dx = cef1->dx(x)*cef1->val(y);
-  dy = cef1->val(x)*cef1->ddxx(y);
+  dy = cef1->val(x)*cef1->dx(y);
 }
 
 Ord ExactSolutionFitzHughNagumo1::ord(Ord x, Ord y) const 
