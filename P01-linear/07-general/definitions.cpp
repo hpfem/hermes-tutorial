@@ -92,6 +92,11 @@ Ord CustomWeakFormGeneral::MatrixFormVolGeneral::ord(int n, double *wt, Func<Ord
   return u->val[0] * v->val[0] * e->x[0] * e->x[0]; 
 }
 
+MatrixFormVol<double>* CustomWeakFormGeneral::MatrixFormVolGeneral::clone()
+{
+  return new MatrixFormVolGeneral(this->i, this->j);
+}
+
 CustomWeakFormGeneral::VectorFormVolGeneral::VectorFormVolGeneral(int i) : VectorFormVol<double>(i) 
 { 
 }
@@ -120,6 +125,11 @@ Ord CustomWeakFormGeneral::VectorFormVolGeneral::ord(int n, double *wt, Func<Ord
 {
   // Returning the sum of the degrees of the test function and solution plus two.
   return u_ext[0]->val[0] * v->val[0] * e->x[0] * e->x[0];  
+}
+
+VectorFormVol<double>* CustomWeakFormGeneral::VectorFormVolGeneral::clone()
+{
+  return new VectorFormVolGeneral(this->i);
 }
 
 double CustomWeakFormGeneral::VectorFormVolGeneral::rhs(double x, double y) const 
@@ -151,4 +161,9 @@ Ord CustomWeakFormGeneral::VectorFormSurfGeneral::ord(int n, double *wt, Func<Or
 double CustomWeakFormGeneral::VectorFormSurfGeneral::g_N(double x, double y) const 
 { 
   return 0;
+}
+
+VectorFormSurf<double>* CustomWeakFormGeneral::VectorFormSurfGeneral::clone()
+{
+  return new VectorFormSurfGeneral(this->i);
 }

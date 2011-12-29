@@ -16,6 +16,11 @@ Ord CustomInitialCondition::ord(Ord x, Ord y) const
   return x*y;
 }
 
+MeshFunction<double>* CustomInitialCondition::clone()
+{
+  return new CustomInitialCondition(this->mesh);
+}
+
 EssentialBoundaryCondition<double>::EssentialBCValueType CustomEssentialBCNonConst::get_value_type() const 
 { 
   return EssentialBoundaryCondition<double>::BC_FUNCTION; 

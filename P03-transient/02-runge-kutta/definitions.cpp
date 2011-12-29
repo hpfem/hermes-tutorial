@@ -1,21 +1,5 @@
 #include "definitions.h"
 
-double CustomInitialCondition::value(double x, double y) const 
-{
-  return const_value;
-}
-
-void CustomInitialCondition::derivatives(double x, double y, double& dx, double& dy) const 
-{   
-  dx = 0;
-  dy = 0;
-}
-
-Ord CustomInitialCondition::ord(Ord x, Ord y) const 
-{
-  return Ord(0);
-}
-
 CustomWeakFormHeatRK::CustomWeakFormHeatRK(std::string bdy_air, double alpha, double lambda, double heatcap, double rho,
                                            double* current_time_ptr, double temp_init, double t_final) : WeakForm<double>(1)
 {
