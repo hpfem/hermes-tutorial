@@ -58,7 +58,7 @@ const int NDOF_STOP = 60000;
 // Stopping criterion for the Newton's method on coarse mesh.
 const double NEWTON_TOL_COARSE = 1e-4;            
 // Stopping criterion for the Newton's method on fine mesh.
-const double NEWTON_TOL_FINE = 1e-4;              
+const double NEWTON_TOL_FINE = 1e-8;              
 // Maximum allowed number of Newton iterations.
 const int NEWTON_MAX_ITER = 100;                  
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
   cpu_time.tick();
 
   // Initialize views.
-  ScalarView sview("Solution<double>", new WinGeom(0, 0, 440, 350));
+  ScalarView sview("Solution", new WinGeom(0, 0, 440, 350));
   sview.show_mesh(false);
   OrderView oview("Mesh", new WinGeom(450, 0, 400, 350));
 

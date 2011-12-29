@@ -9,12 +9,15 @@ class InitialSolutionHeatTransfer : public ExactSolutionScalar<double>
 {
 public:
   InitialSolutionHeatTransfer(Mesh* mesh) : ExactSolutionScalar<double>(mesh) {};
+  ~InitialSolutionHeatTransfer();
 
   virtual double value (double x, double y) const;
 
   virtual void derivatives (double x, double y, double& dx, double& dy) const;
 
   virtual Ord ord(Ord x, Ord y) const;
+
+  MeshFunction<double>* clone();
 };
 
 /* Essential BC */

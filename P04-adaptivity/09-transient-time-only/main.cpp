@@ -149,6 +149,11 @@ int main(int argc, char* argv[])
     eview.set_title(title);
     AbsFilter abs_tef(&time_error_fn);
     eview.show(&abs_tef, HERMES_EPS_VERYHIGH);
+    
+    // Show the new time level solution.
+    sprintf(title, "Solution (higher-order), t = %g", current_time);
+    sview_high.set_title(title);
+    sview_high.show(&sln_time_new, HERMES_EPS_HIGH);
 
     // Calculate relative time stepping error and decide whether the 
     // time step can be accepted. If not, then the time step size is 
@@ -173,12 +178,6 @@ int main(int argc, char* argv[])
     // Add entry to the timestep graph.
     time_step_graph.add_values(current_time, time_step);
     time_step_graph.save("time_step_history.dat");
-
-
-    // Show the new time level solution.
-    sprintf(title, "Solution (higher-order), t = %g", current_time);
-    sview_high.set_title(title);
-    sview_high.show(&sln_time_new, HERMES_EPS_HIGH);
 
     // Copy solution for next time step.
     sln_time_prev.copy(&sln_time_new);

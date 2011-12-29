@@ -18,6 +18,18 @@ Ord InitialSolutionHeatTransfer::ord(Ord x, Ord y) const
   return (x + 10) * (y + 10) / 100. + 2.;
 }
 
+MeshFunction<double>* InitialSolutionHeatTransfer::clone()
+{
+  Mesh* new_mesh = new Mesh();
+  new_mesh->copy(this->mesh);
+  return new InitialSolutionHeatTransfer(new_mesh);
+}
+
+InitialSolutionHeatTransfer::~InitialSolutionHeatTransfer()
+{
+  delete mesh;
+}
+
 /* Essential BC */
 EssentialBoundaryCondition<double>::EssentialBCValueType CustomEssentialBCNonConst::get_value_type() const 
 {
