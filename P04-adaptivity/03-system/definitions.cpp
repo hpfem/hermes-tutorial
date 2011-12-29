@@ -165,7 +165,7 @@ Ord CustomResidual1::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
 
 VectorFormVol<double>* CustomResidual1::clone() 
 {
-  return new CustomResidual1(*this);
+  return new CustomResidual1(this->d_u, this->sigma, this->g1);
 }
 
 double CustomResidual2::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v,
@@ -192,7 +192,7 @@ Ord CustomResidual2::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
 
 VectorFormVol<double>* CustomResidual2::clone() 
 {
-  return new CustomResidual2(*this);
+  return new CustomResidual2(this->d_v, this->g2);
 }
 
 CustomWeakForm::CustomWeakForm(CustomRightHandSide1* g1, CustomRightHandSide2* g2) : WeakForm<double>(2) 
