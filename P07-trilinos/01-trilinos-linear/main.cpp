@@ -142,7 +142,7 @@ int main(int argc, char **argv)
 
   // Calculate initial vector for NOX.
   info("Projecting to obtain initial vector for the Newton's method.");
-  ZeroSolution init_sln(&mesh);
+  ZeroSolution<double> init_sln(&mesh);
   double* coeff_vec = new double[ndof];
   memset(coeff_vec, 0, ndof*sizeof(double));
 

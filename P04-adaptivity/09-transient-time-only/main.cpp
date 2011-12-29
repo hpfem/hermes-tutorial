@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
   // Convert initial condition into a Solution.
   CustomInitialCondition sln_time_prev(&mesh);
   Solution<double> sln_time_new(&mesh);
-  ZeroSolution time_error_fn(&mesh);
+  ZeroSolution<double> time_error_fn(&mesh);
 
   // Initialize the weak formulation
   CustomNonlinearity lambda(alpha);
