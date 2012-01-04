@@ -160,7 +160,7 @@ double CustomResidual1::value(int n, double *wt, Func<double> *u_ext[], Func<dou
 Ord CustomResidual1::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
                          Geom<Ord> *e, ExtData<Ord> *ext) const 
 {
-  return Ord(10);
+  return Ord(20);
 }
 
 VectorFormVol<double>* CustomResidual1::clone() 
@@ -187,7 +187,7 @@ double CustomResidual2::value(int n, double *wt, Func<double> *u_ext[], Func<dou
 Ord CustomResidual2::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
                          Geom<Ord> *e, ExtData<Ord> *ext) const 
 {
-  return Ord(10);
+  return Ord(20);
 } 
 
 VectorFormVol<double>* CustomResidual2::clone() 
