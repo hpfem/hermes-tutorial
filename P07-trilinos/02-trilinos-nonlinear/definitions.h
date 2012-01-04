@@ -48,21 +48,8 @@ public:
   virtual void derivatives (double x, double y, double& dx, double& dy) const;
 
   virtual Ord ord(Ord x, Ord y) const;
-};
-
-/* Initial solution */
-
-class CustomInitialSolution : public ExactSolutionScalar<double>
-{
-public:
-  CustomInitialSolution(Mesh* mesh)
-               : ExactSolutionScalar<double>(mesh) {};
-
-  double value(double x, double y) const;
-
-  virtual void derivatives (double x, double y, double& dx, double& dy) const;
-
-  virtual Ord ord(Ord x, Ord y) const;
+  
+  MeshFunction<double>* clone();
 };
 
 /* Weak form */
@@ -84,6 +71,8 @@ private:
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
             Geom<Ord> *e, ExtData<Ord> *ext) const;
+    
+    MatrixFormVol<double>* clone();
   };
 
   class ResidualFormVol : public VectorFormVol<double>
@@ -96,6 +85,8 @@ private:
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
                     Geom<Ord> *e, ExtData<Ord> *ext) const;
+
+    VectorFormVol<double>* clone();
 
   private:
     // Problem parameters.
@@ -112,6 +103,8 @@ private:
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
             Geom<Ord> *e, ExtData<Ord> *ext) const;
+    
+    MatrixFormVol<double>* clone();
   };
 };
 

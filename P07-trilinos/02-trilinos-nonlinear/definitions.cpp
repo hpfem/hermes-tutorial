@@ -83,23 +83,10 @@ Ord CustomExactSolution::ord(Ord x, Ord y) const
   return (1- 2*x) * y * (1 - y);
 }
 
-
-double CustomInitialSolution::value(double x, double y) const 
+MeshFunction<double>* CustomExactSolution::clone()
 {
-  return  0;
+  return new CustomExactSolution(*this);
 }
-
-void CustomInitialSolution::derivatives (double x, double y, double& dx, double& dy) const 
-{
-  dx = 0;
-  dy = 0;
-}
-
-Ord CustomInitialSolution::ord(Ord x, Ord y) const 
-{
-  return Ord(1);
-}
-
 
 CustomWeakForm::CustomWeakForm(bool JFNK, bool precondition_jacobian, bool precondition_jacobian_approx) : WeakForm<double>(1, JFNK)
 {
@@ -135,6 +122,10 @@ Ord CustomWeakForm::JacobianFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], 
   return Ord(10);
 }
 
+MatrixFormVol<double>* CustomWeakForm::JacobianFormVol::clone()
+{
+  return new CustomWeakForm::JacobianFormVol(*this);
+}
 
 double CustomWeakForm::ResidualFormVol::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
                                               Geom<double> *e, ExtData<double> *ext) const 
@@ -154,6 +145,10 @@ Ord CustomWeakForm::ResidualFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], 
   return Ord(10);
 }
 
+VectorFormVol<double>* CustomWeakForm::ResidualFormVol::clone()
+{
+  return new CustomWeakForm::ResidualFormVol(*this);
+}
 
 double CustomWeakForm::PrecondFormVol::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
                                              Func<double> *v, Geom<double> *e, ExtData<double> *ext) const 
@@ -171,3 +166,7 @@ Ord CustomWeakForm::PrecondFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], F
   return Ord(10);
 }
 
+MatrixFormVol<double>* CustomWeakForm::PrecondFormVol::clone()
+{
+  return new CustomWeakForm::PrecondFormVol(*this);
+}

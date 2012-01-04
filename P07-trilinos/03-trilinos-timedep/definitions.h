@@ -25,6 +25,8 @@ private:
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
                     Geom<Ord> *e, ExtData<Ord> *ext) const;
+    
+    MatrixFormVol<double>* clone();
 
     double heatcap, rho, lambda, tau;
   };
@@ -40,6 +42,8 @@ private:
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
                     Geom<Ord> *e, ExtData<Ord> *ext) const;
+    
+    MatrixFormSurf<double>* clone();
 
     double alpha, lambda;
   };
@@ -55,6 +59,8 @@ private:
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
                     Geom<Ord> *e, ExtData<Ord> *ext) const;
+    
+    VectorFormVol<double>* clone();
 
   private:
     double heatcap, rho, lambda, tau;
@@ -71,6 +77,8 @@ private:
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
                     Geom<Ord> *e, ExtData<Ord> *ext) const;
+    
+    VectorFormSurf<double>* clone();
 
   private:
     double alpha, lambda, temp_ext;
