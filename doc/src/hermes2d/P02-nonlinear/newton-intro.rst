@@ -94,7 +94,7 @@ How to differentiate weak forms
 
 Chain rule is used all the time. If your equation contains parameters that depend on 
 the solution, you will need their derivatives with respect to the solution (such as we needed 
-the derivative d$\lambda$/d$u$ above). In addition, the following elementary rules are useful 
+the derivative $\frac{\partial \lambda}{\partial u}$ above). In addition, the following elementary rules are useful 
 for the differentiation of the weak forms: 
 
 .. math::
