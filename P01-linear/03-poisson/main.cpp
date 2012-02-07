@@ -30,7 +30,7 @@ const bool USE_XML_FORMAT = true;
 // Set to "false" to suppress Hermes OpenGL visualization. 
 const bool HERMES_VISUALIZATION = true;           
 // Set to "true" to enable VTK output.
-const bool VTK_VISUALIZATION = false;              
+const bool VTK_VISUALIZATION = true;              
 // Uniform polynomial degree of mesh elements.
 const int P_INIT = 5;                             
 // Number of initial uniform mesh refinements.
