@@ -216,9 +216,9 @@ int main(int argc, char* argv[])
   v_view.show(&real_filter);
 
   // Output solution in VTK format.
-  Linearizer lin;
+  Views::Linearizer lin;
   bool mode_3D = true;
-  lin.save_solution_vtk(&ref_magn, "sln.vtk", "Magnitude of E", mode_3D);
+  lin.save_solution_vtk(&real_filter, "sln.vtk", "Magnitude of E", mode_3D);
   info("Solution in VTK format saved to file %s.", "sln.vtk");
 
   // Wait for all views to be closed.
