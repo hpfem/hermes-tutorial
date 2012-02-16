@@ -212,11 +212,11 @@ int main(int argc, char* argv[])
 
   // Show the reference solution - the final result.
   v_view.set_title("Fine mesh solution (magnitude)");
-  RealFilter real_filter(&ref_sln);
-  v_view.show(&real_filter);
+  RealFilter ref_magn(&ref_sln);
+  v_view.show(&ref_magn);
 
   // Output solution in VTK format.
-  Linearizer lin;
+  Hermes::Hermes2D::Views::Linearizer lin;
   bool mode_3D = true;
   lin.save_solution_vtk(&ref_magn, "sln.vtk", "Magnitude of E", mode_3D);
   info("Solution in VTK format saved to file %s.", "sln.vtk");
