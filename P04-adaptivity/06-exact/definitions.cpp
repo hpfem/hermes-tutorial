@@ -15,3 +15,8 @@ Ord ExactSolutionCustom::ord(Ord x, Ord y) const
 {
   return pow(x*x + y*y, 0.25);
 }
+
+MeshFunction<double>* ExactSolutionCustom::clone()
+{
+  return new ExactSolutionCustom(this->mesh);
+}

@@ -96,7 +96,7 @@ class EnergyErrorForm : public Adapt<double>::MatrixFormVolError
 {
 public:
   EnergyErrorForm(CustomWeakFormPoisson *wf) 
-    : Adapt<double>::MatrixFormVolError(HERMES_UNSET_NORM), wf(wf)
+    : Adapt<double>::MatrixFormVolError(0, 0, HERMES_UNSET_NORM), wf(wf)
   { };
 
   virtual double value(int n, double *wt, 

@@ -41,5 +41,7 @@ public:
 
     virtual Hermes::Ord ord(int n, double *wt, Func<Hermes::Ord> *u_ext[], Func<Hermes::Ord> *v,
       Geom<Hermes::Ord> *e, ExtData<Hermes::Ord> *ext) const ;
+
+    VectorFormSurf<std::complex<double> >* clone();
   };
 };

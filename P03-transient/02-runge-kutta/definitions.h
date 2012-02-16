@@ -5,25 +5,6 @@ using namespace Hermes::Hermes2D;
 using namespace Hermes::Hermes2D::WeakFormsH1;
 using namespace Hermes::Hermes2D::Views;
 
-/* Initial condition */
-
-class CustomInitialCondition : public ExactSolutionScalar<double>
-{
-public:
-  CustomInitialCondition(Mesh* mesh, double const_value) : ExactSolutionScalar<double>(mesh), 
-    const_value(const_value)
-  {
-  };
-
-  virtual double value(double x, double y) const;
-
-  virtual void derivatives(double x, double y, double& dx, double& dy) const;
-
-  virtual Ord ord(Ord x, Ord y) const;
-
-  double const_value;
-};
-
 /* Weak forms */
 
 class CustomWeakFormHeatRK : public WeakForm<double>

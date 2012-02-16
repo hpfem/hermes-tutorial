@@ -131,6 +131,7 @@ int main(int argc, char* argv[])
   H1Space<double> u_space(&u_mesh, &bcs_u, P_INIT_U);
   H1Space<double> v_space(MULTI ? &v_mesh : &u_mesh, &bcs_v, P_INIT_V);
 
+
   // Initialize coarse and reference mesh solutions.
   Solution<double> u_sln, v_sln, u_ref_sln, v_ref_sln;
 
@@ -161,7 +162,7 @@ int main(int argc, char* argv[])
       Space<double>::construct_refined_spaces(Hermes::vector<Space<double> *>(&u_space, &v_space));
     Space<double>* u_ref_space = (*ref_spaces)[0];
     Space<double>* v_ref_space = (*ref_spaces)[1];
-
+   
     Hermes::vector<const Space<double> *> ref_spaces_const((*ref_spaces)[0], (*ref_spaces)[1]);
 
     int ndof_ref = Space<double>::get_num_dofs(ref_spaces_const);
@@ -179,7 +180,7 @@ int main(int argc, char* argv[])
     // Perform Newton's iteration.
     try
     {
-      newton.solve(NULL, NEWTON_TOL_FINE, NEWTON_MAX_ITER);
+      newton.solve();
     }
     catch(Hermes::Exceptions::Exception e)
     {

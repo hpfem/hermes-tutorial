@@ -134,3 +134,9 @@ Hermes::Ord CustomWeakForm::CustomVectorFormSurf::ord(int n, double *wt, Func<He
 {
   return Hermes::Ord(10);
 }
+
+VectorFormSurf<std::complex<double> >* CustomWeakForm::CustomVectorFormSurf::clone()
+{
+  return new CustomVectorFormSurf();
+}
+

@@ -20,25 +20,6 @@ public:
     double alpha;
 };
 
-/* Initial condition */
-
-class CustomInitialCondition : public ExactSolutionScalar<double>
-{
-public:
-  CustomInitialCondition(Mesh* mesh, double const_value) : ExactSolutionScalar<double>(mesh), 
-    const_value(const_value)
-  {
-  };
-
-  virtual double value(double x, double y) const;
-
-  virtual void derivatives(double x, double y, double& dx, double& dy) const;
-
-  virtual Ord ord(Ord x, Ord y) const;
-
-  double const_value;
-};
-
 /* Weak forms */
 
 // NOTE: The linear problem in the Picard's method is 
@@ -61,6 +42,8 @@ private:
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v,
                     Geom<Ord> *e, ExtData<Ord> *ext) const;
     
+    MatrixFormVol<double>* clone();
+
     protected:
       Hermes1DFunction<double>* lambda;
   };
@@ -79,7 +62,9 @@ private:
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
                     Geom<Ord> *e, ExtData<Ord> *ext) const;
 
-    private:
+    VectorFormVol<double>* clone();
+
+  private:
       Hermes1DFunction<double>* lambda;
       Hermes2DFunction<double>* f;
   };

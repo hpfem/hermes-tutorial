@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
   mesh.refine_towards_boundary("Boundary_ground", INIT_REF_NUM_BDY);
 
   // Previous and next time level solutions.
-  CustomInitialCondition sln_time_prev(&mesh, TEMP_INIT);
+  ConstantSolution<double> sln_time_prev(&mesh, TEMP_INIT);
   Solution<double> sln_time_new(&mesh);
 
   // Initialize the weak formulation.

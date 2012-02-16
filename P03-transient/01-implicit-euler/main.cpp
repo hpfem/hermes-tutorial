@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
   mesh.refine_towards_boundary("Boundary ground", INIT_REF_NUM_BDY);
 
   // Previous time level solution (initialized by the external temperature).
-  CustomInitialCondition tsln(&mesh, TEMP_INIT);
+  ConstantSolution<double> tsln(&mesh, TEMP_INIT);
 
   // Initialize the weak formulation.
   double current_time = 0;

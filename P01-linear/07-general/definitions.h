@@ -36,6 +36,8 @@ private:
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
                     Geom<Ord> *e, ExtData<Ord> *ext) const;
+
+    MatrixFormVol<double>* clone();
   };
 
   class VectorFormVolGeneral : public VectorFormVol<double> 
@@ -49,6 +51,7 @@ private:
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
                     Geom<Ord> *e, ExtData<Ord> *ext) const;
 
+    VectorFormVol<double>* clone();
   private:
     double rhs(double x, double y) const;
   };
@@ -64,6 +67,7 @@ private:
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
                     Geom<Ord> *e, ExtData<Ord> *ext) const;
 
+    VectorFormSurf<double>* clone();
   private:
     double g_N(double x, double y) const;
   };

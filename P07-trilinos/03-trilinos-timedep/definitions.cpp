@@ -36,6 +36,10 @@ Ord CustomWeakForm::JacobianFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], 
   return Ord(10);
 }
 
+MatrixFormVol<double>* CustomWeakForm::JacobianFormVol::clone()
+{
+  return new CustomWeakForm::JacobianFormVol(*this);
+}
 
 double CustomWeakForm::JacobianFormSurf::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
                                                Func<double> *v, Geom<double> *e, ExtData<double> *ext) const 
@@ -51,6 +55,11 @@ Ord CustomWeakForm::JacobianFormSurf::ord(int n, double *wt, Func<Ord> *u_ext[],
 {
   // Returning the sum of the degrees of the basis and test function plus two.
   return Ord(10);
+}
+
+MatrixFormSurf<double>* CustomWeakForm::JacobianFormSurf::clone()
+{
+  return new CustomWeakForm::JacobianFormSurf(*this);
 }
 
 
@@ -71,6 +80,11 @@ Ord CustomWeakForm::ResidualFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], 
   return Ord(10);
 }
 
+VectorFormVol<double>* CustomWeakForm::ResidualFormVol::clone()
+{
+  return new CustomWeakForm::ResidualFormVol(*this);
+}
+
 
 double CustomWeakForm::ResidualFormSurf::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
                                                Geom<double> *e, ExtData<double> *ext) const 
@@ -88,3 +102,7 @@ Ord CustomWeakForm::ResidualFormSurf::ord(int n, double *wt, Func<Ord> *u_ext[],
   return Ord(10);
 }
 
+VectorFormSurf<double>* CustomWeakForm::ResidualFormSurf::clone()
+{
+  return new CustomWeakForm::ResidualFormSurf(*this);
+}

@@ -1,21 +1,5 @@
 #include "definitions.h"
 
-double CustomInitialCondition::value(double x, double y) const 
-{
-  return const_value;
-}
-
-void CustomInitialCondition::derivatives(double x, double y, double& dx, double& dy) const 
-{   
-  dx = 0;
-  dy = 0;
-}
-
-Ord CustomInitialCondition::ord(Ord x, Ord y) const 
-{
-  return Ord(0);
-}
-
 CustomWeakFormHeatRK1::CustomWeakFormHeatRK1(std::string bdy_air, double alpha, double lambda, double heatcap, double rho,
                                              double time_step, double* current_time_ptr, double temp_init, double t_final,
                                              Solution<double>* prev_time_sln) : WeakForm<double>(1)
@@ -55,6 +39,11 @@ Ord CustomWeakFormHeatRK1::CustomVectorFormVol::ord(int n, double *wt, Func<Ord>
   return -int_u_v<Ord, Ord>(n, wt, temp_prev_time, v) / time_step;
 }
 
+VectorFormVol<double>* CustomWeakFormHeatRK1::CustomVectorFormVol::clone()
+{
+  return new CustomVectorFormVol(this->i, this->time_step);
+}
+
 double CustomWeakFormHeatRK1::CustomVectorFormSurf::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<double> *ext) const 
 {
   return -alpha / (rho * heatcap) * temp_ext(*current_time_ptr + time_step) * int_v<double>(n, wt, v);
@@ -70,4 +59,9 @@ template<typename Real>
 Real CustomWeakFormHeatRK1::CustomVectorFormSurf::temp_ext(Real t) const 
 {
   return temp_init + 10. * Hermes::sin(2*M_PI*t/t_final);
+}
+
+VectorFormSurf<double>* CustomWeakFormHeatRK1::CustomVectorFormSurf::clone()
+{
+  return new CustomVectorFormSurf(this->i, this->areas[0], this->alpha, this->rho, this->heatcap, this->time_step, this->current_time_ptr, this->temp_init, this->t_final);
 }

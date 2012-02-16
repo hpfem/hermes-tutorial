@@ -74,7 +74,7 @@ project(hermes_tutorial)
   #add_subdirectory(P05-eigenproblems)
 
   # FVM and DG.
-  add_subdirectory(P06-fvm-and-dg)
+  #add_subdirectory(P06-fvm-and-dg)
 
   # Using Trilinos.
   if(WITH_TRILINOS)

@@ -5,25 +5,6 @@ using namespace Hermes::Hermes2D;
 using namespace Hermes::Hermes2D::WeakFormsH1;
 using namespace Hermes::Hermes2D::Views;
 
-/* Initial condition */
-
-class CustomInitialCondition : public ExactSolutionScalar<double>
-{
-public:
-  CustomInitialCondition(Mesh* mesh, double const_value) : ExactSolutionScalar<double>(mesh), 
-    const_value(const_value)
-  {
-  };
-
-  virtual double value(double x, double y) const;
-
-  virtual void derivatives(double x, double y, double& dx, double& dy) const;
-
-  virtual Ord ord(Ord x, Ord y) const;
-
-  double const_value;
-};
-
 /* Weak forms */
 
 class CustomWeakFormHeatRK1 : public WeakForm<double>
@@ -46,6 +27,8 @@ private:
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const;
 
     double time_step;
+
+    VectorFormVol<double>* clone();
   };
 
   // This form is custom since it contains time-dependent exterior temperature.
@@ -66,5 +49,7 @@ private:
     Real temp_ext(Real t) const;
 
     double alpha, rho, heatcap, time_step, *current_time_ptr, temp_init, t_final;
+    
+    VectorFormSurf<double>* clone();
   };
 };

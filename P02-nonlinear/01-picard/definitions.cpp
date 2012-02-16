@@ -16,22 +16,6 @@ Ord CustomNonlinearity::value(Ord u) const
   return Ord(10);
 }
 
-double CustomInitialCondition::value(double x, double y) const 
-{
-  return const_value;
-}
-
-void CustomInitialCondition::derivatives(double x, double y, double& dx, double& dy) const 
-{   
-  dx = 0;
-  dy = 0;
-}
-
-Ord CustomInitialCondition::ord(Ord x, Ord y) const 
-{
-  return Ord(0);
-}
-
 CustomWeakFormPicard::CustomWeakFormPicard(Solution<double>* prev_iter_sln, 
                                            Hermes1DFunction<double>* lambda, 
                                            Hermes2DFunction<double>* f) 
@@ -74,6 +58,13 @@ Ord CustomWeakFormPicard::CustomJacobian::ord(int n, double *wt, Func<Ord> *u_ex
   return result;
 }
 
+MatrixFormVol<double>* CustomWeakFormPicard::CustomJacobian::clone()
+{
+  CustomJacobian* form = new CustomJacobian(this->i, this->j, this->lambda);
+  form->ext = this->ext;
+  return form;
+}
+
 double CustomWeakFormPicard::CustomResidual::value(int n, double *wt, Func<double> *u_ext[],
                                                    Func<double> *v, Geom<double> *e, ExtData<double> *ext) const 
 {
@@ -98,6 +89,11 @@ Ord CustomWeakFormPicard::CustomResidual::ord(int n, double *wt, Func<Ord> *u_ex
     result += wt[i] * f->value(e->x[i], e->y[i]) * v->val[i];
   }
   return result;
+}
+
+VectorFormVol<double>* CustomWeakFormPicard::CustomResidual::clone()
+{
+  return new CustomResidual(this->i, this->lambda, this->f);
 }
 
 EssentialBoundaryCondition<double>::EssentialBCValueType CustomEssentialBCNonConst::get_value_type() const
