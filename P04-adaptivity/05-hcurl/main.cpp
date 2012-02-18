@@ -203,8 +203,10 @@ int main(int argc, char* argv[])
     // Clean up.
     delete adaptivity;
     if(done == false)
+    {
       delete ref_space->get_mesh();
-    delete ref_space;
+      delete ref_space;
+    }
   }
   while (done == false);
 

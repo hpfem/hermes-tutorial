@@ -14,4 +14,9 @@ class CustomExactSolution : public ExactSolutionScalar<double>
   virtual void derivatives (double x, double y, double& dx, double& dy) const;
 
   virtual Ord ord(Ord x, Ord y) const;
+  
+  virtual MeshFunction<double>* clone()
+  {
+    return new CustomExactSolution(mesh);
+  }
 };
