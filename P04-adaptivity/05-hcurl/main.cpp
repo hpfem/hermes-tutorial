@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
     OGProjection<std::complex<double> >::project_global(&space, &ref_sln, &sln, matrix_solver);
 
     // View the coarse mesh solution and polynomial orders.
-    RealFilter real_filter(&sln);
+    ComplexAbsFilter real_filter(&sln);
     v_view.show(&real_filter);
     o_view.show(&space);
 
@@ -212,13 +212,13 @@ int main(int argc, char* argv[])
 
   // Show the reference solution - the final result.
   v_view.set_title("Fine mesh solution (magnitude)");
-  RealFilter real_filter(&ref_sln);
-  v_view.show(&real_filter);
+  ComplexAbsFilter ref_magn(&ref_sln);
+  v_view.show(&ref_magn);
 
   // Output solution in VTK format.
   Views::Linearizer lin;
   bool mode_3D = true;
-  lin.save_solution_vtk(&real_filter, "sln.vtk", "Magnitude of E", mode_3D);
+  lin.save_solution_vtk(&ref_magn, "sln.vtk", "Magnitude of E", mode_3D);
   info("Solution in VTK format saved to file %s.", "sln.vtk");
 
   // Wait for all views to be closed.
