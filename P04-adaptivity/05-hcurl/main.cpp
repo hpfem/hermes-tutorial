@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
   HcurlProjBasedSelector selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
 
   // Initialize views.
-  Views::VectorView v_view("Solution (magnitude)", new Views::WinGeom(0, 0, 460, 350));
+  Views::ScalarView v_view("Solution (magnitude)", new Views::WinGeom(0, 0, 460, 350));
   v_view.set_min_max_range(0, 1.5);
   Views::OrderView  o_view("Polynomial orders", new Views::WinGeom(470, 0, 400, 350));
 
@@ -157,8 +157,9 @@ int main(int argc, char* argv[])
     OGProjection<std::complex<double> >::project_global(&space, &ref_sln, &sln, matrix_solver);
 
     // View the coarse mesh solution and polynomial orders.
-    ComplexAbsFilter real_filter(&sln);
-    v_view.show(&real_filter);
+    RealFilter real(&sln);
+    MagFilter<double> magn(&real);
+    v_view.show(&magn);
     o_view.show(&space);
 
     // Calculate element errors and total error estimate.
@@ -214,13 +215,14 @@ int main(int argc, char* argv[])
 
   // Show the reference solution - the final result.
   v_view.set_title("Fine mesh solution (magnitude)");
-  ComplexAbsFilter ref_magn(&ref_sln);
+  RealFilter ref_real(&sln);
+  MagFilter<double> ref_magn(&ref_real);
   v_view.show(&ref_magn);
 
   // Output solution in VTK format.
   Views::Linearizer lin;
   bool mode_3D = true;
-  lin.save_solution_vtk(&ref_magn, "sln.vtk", "Magnitude of E", mode_3D);
+  lin.save_solution_vtk(&ref_limited_magn, "sln.vtk", "Magnitude of E", mode_3D);
   info("Solution in VTK format saved to file %s.", "sln.vtk");
 
   // Wait for all views to be closed.
