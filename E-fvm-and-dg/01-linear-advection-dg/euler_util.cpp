@@ -87,8 +87,8 @@ double KrivodonovaDiscontinuityDetector::calculate_relative_flow_direction(Eleme
   double3* pt = solutions[1]->get_quad_2d()->get_points(eo, e->get_mode());
   int np = solutions[1]->get_quad_2d()->get_num_points(eo, e->get_mode());
 
-  Geom<double>* geom = init_geom_surf(solutions[1]->get_refmap(), edge_i, e->marker, eo);
-  double3* tan = solutions[1]->get_refmap()->get_tangent(edge_i, eo);
+  double3* tan = NULL;
+  Geom<double>* geom = init_geom_surf(solutions[0]->get_refmap(), edge_i, e->marker, eo, tan);
   double* jwt = new double[np];
   for(int i = 0; i < np; i++)
     jwt[i] = pt[i][2] * tan[i][2];
@@ -146,8 +146,8 @@ void KrivodonovaDiscontinuityDetector::calculate_jumps(Element* e, int edge_i, d
       solutions[3]->push_transform(ns.get_central_transformations(neighbor_i, trf_i));
     }
 
-    Geom<double>* geom = init_geom_surf(solutions[0]->get_refmap(), edge_i, e->marker, eo);
-    double3* tan = solutions[0]->get_refmap()->get_tangent(edge_i, eo);
+    double3* tan = NULL;
+    Geom<double>* geom = init_geom_surf(solutions[0]->get_refmap(), edge_i, e->marker, eo, tan);
     double* jwt = new double[np];
     for(int i = 0; i < np; i++)
       jwt[i] = pt[i][2] * tan[i][2];
@@ -236,8 +236,8 @@ void KrivodonovaDiscontinuityDetector::calculate_norms(Element* e, int edge_i, d
   double3* pt = solutions[0]->get_quad_2d()->get_points(eo, e->get_mode());
   int np = solutions[0]->get_quad_2d()->get_num_points(eo, e->get_mode());
 
-  Geom<double>* geom = init_geom_surf(solutions[0]->get_refmap(), edge_i, e->marker, eo);
-  double3* tan = solutions[0]->get_refmap()->get_tangent(edge_i, eo);
+  double3* tan = NULL;
+  Geom<double>* geom = init_geom_surf(solutions[0]->get_refmap(), edge_i, e->marker, eo, tan);
   double* jwt = new double[np];
   for(int i = 0; i < np; i++)
     jwt[i] = pt[i][2] * tan[i][2];

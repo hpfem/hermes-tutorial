@@ -23,6 +23,7 @@ private:
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const;
+    Hermes::Hermes2D::MatrixFormVol<double>* clone();
   };
 
   class VectorFormVol : public Hermes::Hermes2D::VectorFormVol<double>
@@ -36,6 +37,7 @@ private:
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const;
+    Hermes::Hermes2D::VectorFormVol<double>* clone();
 
     template<typename Real>
     Real F(Real x, Real y) const;
@@ -52,6 +54,7 @@ private:
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const;
+    Hermes::Hermes2D::MatrixFormSurf<double>* clone();
   };
 
   class MatrixFormInterface : public Hermes::Hermes2D::MatrixFormSurf<double>
@@ -65,6 +68,7 @@ private:
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const;
+    Hermes::Hermes2D::MatrixFormSurf<double>* clone();
   };
 
   class VectorFormSurface : public Hermes::Hermes2D::VectorFormSurf<double>
@@ -78,6 +82,7 @@ private:
 
     template<typename Real>
     Real F(Real x, Real y) const;
+    Hermes::Hermes2D::VectorFormSurf<double>* clone();
   };
 
   double calculate_a_dot_v(double x, double y, double vx, double vy) const;

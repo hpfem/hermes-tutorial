@@ -27,6 +27,11 @@ Ord CustomWeakForm::MatrixFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], Fu
   return matrix_form<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
 }
 
+Hermes::Hermes2D::MatrixFormVol<double>* CustomWeakForm::MatrixFormVol::clone()
+{
+  return new CustomWeakForm::MatrixFormVol(*this);
+}
+
 CustomWeakForm::VectorFormVol::VectorFormVol(int i) : Hermes::Hermes2D::VectorFormVol<double>(i) { }
 
 template<typename Real, typename Scalar>
@@ -43,6 +48,11 @@ double CustomWeakForm::VectorFormVol::value(int n, double *wt, Func<double> *u_e
 
 Ord CustomWeakForm::VectorFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const {
   return vector_form<Ord, Ord>(n, wt, u_ext, v, e, ext);
+}
+
+Hermes::Hermes2D::VectorFormVol<double>* CustomWeakForm::VectorFormVol::clone()
+{
+  return new CustomWeakForm::VectorFormVol(*this);
 }
 
 template<typename Real>
@@ -74,6 +84,11 @@ Ord CustomWeakForm::MatrixFormSurface::ord(int n, double *wt, Func<Ord> *u_ext[]
   return matrix_form<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
 }
 
+Hermes::Hermes2D::MatrixFormSurf<double>* CustomWeakForm::MatrixFormSurface::clone()
+{
+  return new CustomWeakForm::MatrixFormSurface(*this);
+}
+
 CustomWeakForm::MatrixFormInterface::MatrixFormInterface(int i, int j) : Hermes::Hermes2D::MatrixFormSurf<double>(i, j, H2D_DG_INNER_EDGE) { }
 
 template<typename Real, typename Scalar>
@@ -97,6 +112,11 @@ Ord CustomWeakForm::MatrixFormInterface::ord(int n, double *wt, Func<Ord> *u_ext
   return matrix_form<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
 }
 
+Hermes::Hermes2D::MatrixFormSurf<double>* CustomWeakForm::MatrixFormInterface::clone()
+{
+  return new CustomWeakForm::MatrixFormInterface(*this);
+}
+
 CustomWeakForm::VectorFormSurface::VectorFormSurface(int i, std::string left_bottom_bnd_part) : Hermes::Hermes2D::VectorFormSurf<double>(i, left_bottom_bnd_part) { }
 
 double CustomWeakForm::VectorFormSurface::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<double> *ext) const {
@@ -115,6 +135,11 @@ Ord CustomWeakForm::VectorFormSurface::ord(int n, double *wt, Func<Ord> *u_ext[]
   for (int i = 0; i < n; i++)
     result += -wt[i] * v->val[i];
   return result;
+}
+
+Hermes::Hermes2D::VectorFormSurf<double>* CustomWeakForm::VectorFormSurface::clone()
+{
+  return new CustomWeakForm::VectorFormSurface(*this);
 }
 
 template<typename Real>

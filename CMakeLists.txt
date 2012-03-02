@@ -59,28 +59,25 @@ project(hermes_tutorial)
   # --- SUBFOLDERS WITH TUTORIAL TOPICS
   #
   # Linear problems.
-  add_subdirectory(P01-linear)
+  add_subdirectory(A-linear)
 
   # Nonlinear problems.
-  add_subdirectory(P02-nonlinear)
+  add_subdirectory(B-nonlinear)
 
   # Time-dependent problems.
-  add_subdirectory(P03-transient)
+  add_subdirectory(C-transient)
 
   # Adaptivity.
-  add_subdirectory(P04-adaptivity)
-
-  # Eigenproblems.
-  #add_subdirectory(P05-eigenproblems)
+  add_subdirectory(D-adaptivity)
 
   # FVM and DG.
-  #add_subdirectory(P06-fvm-and-dg)
+  add_subdirectory(E-fvm-and-dg)
 
   # Using Trilinos.
   if(WITH_TRILINOS)
-    add_subdirectory(P07-trilinos)
+    add_subdirectory(F-trilinos)
   endif(WITH_TRILINOS)
 
   # Miscellaneous techniques.
-  add_subdirectory(P08-miscellaneous)
+  add_subdirectory(G-miscellaneous)
 
