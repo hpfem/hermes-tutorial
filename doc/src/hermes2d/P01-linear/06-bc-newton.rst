@@ -63,7 +63,7 @@ definitions.h::
 				  double alpha, double t_exterior);
     };
 
-and its constructor in definitions.cpp::
+and its constructor in definitions.cpp:
 
 .. sourcecode::
     .
