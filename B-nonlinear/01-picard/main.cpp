@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
   CustomWeakFormPicard wf(&sln_prev_iter, &lambda, &src);
 
   // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, &space);
+  DiscreteProblemLinear<double> dp(&wf, &space);
 
   // Initialize the Picard solver.
   PicardSolver<double> picard(&dp, &sln_prev_iter, matrix_solver);
