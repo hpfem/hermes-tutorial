@@ -69,7 +69,7 @@ double CustomWeakFormPicard::CustomResidual::value(int n, double *wt, Func<doubl
   double result = 0;
   for (int i = 0; i < n; i++) 
   {
-    result += wt[i] * f->value(e->x[i], e->y[i]) * v->val[i];
+    result -= wt[i] * f->value(e->x[i], e->y[i]) * v->val[i];
   }
   return result;
 }

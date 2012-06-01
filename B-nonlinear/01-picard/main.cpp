@@ -42,7 +42,7 @@ const int PICARD_NUM_LAST_ITER_USED = 4;
 // 0 <= beta <= 1... parameter for the Anderson acceleration. 
 const double PICARD_ANDERSON_BETA = 0.2;          
 // Stopping criterion for the Picard's method.
-const double PICARD_TOL = 1e-3;                   
+const double PICARD_TOL = 1e-3;
 // Maximum allowed number of Picard iterations.
 const int PICARD_MAX_ITER = 100;                  
 

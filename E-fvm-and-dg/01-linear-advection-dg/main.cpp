@@ -26,7 +26,7 @@ const bool WANT_DG = true;
 const bool WANT_FEM = false;
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;
+MatrixSolverType matrix_solver_type = SOLVER_UMFPACK;
 
 // Boundary markers.
 const std::string BDY_BOTTOM_LEFT = "1";
@@ -59,10 +59,6 @@ int main(int argc, char* args[])
   MeshView m;
   m.show(&mesh);
 
-  // Set up the solver, matrix, and rhs according to the solver selection.
-  SparseMatrix<double>* matrix = create_matrix<double>(matrix_solver);
-  Vector<double>* rhs = create_vector<double>(matrix_solver);
-  LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver, matrix, rhs);
 
   ScalarView view1("Solution - Discontinuous Galerkin FEM", new WinGeom(900, 0, 450, 350));
   ScalarView view2("Solution - Standard continuous FEM", new WinGeom(900, 400, 450, 350));
@@ -71,26 +67,29 @@ int main(int argc, char* args[])
   {
     // Create an L2 space.
     L2Space<double> space_l2(&mesh, P_INIT);
-  
+
     // Initialize the solution.
     Solution<double> sln_l2;
 
     // Initialize the weak formulation.
     CustomWeakForm wf_l2(BDY_BOTTOM_LEFT);
 
-
     // Initialize the FE problem.
-    DiscreteProblem<double> dp_l2(&wf_l2, &space_l2);
-    
+    DiscreteProblemLinear<double> dp_l2(&wf_l2, &space_l2);
+
+    // Initialize linear solver.
+    Hermes::Hermes2D::LinearSolver<double> linear_solver(&dp_l2, matrix_solver_type);
+
     info("Assembling Discontinuous Galerkin (nelem: %d, ndof: %d).", mesh.get_num_active_elements(), space_l2.get_num_dofs());
-    dp_l2.assemble(matrix, rhs);
 
     // Solve the linear system. If successful, obtain the solution.
     info("Solving Discontinuous Galerkin.");
-    if(solver->solve())
+    try
+    {
+      linear_solver.solve();
       if(DG_SHOCK_CAPTURING)
       {      
-        FluxLimiter flux_limiter(FluxLimiter::Kuzmin, solver->get_sln_vector(), &space_l2, true);
+        FluxLimiter flux_limiter(FluxLimiter::Kuzmin, linear_solver.get_sln_vector(), &space_l2, true);
 
         flux_limiter.limit_second_orders_according_to_detector();
 
@@ -101,52 +100,53 @@ int main(int argc, char* args[])
         view1.set_title("Solution - limited Discontinuous Galerkin FEM");
       }
       else
-        Solution<double>::vector_to_solution(solver->get_sln_vector(), &space_l2, &sln_l2);
-    else 
-      error ("Matrix solver failed.\n");
+        Solution<double>::vector_to_solution(linear_solver.get_sln_vector(), &space_l2, &sln_l2);
 
-    // View the solution.
-    view1.show(&sln_l2);
+      // View the solution.
+      view1.show(&sln_l2);
+    }
+    catch(Hermes::Exceptions::Exception e)
+    {
+      e.printMsg();
+      error("The solution, using method LinearSolver:solve() failed.");
+    }
   }
   if(WANT_FEM)
   {
     // Create an H1 space.
     H1Space<double> space_h1(&mesh, P_INIT);
-  
+
     // Initialize the solution.
     Solution<double> sln_h1;
 
     // Initialize the weak formulation.
     CustomWeakForm wf_h1(BDY_BOTTOM_LEFT, false);
 
-
     // Initialize the FE problem.
-    DiscreteProblem<double> dp_h1(&wf_h1, &space_h1);
-    
-    // Set up the solver, matrix, and rhs according to the solver selection.
-    SparseMatrix<double>* matrix = create_matrix<double>(matrix_solver);
-    Vector<double>* rhs = create_vector<double>(matrix_solver);
-    LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver, matrix, rhs);
+    DiscreteProblemLinear<double> dp_h1(&wf_h1, &space_h1);
 
     info("Assembling Continuous FEM (nelem: %d, ndof: %d).", mesh.get_num_active_elements(), space_h1.get_num_dofs());
-    dp_h1.assemble(matrix, rhs);
+
+    // Initialize linear solver.
+    Hermes::Hermes2D::LinearSolver<double> linear_solver(&dp_h1, matrix_solver_type);
 
     // Solve the linear system. If successful, obtain the solution.
     info("Solving Continuous FEM.");
-    if(solver->solve())
-      Solution<double>::vector_to_solution(solver->get_sln_vector(), &space_h1, &sln_h1);
-    else 
-      error ("Matrix solver failed.\n");
-    
-    // View the solution.
-    view2.show(&sln_h1);
+    try
+    {
+      linear_solver.solve();
+      Solution<double>::vector_to_solution(linear_solver.get_sln_vector(), &space_h1, &sln_h1);
+
+      // View the solution.
+      view2.show(&sln_h1);
+    }
+    catch(Hermes::Exceptions::Exception e)
+    {
+      e.printMsg();
+      error("The solution, using method LinearSolver:solve() failed.");
+    }
   }
 
-  // Clean up.
-  delete solver;
-  delete matrix;
-  delete rhs;
-  
   // Wait for keyboard or mouse input.
   View::wait();
   return 0;

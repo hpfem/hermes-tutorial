@@ -59,11 +59,6 @@ int main(int argc, char* argv[])
   // Initialize the FE problem.
   DiscreteProblem<double> dp(&wf, &space);
 
-  // Set up the solver, matrix, and rhs according to the solver selection.
-  SparseMatrix<double>* matrix = create_matrix<double>(matrix_solver);
-  Vector<double>* rhs = create_vector<double>(matrix_solver);
-  LinearSolver<double>* solver = create_linear_solver<double>(matrix_solver, matrix, rhs);
-
   // Perform Newton's iteration.
   Hermes::Hermes2D::Solution<double> sln;
   Hermes::Hermes2D::NewtonSolver<double> newton(&dp, matrix_solver);
@@ -85,11 +80,6 @@ int main(int argc, char* argv[])
 
   // Wait for the view to be closed.
   Views::View::wait();
-
-  // Clean up.
-  delete solver;
-  delete matrix;
-  delete rhs;
 
   return 0;
 }
