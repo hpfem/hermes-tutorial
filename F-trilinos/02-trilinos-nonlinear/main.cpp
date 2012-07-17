@@ -72,7 +72,7 @@ int max_iters = 100;
 int main(int argc, char* argv[])
 {
   // Time measurement.
-  TimePeriod cpu_time;
+  Hermes::Mixins::TimeMeasurable cpu_time;
   cpu_time.tick();
 
   // Load the mesh.
@@ -90,12 +90,12 @@ int main(int argc, char* argv[])
   // Create an H1 space with default shapeset.
   H1Space<double> space(&mesh, &bcs, P_INIT);
   int ndof = Space<double>::get_num_dofs(&space);
-  info("ndof: %d", ndof);
+  Hermes::Mixins::Loggable::Static::info("ndof: %d", ndof);
 
-  info("Assembling by DiscreteProblem, solving by Umfpack:");
+  Hermes::Mixins::Loggable::Static::info("Assembling by DiscreteProblem, solving by Umfpack:");
 
   // Time measurement.
-  cpu_time.tick(HERMES_SKIP);
+  cpu_time.tick();
 
   // Initialize weak formulation,
   CustomWeakForm wf1;
@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
   DiscreteProblem<double> dp1(&wf1, &space);
 
   // Initialize the Newton solver.
-  Hermes::Hermes2D::NewtonSolver<double> newton(&dp1, matrix_solver);
+  Hermes::Hermes2D::NewtonSolver<double> newton(&dp1);
 
   // Perform Newton's iteration and translate the resulting coefficient vector into a Solution.
   Hermes::Hermes2D::Solution<double> sln1;
@@ -112,10 +112,10 @@ int main(int argc, char* argv[])
   {
     newton.solve();
   }
-  catch(Hermes::Exceptions::Exception e)
+  catch(std::exception& e)
   {
-    e.printMsg();
-    error("Newton's iteration failed.");
+    std::cout << e.what();
+    
   }
 
   // Translate the solution vector into a Solution.
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
   double time1 = cpu_time.tick().last();
 
   // Time measurement.
-  cpu_time.tick(HERMES_SKIP);
+  cpu_time.tick();
  
   // Show UMFPACK solution.
   ScalarView view1("Solution 1", new WinGeom(0, 0, 500, 400));
@@ -134,16 +134,16 @@ int main(int argc, char* argv[])
   // Calculate error.
   CustomExactSolution ex(&mesh);
   double rel_err_1 = Global<double>::calc_rel_error(&sln1, &ex, HERMES_H1_NORM) * 100;
-  info("Solution 1 (%s):  exact H1 error: %g%% (time %g s)", MatrixSolverNames[matrix_solver].c_str(), rel_err_1, time1);
+  Hermes::Mixins::Loggable::Static::info("Solution 1 :  exact H1 error: %g%% (time %g s)", rel_err_1, time1);
 
   // TRILINOS PART:
 
   // Project the initial condition to obtain the initial
   // coefficient vector.
-  info("Projecting to obtain initial vector for the Newton's method.");
+  Hermes::Mixins::Loggable::Static::info("Projecting to obtain initial vector for the Newton's method.");
   double* coeff_vec = new double[ndof];
   ZeroSolution<double> sln_tmp(&mesh);
-  OGProjection<double>::project_global(&space, &sln_tmp, coeff_vec, matrix_solver);
+  OGProjection<double> ogProjection; ogProjection.project_global(&space, &sln_tmp, coeff_vec);
 
   // Measure the projection time.
   double proj_time = cpu_time.tick().last();
@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
   DiscreteProblem<double> dp2(&wf2, &space);
 
   // Initialize the NOX solver with the vector "coeff_vec".
-  info("Initializing NOX.");
+  Hermes::Mixins::Loggable::Static::info("Initializing NOX.");
   NewtonSolverNOX<double> solver_nox(&dp2);
   solver_nox.set_output_flags(message_type);
 
@@ -176,22 +176,22 @@ int main(int argc, char* argv[])
   }
 
   // Solve the nonlinear problem using NOX.
-  info("Assembling by DiscreteProblem, solving by NOX.");
+  Hermes::Mixins::Loggable::Static::info("Assembling by DiscreteProblem, solving by NOX.");
   Solution<double> sln2;
   try
   {
     solver_nox.solve(coeff_vec);
   }
-  catch(Hermes::Exceptions::Exception e)
+  catch(std::exception& e)
   {
-    e.printMsg();
-    error("NOX failed.");
+    std::cout << e.what();
+    
   }
 
   Solution<double>::vector_to_solution(solver_nox.get_sln_vector(), &space, &sln2);
-  info("Number of nonlin iterations: %d (norm of residual: %g)", 
+  Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)", 
         solver_nox.get_num_iters(), solver_nox.get_residual());
-  info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
+  Hermes::Mixins::Loggable::Static::info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
         solver_nox.get_num_lin_iters(), solver_nox.get_achieved_tol());
 
   // CPU time needed by NOX.
@@ -199,7 +199,7 @@ int main(int argc, char* argv[])
 
   // Calculate error.
   double rel_err_2 = Global<double>::calc_rel_error(&sln2, &ex, HERMES_H1_NORM) * 100;
-  info("Solution 2 (NOX): exact H1 error: %g%% (time %g + %g = %g [s])", rel_err_2, proj_time, time2, proj_time+time2);
+  Hermes::Mixins::Loggable::Static::info("Solution 2 (NOX): exact H1 error: %g%% (time %g + %g = %g [s])", rel_err_2, proj_time, time2, proj_time+time2);
 
   // Show NOX solution.
   ScalarView view2("Solution 2", new WinGeom(510, 0, 500, 400));

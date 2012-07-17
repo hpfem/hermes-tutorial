@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
   // Create an H1 space with default shapeset.
   H1Space<double> space(&mesh, &bcs, P_INIT);
   int ndof = space.get_num_dofs();
-  info("ndof: %d", ndof);
+  Hermes::Mixins::Loggable::Static::info("ndof: %d", ndof);
 
   // Initialize the weak formulation
   CustomNonlinearity lambda(alpha);
@@ -69,23 +69,23 @@ int main(int argc, char* argv[])
   // coefficient vector for the Newton's method.
   // NOTE: If you want to start from the zero vector, just define 
   // coeff_vec to be a vector of ndof zeros (no projection is needed).
-  info("Projecting to obtain initial vector for the Newton's method.");
+  Hermes::Mixins::Loggable::Static::info("Projecting to obtain initial vector for the Newton's method.");
   double* coeff_vec = new double[ndof];
   CustomInitialCondition init_sln(&mesh);
-  OGProjection<double>::project_global(&space, &init_sln, coeff_vec, matrix_solver); 
+  OGProjection<double> ogProjection; ogProjection.project_global(&space, &init_sln, coeff_vec); 
 
   // Initialize Newton solver.
-  NewtonSolver<double> newton(&dp, matrix_solver);
+  NewtonSolver<double> newton(&dp);
 
   // Perform Newton's iteration.
   try
   {
     newton.solve(coeff_vec, NEWTON_TOL, NEWTON_MAX_ITER);
   }
-  catch(Hermes::Exceptions::Exception e)
+  catch(std::exception& e)
   {
-    e.printMsg();
-    error("Newton's iteration failed.");
+    std::cout << e.what();
+    
   }
 
   // Translate the resulting coefficient vector into a Solution.

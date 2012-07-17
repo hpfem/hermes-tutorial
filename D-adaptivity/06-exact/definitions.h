@@ -6,7 +6,7 @@ using namespace Hermes::Hermes2D;
 class ExactSolutionCustom : public ExactSolutionScalar<double>
 {
 public:
-  ExactSolutionCustom(Mesh* mesh) : ExactSolutionScalar<double>(mesh) {};
+  ExactSolutionCustom(const Mesh* mesh) : ExactSolutionScalar<double>(mesh) {};
 
   virtual double value (double x, double y) const;
 

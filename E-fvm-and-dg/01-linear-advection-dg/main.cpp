@@ -78,12 +78,12 @@ int main(int argc, char* args[])
     DiscreteProblemLinear<double> dp_l2(&wf_l2, &space_l2);
 
     // Initialize linear solver.
-    Hermes::Hermes2D::LinearSolver<double> linear_solver(&dp_l2, matrix_solver_type);
+    Hermes::Hermes2D::LinearSolver<double> linear_solver(&dp_l2);
 
-    info("Assembling Discontinuous Galerkin (nelem: %d, ndof: %d).", mesh.get_num_active_elements(), space_l2.get_num_dofs());
+    Hermes::Mixins::Loggable::Static::info("Assembling Discontinuous Galerkin (nelem: %d, ndof: %d).", mesh.get_num_active_elements(), space_l2.get_num_dofs());
 
     // Solve the linear system. If successful, obtain the solution.
-    info("Solving Discontinuous Galerkin.");
+    Hermes::Mixins::Loggable::Static::info("Solving Discontinuous Galerkin.");
     try
     {
       linear_solver.solve();
@@ -105,10 +105,10 @@ int main(int argc, char* args[])
       // View the solution.
       view1.show(&sln_l2);
     }
-    catch(Hermes::Exceptions::Exception e)
+    catch(std::exception& e)
     {
-      e.printMsg();
-      error("The solution, using method LinearSolver:solve() failed.");
+      std::cout << e.what();
+      
     }
   }
   if(WANT_FEM)
@@ -125,13 +125,13 @@ int main(int argc, char* args[])
     // Initialize the FE problem.
     DiscreteProblemLinear<double> dp_h1(&wf_h1, &space_h1);
 
-    info("Assembling Continuous FEM (nelem: %d, ndof: %d).", mesh.get_num_active_elements(), space_h1.get_num_dofs());
+    Hermes::Mixins::Loggable::Static::info("Assembling Continuous FEM (nelem: %d, ndof: %d).", mesh.get_num_active_elements(), space_h1.get_num_dofs());
 
     // Initialize linear solver.
-    Hermes::Hermes2D::LinearSolver<double> linear_solver(&dp_h1, matrix_solver_type);
+    Hermes::Hermes2D::LinearSolver<double> linear_solver(&dp_h1);
 
     // Solve the linear system. If successful, obtain the solution.
-    info("Solving Continuous FEM.");
+    Hermes::Mixins::Loggable::Static::info("Solving Continuous FEM.");
     try
     {
       linear_solver.solve();
@@ -140,10 +140,10 @@ int main(int argc, char* args[])
       // View the solution.
       view2.show(&sln_h1);
     }
-    catch(Hermes::Exceptions::Exception e)
+    catch(std::exception& e)
     {
-      e.printMsg();
-      error("The solution, using method LinearSolver:solve() failed.");
+      std::cout << e.what();
+      
     }
   }
 

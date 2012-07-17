@@ -61,7 +61,7 @@ Real CustomWeakForm::VectorFormVol::F(Real x, Real y) const {
 }
 
 
-CustomWeakForm::MatrixFormSurface::MatrixFormSurface(int i, int j) : Hermes::Hermes2D::MatrixFormSurf<double>(i, j, H2D_DG_BOUNDARY_EDGE) { }
+CustomWeakForm::MatrixFormSurface::MatrixFormSurface(int i, int j) : Hermes::Hermes2D::MatrixFormSurf<double>(i, j, HERMES_ANY) { }
 
 template<typename Real, typename Scalar>
 Scalar CustomWeakForm::MatrixFormSurface::matrix_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {

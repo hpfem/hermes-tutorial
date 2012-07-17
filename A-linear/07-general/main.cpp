@@ -30,7 +30,7 @@ MatrixSolverType matrix_solver = SOLVER_UMFPACK;
 int main(int argc, char* argv[])
 {
   // Time measurement.
-  TimePeriod cpu_time;
+  Hermes::Mixins::TimeMeasurable cpu_time;
   cpu_time.tick();
 
   // Load the mesh.
@@ -38,13 +38,13 @@ int main(int argc, char* argv[])
   if (USE_XML_FORMAT == true)
   {
     MeshReaderH2DXML mloader;  
-    info("Reading mesh in XML format.");
+    Hermes::Mixins::Loggable::Static::info("Reading mesh in XML format.");
     mloader.load("domain.xml", &mesh);
   }
   else 
   {
     MeshReaderH2D mloader;
-    info("Reading mesh in original format.");
+    Hermes::Mixins::Loggable::Static::info("Reading mesh in original format.");
     mloader.load("domain.mesh", &mesh);
   }
 
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
   // Create an H1 space with default shapeset.
   H1Space<double> space(&mesh, &bcs, P_INIT);
   int ndof = space.get_num_dofs();
-  info("ndof = %d", ndof);
+  Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
   // Initialize the weak formulation.
   CustomWeakFormGeneral wf("Horizontal");
@@ -67,17 +67,17 @@ int main(int argc, char* argv[])
   DiscreteProblem<double> dp(&wf, &space);
 
   // Initialize Newton solver.
-  NewtonSolver<double> newton(&dp, matrix_solver);
+  NewtonSolver<double> newton(&dp);
 
   // Perform Newton's iteration.
   try
   {
     newton.solve();
   }
-  catch(Hermes::Exceptions::Exception e)
+  catch(std::exception& e)
   {
-    e.printMsg();
-    error("Newton's iteration failed.");
+    std::cout << e.what();
+    
   }
 
   // Translate the resulting coefficient vector into a Solution.
@@ -93,11 +93,8 @@ int main(int argc, char* argv[])
   OrderView oview("Polynomial orders", new WinGeom(450, 0, 405, 350));
   oview.show(&space);
 
-  // Skip visualization time.
-  cpu_time.tick(HERMES_SKIP);
-
   // Print timing information.
-  verbose("Total running time: %g s", cpu_time.accumulated());
+  Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 
   // Wait for all views to be closed.
   View::wait();

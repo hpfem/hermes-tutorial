@@ -72,7 +72,7 @@ const double LAMBDA = 1.0;
 int main(int argc, char* argv[])
 {
   // Time measurement
-  Hermes::TimePeriod cpu_time;
+  Hermes::Mixins::TimeMeasurable cpu_time;
   cpu_time.tick();
 
   // Load the mesh.
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
   // Create an Hcurl space with default shapeset.
   HcurlSpace<std::complex<double> > space(&mesh, &bcs, P_INIT);
   int ndof = space.get_num_dofs();
-  info("ndof = %d", ndof);
+  Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
   // Initialize the weak formulation.
   CustomWeakForm wf(MU_R, KAPPA);
@@ -117,33 +117,35 @@ int main(int argc, char* argv[])
   SimpleGraph graph_dof_est, graph_cpu_est,
     graph_dof_exact, graph_cpu_exact;
 
+  DiscreteProblem<std::complex<double> > dp(&wf, &space);
+
   // Adaptivity loop:
   int as = 1; bool done = false;
   do
   {
-    info("---- Adaptivity step %d:", as);
+    Hermes::Mixins::Loggable::Static::info("---- Adaptivity step %d:", as);
 
     // Construct globally refined reference mesh and setup reference space.
     Space<std::complex<double> >* ref_space = Space<std::complex<double> >::construct_refined_space(&space);
     int ndof_ref = ref_space->get_num_dofs();
 
     // Initialize reference problem.
-    info("Solving on reference mesh.");
-    DiscreteProblem<std::complex<double> > dp(&wf, ref_space);
+    Hermes::Mixins::Loggable::Static::info("Solving on reference mesh.");
+    dp.set_space(ref_space);
 
     // Time measurement.
     cpu_time.tick();
 
     // Perform Newton's iteration.
-    Hermes::Hermes2D::NewtonSolver<std::complex<double> > newton(&dp, matrix_solver);
+    Hermes::Hermes2D::NewtonSolver<std::complex<double> > newton(&dp);
 
     try{
       newton.solve();
     }
-    catch(Hermes::Exceptions::Exception e)
+    catch(std::exception& e)
     {
-      e.printMsg();
-      error("Newton's iteration failed.");
+      std::cout << e.what();
+      
     }
 
     // Translate the resulting coefficient vector into a Solution.    
@@ -153,8 +155,8 @@ int main(int argc, char* argv[])
     cpu_time.tick();
 
     // Project the fine mesh solution onto the coarse mesh.
-    info("Projecting reference solution on coarse mesh.");
-    OGProjection<std::complex<double> >::project_global(&space, &ref_sln, &sln, matrix_solver);
+    Hermes::Mixins::Loggable::Static::info("Projecting reference solution on coarse mesh.");
+    OGProjection<std::complex<double> > ogProjection; ogProjection.project_global(&space, &ref_sln, &sln);
 
     // View the coarse mesh solution and polynomial orders.
     RealFilter real(&sln);
@@ -163,7 +165,7 @@ int main(int argc, char* argv[])
     o_view.show(&space);
 
     // Calculate element errors and total error estimate.
-    info("Calculating error estimate and exact error.");
+    Hermes::Mixins::Loggable::Static::info("Calculating error estimate and exact error.");
     Adapt<std::complex<double> >* adaptivity = new Adapt<std::complex<double> >(&space);
     double err_est_rel = adaptivity->calc_err_est(&sln, &ref_sln) * 100;
 
@@ -172,9 +174,9 @@ int main(int argc, char* argv[])
     double err_exact_rel = adaptivity->calc_err_exact(&sln, &sln_exact, solutions_for_adapt) * 100;
 
     // Report results.
-    info("ndof_coarse: %d, ndof_fine: %d",
+    Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_fine: %d",
       space.get_num_dofs(), ref_space->get_num_dofs());
-    info("err_est_rel: %g%%, err_exact_rel: %g%%", err_est_rel, err_exact_rel);
+    Hermes::Mixins::Loggable::Static::info("err_est_rel: %g%%, err_exact_rel: %g%%", err_est_rel, err_exact_rel);
 
     // Time measurement.
     cpu_time.tick();
@@ -193,7 +195,7 @@ int main(int argc, char* argv[])
     if (err_est_rel < ERR_STOP) done = true;
     else
     {
-      info("Adapting coarse mesh.");
+      Hermes::Mixins::Loggable::Static::info("Adapting coarse mesh.");
       done = adaptivity->adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
 
       // Increase the counter of performed adaptivity steps.
@@ -211,7 +213,7 @@ int main(int argc, char* argv[])
   }
   while (done == false);
 
-  verbose("Total running time: %g s", cpu_time.accumulated());
+  Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 
   // Show the reference solution - the final result.
   v_view.set_title("Fine mesh solution (magnitude)");
@@ -224,7 +226,7 @@ int main(int argc, char* argv[])
   Views::Linearizer lin;
   bool mode_3D = true;
   lin.save_solution_vtk(&ref_limited_magn, "sln.vtk", "Magnitude of E", mode_3D);
-  info("Solution in VTK format saved to file %s.", "sln.vtk");
+  Hermes::Mixins::Loggable::Static::info("Solution in VTK format saved to file %s.", "sln.vtk");
 
   // Wait for all views to be closed.
   Views::View::wait();

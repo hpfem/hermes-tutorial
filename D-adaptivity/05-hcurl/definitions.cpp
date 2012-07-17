@@ -60,21 +60,27 @@ static void exact_sol_der(double x, double y, std::complex<double>& e1dx, std::c
   e0dy = (t11*y+2.0/3.0*t15*y-2.0/3.0*t22*y)*t6*y*t29-t32*t2*t29+t36-t47-4.0/9.0*t48*t41*t53+4.0/3.0*t57*t59*t53*y;
 }
 
-CustomExactSolution::CustomExactSolution(Mesh* mesh) : Hermes::Hermes2D::ExactSolutionVector<std::complex<double> >(mesh) {};
+CustomExactSolution::CustomExactSolution(const Mesh* mesh) : Hermes::Hermes2D::ExactSolutionVector<std::complex<double> >(mesh) {};
 
 CustomExactSolution::~CustomExactSolution() {};
 
 Scalar2<std::complex<double> > CustomExactSolution::value(double x, double y) const 
 {
   Scalar2<std::complex<double> >ex(0.0, 0.0);
+#pragma omp critical (custom)
+  {
   exact_sol_val(x, y,  ex[0], ex[1]);
+  }
   return ex;
 };
 
 void CustomExactSolution::derivatives (double x, double y, Scalar2<std::complex<double> >& dx, Scalar2<std::complex<double> >& dy) const 
 {
   std::complex<double> e1dx, e0dy;
+#pragma omp critical (custom)
+  {
   exact_sol_der(x, y, e1dx, e0dy);
+  }
   dx[0] = 0;
   dx[1] = e1dx;
   dy[0] = e0dy;
@@ -113,19 +119,22 @@ std::complex<double> CustomWeakForm::CustomVectorFormSurf::value(int n, double *
   Func<double> *v, Geom<double> *e, ExtData<std::complex<double> > *ext) const 
 {
   std::complex<double> result = 0;
-  for (int i = 0; i < n; i++) {
-    double r = std::sqrt(e->x[i] * e->x[i] + e->y[i] * e->y[i]);
-    double theta = std::atan2(e->y[i], e->x[i]);
-    if (theta < 0) theta += 2.0*M_PI;
-    double j13    = jv(-1.0/3.0, r),    j23    = jv(+2.0/3.0, r);
-    double cost   = std::cos(theta),         sint   = std::sin(theta);
-    double cos23t = std::cos(2.0/3.0*theta), sin23t = std::sin(2.0/3.0*theta);
+  #pragma omp critical (jv)
+      {
+    for (int i = 0; i < n; i++) {
+      double r = std::sqrt(e->x[i] * e->x[i] + e->y[i] * e->y[i]);
+      double theta = std::atan2(e->y[i], e->x[i]);
+      if (theta < 0) theta += 2.0*M_PI;
+      double j13    = jv(-1.0/3.0, r),    j23    = jv(+2.0/3.0, r);
+      double cost   = std::cos(theta),         sint   = std::sin(theta);
+      double cos23t = std::cos(2.0/3.0*theta), sin23t = std::sin(2.0/3.0*theta);
 
-    double Etau = e->tx[i] * (cos23t*sint*j13 - 2.0/(3.0*r)*j23*(cos23t*sint + sin23t*cost)) +
-      e->ty[i] * (-cos23t*cost*j13 + 2.0/(3.0*r)*j23*(cos23t*cost - sin23t*sint));
+      double Etau = e->tx[i] * (cos23t*sint*j13 - 2.0/(3.0*r)*j23*(cos23t*sint + sin23t*cost)) +
+        e->ty[i] * (-cos23t*cost*j13 + 2.0/(3.0*r)*j23*(cos23t*cost - sin23t*sint));
 
-    result += wt[i] * std::complex<double>(cos23t*j23, -Etau) * ((v->val0[i] * e->tx[i] + v->val1[i] * e->ty[i]));
-  }
+      result += wt[i] * std::complex<double>(cos23t*j23, -Etau) * ((v->val0[i] * e->tx[i] + v->val1[i] * e->ty[i]));
+    }
+      }
   return -result;
 }
 

@@ -113,22 +113,22 @@ int main(int argc, char* argv[])
   SimpleGraph graph_dof, graph_cpu;
 
   // Time measurement.
-  TimePeriod cpu_time;
+  Hermes::Mixins::TimeMeasurable cpu_time;
 
   // Adaptivity loop:
   int as = 1; bool done = false;
   do
   {
-    info("---- Adaptivity step %d:", as);
+    Hermes::Mixins::Loggable::Static::info("---- Adaptivity step %d:", as);
     
     // Time measurement.
     cpu_time.tick();
 
     // Initialize reference problem.
-    info("Solving.");
+    Hermes::Mixins::Loggable::Static::info("Solving.");
     DiscreteProblem<double> dp(&wf, &space);
     
-    NewtonSolver<double> newton(&dp, matrix_solver);
+    NewtonSolver<double> newton(&dp);
     newton.set_verbose_output(false);
 
     // Initial ndof.
@@ -139,10 +139,10 @@ int main(int argc, char* argv[])
     {
       newton.solve();
     }
-    catch(Hermes::Exceptions::Exception e)
+    catch(std::exception& e)
     {
-      e.printMsg();
-      error("Newton's iteration failed.");
+      std::cout << e.what();
+      
     }
     // Translate the resulting coefficient vector into the instance of Solution.
     Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);
@@ -158,13 +158,13 @@ int main(int argc, char* argv[])
       char* title = new char[100];
       sprintf(title, "sln-%d.vtk", as);
       lin.save_solution_vtk(&sln, title, "Potential", false);
-      info("Solution in VTK format saved to file %s.", title);
+      Hermes::Mixins::Loggable::Static::info("Solution in VTK format saved to file %s.", title);
 
       // Output mesh and element orders in VTK format.
       Views::Orderizer ord;
       sprintf(title, "ord-%d.vtk", as);
       ord.save_orders_vtk(&space, title);
-      info("Element orders in VTK format saved to file %s.", title);
+      Hermes::Mixins::Loggable::Static::info("Element orders in VTK format saved to file %s.", title);
     }
 
     // View the coarse mesh solution and polynomial orders.
@@ -175,10 +175,10 @@ int main(int argc, char* argv[])
     }
 
     // Skip visualization time.
-    cpu_time.tick(HERMES_SKIP);
+    cpu_time.tick();
     
     // Calculate element errors and total error estimate.
-    info("Calculating error estimate.");
+    Hermes::Mixins::Loggable::Static::info("Calculating error estimate.");
     bool ignore_visited_segments = true;
     KellyTypeAdapt<double> adaptivity(&space, ignore_visited_segments, 
                                       USE_EPS_IN_INTERFACE_ESTIMATOR 
@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
     double err_est_rel = adaptivity.calc_err_est(&sln, HERMES_TOTAL_ERROR_REL | HERMES_ELEMENT_ERROR_REL) * 100;
 
     // Report results.
-    info("ndof: %d, err_est_rel: %g%%", space.get_num_dofs(), err_est_rel);
+    Hermes::Mixins::Loggable::Static::info("ndof: %d, err_est_rel: %g%%", space.get_num_dofs(), err_est_rel);
 
     // Add entry to DOF and CPU convergence graphs.
     cpu_time.tick();    
@@ -217,14 +217,14 @@ int main(int argc, char* argv[])
     graph_dof.save("conv_dof_est.dat");
     
     // Skip the time spent to save the convergence graphs.
-    cpu_time.tick(HERMES_SKIP);
+    cpu_time.tick();
 
     // If err_est too large, adapt the mesh.
     if (err_est_rel < ERR_STOP) 
       done = true;
     else
     {
-      info("Adapting coarse mesh.");
+      Hermes::Mixins::Loggable::Static::info("Adapting coarse mesh.");
       
       // h-refinement is automatically selected here, no need for parameter "selector".
       done = adaptivity.adapt(THRESHOLD, STRATEGY, MESH_REGULARITY);
@@ -238,7 +238,7 @@ int main(int argc, char* argv[])
   }
   while (done == false);
 
-  verbose("Total running time: %g s", cpu_time.accumulated());
+  Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 
   // The final result has already been shown in the final step of the adaptivity loop, so we only
   // adjust the title and hide the mesh here.

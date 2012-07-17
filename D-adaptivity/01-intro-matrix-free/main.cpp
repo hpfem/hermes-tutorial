@@ -127,14 +127,14 @@ int main(int argc, char* argv[])
   SimpleGraph graph_dof, graph_cpu;
 
   // Time measurement.
-  TimePeriod cpu_time;
+  Hermes::Mixins::TimeMeasurable cpu_time;
 
   // Adaptivity loop:
   int as = 1; bool done = false;
   Space<double>* ref_space_new = NULL, *ref_space_prev = NULL;
   do
   {
-    info("---- Adaptivity step %d:", as);
+    Hermes::Mixins::Loggable::Static::info("---- Adaptivity step %d:", as);
     
     // Time measurement.
     cpu_time.tick();
@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
     memset(coeff_vec, 0, ndof_ref * sizeof(double));
 
     // Initialize the NOX solver with the vector "coeff_vec".
-    info("Initializing NOX.");
+    Hermes::Mixins::Loggable::Static::info("Initializing NOX.");
     NewtonSolverNOX<double> newton_nox(&dp);
     newton_nox.set_verbose_output(true);
     newton_nox.set_output_flags(message_type);
@@ -174,8 +174,8 @@ int main(int argc, char* argv[])
     // Transfer previous fine mesh solution to new fine mesh.
     if (as > 1)
     {
-      info("Transferring previous fine mesh solution to new fine mesh.");
-      Hermes::Hermes2D::OGProjectionNOX<double>::project_global(ref_space_new, &ref_sln, coeff_vec);
+      Hermes::Mixins::Loggable::Static::info("Transferring previous fine mesh solution to new fine mesh.");
+      Hermes::Hermes2D::OGProjectionNOX<double> ogProjection; ogProjection.project_global(ref_space_new, &ref_sln, coeff_vec);
     }
 
     // Choose preconditioning.
@@ -187,29 +187,29 @@ int main(int argc, char* argv[])
     }
 
     // Perform Newton's iteration.
-    info("Performing JFNK on new fine mesh.");
+    Hermes::Mixins::Loggable::Static::info("Performing JFNK on new fine mesh.");
     try
     {
       newton_nox.solve(coeff_vec);
     }
-    catch(Hermes::Exceptions::Exception e)
+    catch(std::exception& e)
     {
-      e.printMsg();
-      error("JFNK iteration failed.");
+      std::cout << e.what();
+      
     }
 
     // Translate the resulting coefficient vector into the instance of Solution.
     Solution<double>::vector_to_solution(newton_nox.get_sln_vector(), ref_space_new, &ref_sln);
 
     // Output.
-    info("Number of nonlin iterations: %d (norm of residual: %g)", 
+    Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)", 
       newton_nox.get_num_iters(), newton_nox.get_residual());
-    info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
+    Hermes::Mixins::Loggable::Static::info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
       newton_nox.get_num_lin_iters(), newton_nox.get_achieved_tol());
 
     // Project the fine mesh solution on the coarse mesh.
-    info("Projecting fine mesh solution to coarse mesh.");
-    Hermes::Hermes2D::OGProjectionNOX<double>::project_global(&space, &ref_sln, &sln);
+    Hermes::Mixins::Loggable::Static::info("Projecting fine mesh solution to coarse mesh.");
+    Hermes::Hermes2D::OGProjectionNOX<double> ogProjection; ogProjection.project_global(&space, &ref_sln, &sln);
 
     // Time measurement.
     cpu_time.tick();
@@ -222,13 +222,13 @@ int main(int argc, char* argv[])
       char* title = new char[100];
       sprintf(title, "sln-%d.vtk", as);
       lin.save_solution_vtk(&sln, title, "Potential", false);
-      info("Solution in VTK format saved to file %s.", title);
+      Hermes::Mixins::Loggable::Static::info("Solution in VTK format saved to file %s.", title);
 
       // Output mesh and element orders in VTK format.
       Views::Orderizer ord;
       sprintf(title, "ord-%d.vtk", as);
       ord.save_orders_vtk(&space, title);
-      info("Element orders in VTK format saved to file %s.", title);
+      Hermes::Mixins::Loggable::Static::info("Element orders in VTK format saved to file %s.", title);
     }
 
     // View the coarse mesh solution and polynomial orders.
@@ -239,10 +239,10 @@ int main(int argc, char* argv[])
     }
 
     // Skip visualization time.
-    cpu_time.tick(HERMES_SKIP);
+    cpu_time.tick();
 
     // Calculate element errors and total error estimate.
-    info("Calculating error estimate.");
+    Hermes::Mixins::Loggable::Static::info("Calculating error estimate.");
     Adapt<double> adaptivity(&space);
     bool solutions_for_adapt = true;
     // In the following function, the Boolean parameter "solutions_for_adapt" determines whether
@@ -255,7 +255,7 @@ int main(int argc, char* argv[])
     double err_est_rel = adaptivity.calc_err_est(&sln, &ref_sln, solutions_for_adapt) * 100;
 
     // Report results.
-    info("ndof_coarse: %d, ndof_fine: %d, err_est_rel: %g%%",
+    Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_fine: %d, err_est_rel: %g%%",
       space.get_num_dofs(), ref_space_new->get_num_dofs(), err_est_rel);
 
     // Add entry to DOF and CPU convergence graphs.
@@ -266,14 +266,14 @@ int main(int argc, char* argv[])
     graph_dof.save("conv_dof_est.dat");
     
     // Skip the time spent to save the convergence graphs.
-    cpu_time.tick(HERMES_SKIP);
+    cpu_time.tick();
 
     // If err_est too large, adapt the mesh.
     if (err_est_rel < ERR_STOP) 
       done = true;
     else
     {
-      info("Adapting coarse mesh.");
+      Hermes::Mixins::Loggable::Static::info("Adapting coarse mesh.");
       done = adaptivity.adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
 
       // Increase the counter of performed adaptivity steps.
@@ -291,7 +291,7 @@ int main(int argc, char* argv[])
   }
   while (done == false);
 
-  verbose("Total running time: %g s", cpu_time.accumulated());
+  Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 
   // Show the last fine mesh solution - final result.
   sview.set_title("Fine mesh solution");

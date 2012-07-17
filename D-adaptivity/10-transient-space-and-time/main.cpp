@@ -130,13 +130,13 @@ int main(int argc, char* argv[])
 {
   // Choose a Butcher's table or define your own.
   ButcherTable bt(butcher_table_type);
-  if (bt.is_explicit()) info("Using a %d-stage explicit R-K method.", bt.get_size());
-  if (bt.is_diagonally_implicit()) info("Using a %d-stage diagonally implicit R-K method.", bt.get_size());
-  if (bt.is_fully_implicit()) info("Using a %d-stage fully implicit R-K method.", bt.get_size());
+  if (bt.is_explicit()) Hermes::Mixins::Loggable::Static::info("Using a %d-stage explicit R-K method.", bt.get_size());
+  if (bt.is_diagonally_implicit()) Hermes::Mixins::Loggable::Static::info("Using a %d-stage diagonally implicit R-K method.", bt.get_size());
+  if (bt.is_fully_implicit()) Hermes::Mixins::Loggable::Static::info("Using a %d-stage fully implicit R-K method.", bt.get_size());
 
   // Turn off adaptive time stepping if R-K method is not embedded.
   if (bt.is_embedded() == false && ADAPTIVE_TIME_STEP_ON == true) {
-    warn("R-K method not embedded, turning off adaptive time stepping.");
+    throw Hermes::Exceptions::Exception("R-K method not embedded, turning off adaptive time stepping.");
     ADAPTIVE_TIME_STEP_ON = false;
   }
 
@@ -186,17 +186,17 @@ int main(int argc, char* argv[])
 
   // Graph for time step history.
   SimpleGraph time_step_graph;
-  if (ADAPTIVE_TIME_STEP_ON) info("Time step history will be saved to file time_step_history.dat.");
+  if (ADAPTIVE_TIME_STEP_ON) Hermes::Mixins::Loggable::Static::info("Time step history will be saved to file time_step_history.dat.");
   
   // Time stepping loop.
   double current_time = 0.0; int ts = 1;
   do 
   {
-    info("Begin time step %d.", ts);
+    Hermes::Mixins::Loggable::Static::info("Begin time step %d.", ts);
     // Periodic global derefinement.
     if (ts > 1 && ts % UNREF_FREQ == 0) 
     {
-      info("Global mesh derefinement.");
+      Hermes::Mixins::Loggable::Static::info("Global mesh derefinement.");
       switch (UNREF_METHOD) {
         case 1: mesh.copy(&basemesh);
                 space.set_uniform_order(P_INIT);
@@ -207,12 +207,11 @@ int main(int argc, char* argv[])
         case 3: mesh.unrefine_all_elements();
                 space.adjust_element_order(-1, -1, P_INIT, P_INIT);
                 break;
-        default: error("Wrong global derefinement method.");
       }
 
       ndof = Space<double>::get_num_dofs(&space);
     }
-    info("ndof: %d", ndof);
+    Hermes::Mixins::Loggable::Static::info("ndof: %d", ndof);
 
     // Spatial adaptivity loop. Note: sln_time_prev must not be 
     // changed during spatial adaptivity. 
@@ -226,23 +225,20 @@ int main(int argc, char* argv[])
       // Construct globally refined reference mesh and setup reference space.
       Space<double>* ref_space = Space<double>::construct_refined_space(&space);
 
-      RungeKutta<double> runge_kutta(&wf, ref_space, &bt, matrix_solver);
+      RungeKutta<double> runge_kutta(&wf, ref_space, &bt);
 
       // Runge-Kutta step on the fine mesh.
-      info("Runge-Kutta time step on fine mesh (t = %g s, tau = %g s, stages: %d).", 
+      Hermes::Mixins::Loggable::Static::info("Runge-Kutta time step on fine mesh (t = %g s, tau = %g s, stages: %d).", 
          current_time, time_step, bt.get_size());
-      bool verbose = true;
-      
       try
       {
         runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, 
-                                      &ref_sln, time_error_fn, false, false, verbose, 
-                                      NEWTON_TOL_FINE, NEWTON_MAX_ITER);
+                                      &ref_sln, time_error_fn, false, false, NEWTON_TOL_FINE, NEWTON_MAX_ITER);
       }
       catch(Exceptions::Exception& e)
       {
-        e.printMsg();
-        error("Runge-Kutta time step failed");
+        std::cout << e.what();
+        
       }
 
       /* If ADAPTIVE_TIME_STEP_ON == true, estimate temporal error. 
@@ -250,7 +246,7 @@ int main(int argc, char* argv[])
 
       double rel_err_time = 0;
       if (bt.is_embedded() == true) {
-        info("Calculating temporal error estimate.");
+        Hermes::Mixins::Loggable::Static::info("Calculating temporal error estimate.");
 
         // Show temporal error.
         char title[100];
@@ -262,27 +258,27 @@ int main(int argc, char* argv[])
 
         rel_err_time = Global<double>::calc_norm(time_error_fn, HERMES_H1_NORM) / 
                        Global<double>::calc_norm(&ref_sln, HERMES_H1_NORM) * 100;
-        if (ADAPTIVE_TIME_STEP_ON == false) info("rel_err_time: %g%%", rel_err_time);
+        if (ADAPTIVE_TIME_STEP_ON == false) Hermes::Mixins::Loggable::Static::info("rel_err_time: %g%%", rel_err_time);
       }
 
       if (ADAPTIVE_TIME_STEP_ON) {
         if (rel_err_time > TIME_ERR_TOL_UPPER) {
-          info("rel_err_time %g%% is above upper limit %g%%", rel_err_time, TIME_ERR_TOL_UPPER);
-          info("Decreasing tau from %g to %g s and restarting time step.", 
+          Hermes::Mixins::Loggable::Static::info("rel_err_time %g%% is above upper limit %g%%", rel_err_time, TIME_ERR_TOL_UPPER);
+          Hermes::Mixins::Loggable::Static::info("Decreasing tau from %g to %g s and restarting time step.", 
                time_step, time_step * TIME_STEP_DEC_RATIO);
           time_step *= TIME_STEP_DEC_RATIO;
           delete ref_space;
           continue;
         }
         else if (rel_err_time < TIME_ERR_TOL_LOWER) {
-          info("rel_err_time = %g%% is below lower limit %g%%", rel_err_time, TIME_ERR_TOL_LOWER);
-          info("Increasing tau from %g to %g s.", time_step, time_step * TIME_STEP_INC_RATIO);
+          Hermes::Mixins::Loggable::Static::info("rel_err_time = %g%% is below lower limit %g%%", rel_err_time, TIME_ERR_TOL_LOWER);
+          Hermes::Mixins::Loggable::Static::info("Increasing tau from %g to %g s.", time_step, time_step * TIME_STEP_INC_RATIO);
           time_step *= TIME_STEP_INC_RATIO;
           delete ref_space;
           continue;
         }
         else {
-          info("rel_err_time = %g%% is in acceptable interval (%g%%, %g%%)", 
+          Hermes::Mixins::Loggable::Static::info("rel_err_time = %g%% is in acceptable interval (%g%%, %g%%)", 
             rel_err_time, TIME_ERR_TOL_LOWER, TIME_ERR_TOL_UPPER);
         }
 
@@ -293,12 +289,12 @@ int main(int argc, char* argv[])
 
       /* Estimate spatial errors and perform mesh refinement */
 
-      info("Spatial adaptivity step %d.", as);
+      Hermes::Mixins::Loggable::Static::info("Spatial adaptivity step %d.", as);
 
       // Project the fine mesh solution onto the coarse mesh.
       Solution<double> sln;
-      info("Projecting fine mesh solution on coarse mesh for error estimation.");
-      OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver); 
+      Hermes::Mixins::Loggable::Static::info("Projecting fine mesh solution on coarse mesh for error estimation.");
+      OGProjection<double> ogProjection; ogProjection.project_global(&space, &ref_sln, &sln); 
 
       // Show spatial error.
       sprintf(title, "Spatial error est, spatial adaptivity step %d", as);  
@@ -309,19 +305,19 @@ int main(int argc, char* argv[])
       space_error_view.show(&abs_sef);
 
       // Calculate element errors and spatial error estimate.
-      info("Calculating spatial error estimate.");
+      Hermes::Mixins::Loggable::Static::info("Calculating spatial error estimate.");
       Adapt<double>* adaptivity = new Adapt<double>(&space);
       double err_rel_space = adaptivity->calc_err_est(&sln, &ref_sln) * 100;
 
       // Report results.
-      info("ndof: %d, ref_ndof: %d, err_rel_space: %g%%", 
+      Hermes::Mixins::Loggable::Static::info("ndof: %d, ref_ndof: %d, err_rel_space: %g%%", 
            Space<double>::get_num_dofs(&space), Space<double>::get_num_dofs(ref_space), err_rel_space);
 
       // If err_est too large, adapt the mesh.
       if (err_rel_space < SPACE_ERR_TOL) done = true;
       else 
       {
-        info("Adapting the coarse mesh.");
+        Hermes::Mixins::Loggable::Static::info("Adapting the coarse mesh.");
         done = adaptivity->adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
 
         if (Space<double>::get_num_dofs(&space) >= NDOF_STOP) 

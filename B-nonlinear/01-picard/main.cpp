@@ -81,11 +81,10 @@ int main(int argc, char* argv[])
   DiscreteProblemLinear<double> dp(&wf, &space);
 
   // Initialize the Picard solver.
-  PicardSolver<double> picard(&dp, &sln_prev_iter, matrix_solver);
+  PicardSolver<double> picard(&dp, &sln_prev_iter);
 
   // Perform the Picard's iteration (Anderson acceleration on by default).
-  if (!picard.solve(PICARD_TOL, PICARD_MAX_ITER, PICARD_NUM_LAST_ITER_USED, 
-                    PICARD_ANDERSON_BETA)) error("Picard's iteration failed.");
+  picard.solve(PICARD_TOL, PICARD_MAX_ITER, PICARD_NUM_LAST_ITER_USED, PICARD_ANDERSON_BETA);
 
   // Translate the coefficient vector into a Solution. 
   Solution<double> sln;

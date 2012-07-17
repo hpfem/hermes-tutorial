@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   // Create an H1 space with default shapeset.
   H1Space<double> space(&mesh, &bcs, P_INIT);
   int ndof = Space<double>::get_num_dofs(&space);
-  info("ndof = %d", ndof);
+  Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
   // Initialize the weak formulation.
   WeakFormsH1::DefaultWeakFormPoisson<double> wf(HERMES_ANY, 
@@ -61,15 +61,15 @@ int main(int argc, char* argv[])
 
   // Perform Newton's iteration.
   Hermes::Hermes2D::Solution<double> sln;
-  Hermes::Hermes2D::NewtonSolver<double> newton(&dp, matrix_solver);
+  Hermes::Hermes2D::NewtonSolver<double> newton(&dp);
   try
   {
     newton.solve();
   }
-  catch(Hermes::Exceptions::Exception e)
+  catch(std::exception& e)
   {
-    e.printMsg();
-    error("Newton's iteration failed.");
+    std::cout << e.what();
+    
   }
 
   Hermes::Hermes2D::Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);

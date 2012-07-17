@@ -51,7 +51,7 @@ MatrixSolverType matrix_solver = SOLVER_UMFPACK;
 int main(int argc, char* argv[])
 {
   // Time measurement.
-  TimePeriod cpu_time;
+  Hermes::Mixins::TimeMeasurable cpu_time;
   cpu_time.tick();
 
   // Load the mesh.
@@ -85,13 +85,13 @@ int main(int argc, char* argv[])
   int as = 1; bool done = false;
   do
   {
-    info("---- Adaptivity step %d:", as);
+    Hermes::Mixins::Loggable::Static::info("---- Adaptivity step %d:", as);
 
     // Construct globally refined reference mesh and setup reference space.
     Space<double>* ref_space = Space<double>::construct_refined_space(&space);
 
     // Assign the function f() to the fine mesh.
-    info("Assigning f() to the fine mesh.");
+    Hermes::Mixins::Loggable::Static::info("Assigning f() to the fine mesh.");
     if(ref_sln != NULL) delete ref_sln;
     ref_sln = new ExactSolutionCustom(ref_space->get_mesh());
 
@@ -99,21 +99,21 @@ int main(int argc, char* argv[])
     cpu_time.tick();
     
     // Project the fine mesh solution onto the coarse mesh.
-    info("Projecting reference solution on coarse mesh.");
-    OGProjection<double>::project_global(&space, ref_sln, &sln, matrix_solver); 
+    Hermes::Mixins::Loggable::Static::info("Projecting reference solution on coarse mesh.");
+    OGProjection<double> ogProjection; ogProjection.project_global(&space, ref_sln, &sln); 
    
     // View the coarse mesh solution and polynomial orders.
     sview.show(&sln);
     oview.show(&space);
 
     // Calculate element errors and total error estimate.
-    info("Calculating exact error."); 
+    Hermes::Mixins::Loggable::Static::info("Calculating exact error."); 
     Adapt<double>* adaptivity = new Adapt<double>(&space);
     // Note: the error estimate is now equal to the exact error.
     double err_exact_rel = adaptivity->calc_err_est(&sln, ref_sln) * 100;
 
     // Report results.
-    info("ndof_coarse: %d, ndof_fine: %d, err_exact_rel: %g%%", 
+    Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_fine: %d, err_exact_rel: %g%%", 
       Space<double>::get_num_dofs(&space), Space<double>::get_num_dofs(ref_space), err_exact_rel);
 
     // Time measurement.
@@ -129,7 +129,7 @@ int main(int argc, char* argv[])
     if (err_exact_rel < ERR_STOP) done = true;
     else 
     {
-      info("Adapting coarse mesh.");
+      Hermes::Mixins::Loggable::Static::info("Adapting coarse mesh.");
       done = adaptivity->adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
       
       // Increase the counter of performed adaptivity steps.
@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
   }
   while (done == false);
   
-  verbose("Total running time: %g s", cpu_time.accumulated());
+  Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 
   // Show the reference solution - the final result.
   sview.set_title("Fine mesh solution");

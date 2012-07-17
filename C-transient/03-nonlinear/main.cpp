@@ -67,9 +67,9 @@ int main(int argc, char* argv[])
 {
   // Choose a Butcher's table or define your own.
   ButcherTable bt(butcher_table_type);
-  if (bt.is_explicit()) info("Using a %d-stage explicit R-K method.", bt.get_size());
-  if (bt.is_diagonally_implicit()) info("Using a %d-stage diagonally implicit R-K method.", bt.get_size());
-  if (bt.is_fully_implicit()) info("Using a %d-stage fully implicit R-K method.", bt.get_size());
+  if (bt.is_explicit()) Hermes::Mixins::Loggable::Static::info("Using a %d-stage explicit R-K method.", bt.get_size());
+  if (bt.is_diagonally_implicit()) Hermes::Mixins::Loggable::Static::info("Using a %d-stage diagonally implicit R-K method.", bt.get_size());
+  if (bt.is_fully_implicit()) Hermes::Mixins::Loggable::Static::info("Using a %d-stage fully implicit R-K method.", bt.get_size());
 
   // Load the mesh.
   Mesh mesh;
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
   // Create an H1 space with default shapeset.
   H1Space<double> space(&mesh, &bcs, P_INIT);
   int ndof = space.get_num_dofs();
-  info("ndof = %d.", ndof);
+  Hermes::Mixins::Loggable::Static::info("ndof = %d.", ndof);
 
   // Previous time level solution (initialized by the initial condition).
   CustomInitialCondition sln_time_prev(&mesh);
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
   Solution<double> sln_time_new(&mesh);
 
   // Initialize Runge-Kutta time stepping.
-  RungeKutta<double> runge_kutta(&wf, &space, &bt, matrix_solver);
+  RungeKutta<double> runge_kutta(&wf, &space, &bt);
 
   // Initialize views.
   ScalarView sview("Solution", new WinGeom(0, 0, 500, 400));
@@ -113,11 +113,10 @@ int main(int argc, char* argv[])
   do
   {
     // Perform one Runge-Kutta time step according to the selected Butcher's table.
-    info("Runge-Kutta time step (t = %g s, tau = %g s, stages: %d).",
+    Hermes::Mixins::Loggable::Static::info("Runge-Kutta time step (t = %g s, tau = %g s, stages: %d).",
          current_time, time_step, bt.get_size());
     bool freeze_jacobian = false;
     bool block_diagonal_jacobian = false;
-    bool verbose = true;
     double damping_coeff = 1.0;
     double max_allowed_residual_norm = 1e10;
     Hermes::vector<Solution<double>*> slns_time_prev;
@@ -127,13 +126,13 @@ int main(int argc, char* argv[])
     try
     {
       runge_kutta.rk_time_step_newton(current_time, time_step, slns_time_prev, slns_time_new, 
-          freeze_jacobian, block_diagonal_jacobian, verbose, NEWTON_TOL, 
+          freeze_jacobian, block_diagonal_jacobian, true, NEWTON_TOL, 
           NEWTON_MAX_ITER, damping_coeff, max_allowed_residual_norm);
     }
     catch(Exceptions::Exception& e)
     {
-      e.printMsg();
-      error("Runge-Kutta time step failed");
+      std::cout << e.what();
+      
     }
 
     // Update time.

@@ -43,7 +43,8 @@ int main(int argc, char* argv[])
   CustomExactSolution sln_exact(&mesh);
 
   // Project the exact function on the FE space.
-  OGProjection<double>::project_global(&space, &sln_exact, &sln, matrix_solver);
+  OGProjection<double> ogProjection;
+  ogProjection.project_global(&space, &sln_exact, &sln);
 
   // Visualize the projection.
   ScalarView view1("Projection", new WinGeom(610, 0, 600, 500));

@@ -81,9 +81,9 @@ int main(int argc, char* argv[])
 {
   // Choose a Butcher's table or define your own.
   ButcherTable bt(butcher_table_type);
-  if (bt.is_explicit()) info("Using a %d-stage explicit R-K method.", bt.get_size());
-  if (bt.is_diagonally_implicit()) info("Using a %d-stage diagonally implicit R-K method.", bt.get_size());
-  if (bt.is_fully_implicit()) info("Using a %d-stage fully implicit R-K method.", bt.get_size());
+  if (bt.is_explicit()) Hermes::Mixins::Loggable::Static::info("Using a %d-stage explicit R-K method.", bt.get_size());
+  if (bt.is_diagonally_implicit()) Hermes::Mixins::Loggable::Static::info("Using a %d-stage diagonally implicit R-K method.", bt.get_size());
+  if (bt.is_fully_implicit()) Hermes::Mixins::Loggable::Static::info("Using a %d-stage fully implicit R-K method.", bt.get_size());
 
   // Load the mesh.
   Mesh mesh;
@@ -117,30 +117,29 @@ int main(int argc, char* argv[])
   ScalarView eview("Temporal error", new WinGeom(500, 0, 500, 400));
   eview.fix_scale_width(50);
 
-  RungeKutta<double> runge_kutta(&wf, &space, &bt, matrix_solver);
+  RungeKutta<double> runge_kutta(&wf, &space, &bt);
 
   // Graph for time step history.
   SimpleGraph time_step_graph;
-  info("Time step history will be saved to file time_step_history.dat.");
+  Hermes::Mixins::Loggable::Static::info("Time step history will be saved to file time_step_history.dat.");
 
   // Time stepping loop:
   double current_time = 0.0; int ts = 1;
   do 
   {
     // Perform one Runge-Kutta time step according to the selected Butcher's table.
-    info("Runge-Kutta time step (t = %g, tau = %g, stages: %d).", 
+    Hermes::Mixins::Loggable::Static::info("Runge-Kutta time step (t = %g, tau = %g, stages: %d).", 
          current_time, time_step, bt.get_size());
-    bool verbose = true;
     try
     {
       runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, 
-                                &sln_time_new, &time_error_fn, false, false, verbose, 
+                                &sln_time_new, &time_error_fn, false, false,
                                 NEWTON_TOL, NEWTON_MAX_ITER);
     }
     catch(Exceptions::Exception& e)
     {
-      e.printMsg();
-      error("Runge-Kutta time step failed");
+      std::cout << e.what();
+      
     }
 
     // Plot error function.
@@ -162,15 +161,15 @@ int main(int argc, char* argv[])
     // is increased.
     double rel_err_time = Global<double>::calc_norm(&time_error_fn, HERMES_H1_NORM) / 
                           Global<double>::calc_norm(&sln_time_new, HERMES_H1_NORM) * 100;
-    info("rel_err_time = %g%%", rel_err_time);
+    Hermes::Mixins::Loggable::Static::info("rel_err_time = %g%%", rel_err_time);
     if (rel_err_time > TIME_TOL_UPPER) {
-      info("rel_err_time above upper limit %g%% -> decreasing time step from %g to %g and repeating time step.", 
+      Hermes::Mixins::Loggable::Static::info("rel_err_time above upper limit %g%% -> decreasing time step from %g to %g and repeating time step.", 
            TIME_TOL_UPPER, time_step, time_step * TIME_STEP_DEC_RATIO);
       time_step *= TIME_STEP_DEC_RATIO;
       continue;
     }
     if (rel_err_time < TIME_TOL_LOWER) {
-      info("rel_err_time = below lower limit %g%% -> increasing time step from %g to %g", 
+      Hermes::Mixins::Loggable::Static::info("rel_err_time = below lower limit %g%% -> increasing time step from %g to %g", 
            TIME_TOL_UPPER, time_step, time_step * TIME_STEP_INC_RATIO);
       time_step *= TIME_STEP_INC_RATIO;
     }

@@ -76,13 +76,13 @@ int main(int argc, char* argv[])
   // Create an H1 space with default shapeset.
   H1Space<double> space(&mesh, &bcs, P_INIT);
   int ndof = space.get_num_dofs();
-  info("ndof = %d", ndof);
+  Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
  
   // Initialize the FE problem.
   DiscreteProblem<double> dp(&wf, &space);
 
   // Initialize Newton solver.
-  NewtonSolver<double> newton(&dp, matrix_solver);
+  NewtonSolver<double> newton(&dp);
 
   // Initialize views.
   ScalarView Tview("Temperature", new WinGeom(0, 0, 450, 600));
@@ -93,17 +93,17 @@ int main(int argc, char* argv[])
   int ts = 1;
   do 
   {
-    info("---- Time step %d, time %3.5f s", ts, current_time);
+    Hermes::Mixins::Loggable::Static::info("---- Time step %d, time %3.5f s", ts, current_time);
 
     // Perform Newton's iteration.
     try
     {
       newton.solve_keep_jacobian();
     }
-    catch(Hermes::Exceptions::Exception e)
+    catch(std::exception& e)
     {
-      e.printMsg();
-      error("Newton's iteration failed.");
+      std::cout << e.what();
+      
     }
 
     // Translate the resulting coefficient vector into the Solution sln.

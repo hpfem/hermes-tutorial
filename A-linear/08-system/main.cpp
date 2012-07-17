@@ -46,13 +46,13 @@ int main(int argc, char* argv[])
   if (USE_XML_FORMAT == true)
   {
     MeshReaderH2DXML mloader;  
-    info("Reading mesh in XML format.");
+    Hermes::Mixins::Loggable::Static::info("Reading mesh in XML format.");
     mloader.load("domain.xml", &mesh);
   }
   else 
   {
     MeshReaderH2D mloader;
-    info("Reading mesh in original format.");
+    Hermes::Mixins::Loggable::Static::info("Reading mesh in original format.");
     mloader.load("domain.mesh", &mesh);
   }
 
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
   H1Space<double> u1_space(&mesh, &bcs, P_INIT);
   H1Space<double> u2_space(&mesh, &bcs, P_INIT);
   int ndof = Space<double>::get_num_dofs(Hermes::vector<const Space<double> *>(&u1_space, &u2_space));
-  info("ndof = %d", ndof);
+  Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
   // Initialize the weak formulation.
   CustomWeakFormLinearElasticity wf(E, nu, rho*g1, "Top", f0, f1);
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
   DiscreteProblem<double> dp(&wf, Hermes::vector<const Space<double> *>(&u1_space, &u2_space));
 
   // Initialize Newton solver.
-  NewtonSolver<double> newton(&dp, matrix_solver);
+  NewtonSolver<double> newton(&dp);
   newton.set_verbose_output(true);
 
   // Perform Newton's iteration.
@@ -89,10 +89,10 @@ int main(int argc, char* argv[])
     // NULL = start from zero initial vector, 1e-7 = tolerance.
     newton.solve(NULL, 1e-7);
   }
-  catch(Hermes::Exceptions::Exception e)
+  catch(std::exception& e)
   {
-    e.printMsg();
-    error("Newton's iteration failed.");
+    std::cout << e.what();
+    
   }
 
   // Translate the resulting coefficient vector into the Solution sln.

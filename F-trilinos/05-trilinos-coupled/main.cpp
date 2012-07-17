@@ -65,7 +65,7 @@ int max_iters = 100;
 int main(int argc, char* argv[])
 {
   // Time measurement.
-  TimePeriod cpu_time;
+  Hermes::Mixins::TimeMeasurable cpu_time;
   cpu_time.tick();
 
   // Load the mesh.
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
   H1Space<double>* t_space = new H1Space<double>(&mesh, &bcs_t, P_INIT);
   H1Space<double>* c_space = new H1Space<double>(&mesh, &bcs_c, P_INIT);
   int ndof = Space<double>::get_num_dofs(Hermes::vector<const Space<double>*>(t_space, c_space));
-  info("ndof = %d.", ndof);
+  Hermes::Mixins::Loggable::Static::info("ndof = %d.", ndof);
 
   // Define initial conditions.
   InitialSolutionTemperature t_prev_time_1(&mesh, x1);
@@ -111,9 +111,9 @@ int main(int argc, char* argv[])
 
   // Project the functions "t_prev_time_1" and "c_prev_time_1" on the FE space 
   // in order to obtain initial vector for NOX. 
-  info("Projecting initial solutions on the FE meshes.");
+  Hermes::Mixins::Loggable::Static::info("Projecting initial solutions on the FE meshes.");
   double* coeff_vec = new double[ndof];
-  OGProjection<double>::project_global(Hermes::vector<const Space<double> *>(t_space, c_space), 
+  OGProjection<double> ogProjection; ogProjection.project_global(Hermes::vector<const Space<double> *>(t_space, c_space), 
                                        Hermes::vector<MeshFunction<double>*>(&t_prev_time_1, &c_prev_time_1),
                                        coeff_vec);
 
@@ -141,33 +141,33 @@ int main(int argc, char* argv[])
   cpu_time.tick_reset();
   for (int ts = 1; total_time <= T_FINAL; ts++)
   {
-    info("---- Time step %d, t = %g s", ts, total_time + TAU);
+    Hermes::Mixins::Loggable::Static::info("---- Time step %d, t = %g s", ts, total_time + TAU);
 
-    cpu_time.tick(HERMES_SKIP);
+    cpu_time.tick();
     try
     {
       solver.solve(coeff_vec);
     }
-    catch(Hermes::Exceptions::Exception e)
+    catch(std::exception& e)
     {
-      e.printMsg();
-      error("NOX failed.");
+      std::cout << e.what();
+      
     }
 
     Solution<double>::vector_to_solutions(solver.get_sln_vector(), Hermes::vector<const Space<double> *>(t_space, c_space), 
               Hermes::vector<Solution<double> *>(&t_prev_newton, &c_prev_newton));
 
     cpu_time.tick();
-    info("Number of nonlin iterations: %d (norm of residual: %g)",
+    Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)",
         solver.get_num_iters(), solver.get_residual());
-    info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)",
+    Hermes::Mixins::Loggable::Static::info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)",
         solver.get_num_lin_iters(), solver.get_achieved_tol());
 
     // Time measurement.
-    cpu_time.tick(HERMES_SKIP);
+    cpu_time.tick();
 			
     // Skip visualization time.
-    cpu_time.tick(HERMES_SKIP);
+    cpu_time.tick();
 
     // Update global time.
     total_time += TAU;
@@ -185,9 +185,9 @@ int main(int argc, char* argv[])
     // Visualization.
     rview.set_min_max_range(0.0,2.0);
     rview.show(&omega);
-    cpu_time.tick(HERMES_SKIP);
+    cpu_time.tick();
 
-    info("Total running time for time level %d: %g s.", ts, cpu_time.tick().last());
+    Hermes::Mixins::Loggable::Static::info("Total running time for time level %d: %g s.", ts, cpu_time.tick().last());
   }
 
   // Wait for all views to be closed.

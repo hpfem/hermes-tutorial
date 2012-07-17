@@ -185,7 +185,7 @@ private:
 class InitialSolutionTemperature : public ExactSolutionScalar<double>
 {
 public:
-  InitialSolutionTemperature(Mesh* mesh, double x1) : ExactSolutionScalar<double>(mesh), x1(x1) {};
+  InitialSolutionTemperature(const Mesh* mesh, double x1) : ExactSolutionScalar<double>(mesh), x1(x1) {};
 
   virtual double value (double x, double y) const {
     return (x <= x1) ? 1.0 : exp(x1 - x);
@@ -212,7 +212,7 @@ public:
 class InitialSolutionConcentration : public ExactSolutionScalar<double>
 {
 public:
-  InitialSolutionConcentration(Mesh* mesh, double x1, double Le) : ExactSolutionScalar<double>(mesh), x1(x1), Le(Le) {};
+  InitialSolutionConcentration(const Mesh* mesh, double x1, double Le) : ExactSolutionScalar<double>(mesh), x1(x1), Le(Le) {};
 
   virtual double value (double x, double y) const {
     return (x <= x1) ? 0.0 : 1.0 - exp(Le*(x1 - x));
