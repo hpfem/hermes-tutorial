@@ -32,11 +32,11 @@ const double x1    = 9.0;
 const bool TRILINOS_OUTPUT = true;                
 // true = Jacobian-free method (for NOX),
 // false = Newton (for NOX).
-const bool TRILINOS_JFNK = true;
+const bool TRILINOS_JFNK = false;
 // Preconditioning by jacobian (1) (less GMRES iterations, more time to create precond)
 // or by approximation of jacobian (2) (less time for precond creation, more GMRES iters).
 // in case of jfnk, default Ifpack proconditioner in case of Newton.
-const int PRECOND = 1;                            
+const int PRECOND = 0;                            
 // Name of the iterative method employed by AztecOO (ignored by the other solvers). 
 // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
 const char* iterative_method = "GMRES";           
@@ -50,7 +50,7 @@ const char* preconditioner = "ML";
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
                                                   
 // Tolerance for linear system.
-double ls_tolerance = 1e-5;                       
+double ls_tolerance = 1e-2;                       
 // Flag for absolute value of the residuum.
 unsigned flag_absresid = 0;                       
 // Tolerance for absolute value of the residuum.
@@ -128,8 +128,10 @@ int main(int argc, char* argv[])
   MlPrecond<double> pc("sa");
   if (PRECOND)
   {
-    if (TRILINOS_JFNK) solver.set_precond(pc);
-    else solver.set_precond("Ifpack");
+    if (TRILINOS_JFNK) 
+      solver.set_precond(pc);
+    else 
+      solver.set_precond("New Ifpack");
   }
   if (TRILINOS_OUTPUT)
     solver.set_output_flags(NOX::Utils::Error | NOX::Utils::OuterIteration |
