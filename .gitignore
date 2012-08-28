@@ -1,5 +1,4 @@
 # Hidden, backup, log files
-.*
 *.*~
 *~
 *.log
