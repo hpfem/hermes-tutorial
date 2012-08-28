@@ -125,6 +125,7 @@ int main(int argc, char* argv[])
     slns_time_new.push_back(&sln_time_new);
     try
     {
+      runge_kutta.set_verbose_output(true);
       runge_kutta.setTime(current_time);
       runge_kutta.setTimeStep(time_step);
       runge_kutta.set_newton_max_iter(NEWTON_MAX_ITER);
@@ -145,7 +146,7 @@ int main(int argc, char* argv[])
     char title[100];
     sprintf(title, "Solution, t = %g", current_time);
     sview.set_title(title);
-    sview.show(&sln_time_new, HERMES_EPS_VERYHIGH);
+    sview.show(&sln_time_new, HERMES_EPS_HIGH);
     oview.show(&space);
 
     // Copy solution for the new time step.

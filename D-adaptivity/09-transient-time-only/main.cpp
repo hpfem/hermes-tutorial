@@ -34,7 +34,7 @@ const int INIT_BDY_REF_NUM = 4;
 // Initial polynomial degree.
 const int P_INIT = 2;                              
 // Time step.
-double time_step = 0.05;                           
+double time_step = 1.5;                           
 // Time interval length.
 const double T_FINAL = 5.0;                        
 // Stopping criterion for the Newton's method.
@@ -132,6 +132,7 @@ int main(int argc, char* argv[])
          current_time, time_step, bt.get_size());
     try
     {
+      runge_kutta.set_verbose_output(true);
       runge_kutta.setTime(current_time);
       runge_kutta.setTimeStep(time_step);
       runge_kutta.set_newton_max_iter(NEWTON_MAX_ITER);
@@ -148,12 +149,12 @@ int main(int argc, char* argv[])
     sprintf(title, "Temporal error, t = %g", current_time);
     eview.set_title(title);
     AbsFilter abs_tef(&time_error_fn);
-    eview.show(&abs_tef, HERMES_EPS_VERYHIGH);
+    eview.show(&abs_tef);
     
     // Show the new time level solution.
     sprintf(title, "Solution (higher-order), t = %g", current_time);
     sview_high.set_title(title);
-    sview_high.show(&sln_time_new, HERMES_EPS_HIGH);
+    sview_high.show(&sln_time_new);
 
     // Calculate relative time stepping error and decide whether the 
     // time step can be accepted. If not, then the time step size is 
@@ -187,8 +188,6 @@ int main(int argc, char* argv[])
 
     // Increase counter of time steps.
     ts++;
-
-    //View::wait(HERMES_WAIT_KEYPRESS);
 
   } 
   while (current_time < T_FINAL);

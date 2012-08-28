@@ -27,7 +27,6 @@ MeshFunction<double>* InitialSolutionHeatTransfer::clone()
 
 InitialSolutionHeatTransfer::~InitialSolutionHeatTransfer()
 {
-  delete mesh;
 }
 
 /* Essential BC */

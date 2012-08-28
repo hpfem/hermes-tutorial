@@ -257,7 +257,7 @@ int main(int argc, char* argv[])
         time_error_view.set_title(title);
         time_error_view.show_mesh(false);
         AbsFilter abs_tef(time_error_fn);
-        time_error_view.show(&abs_tef, HERMES_EPS_HIGH);
+        time_error_view.show(&abs_tef);
 
         rel_err_time = Global<double>::calc_norm(time_error_fn, HERMES_H1_NORM) / 
                        Global<double>::calc_norm(&ref_sln, HERMES_H1_NORM) * 100;
@@ -270,6 +270,7 @@ int main(int argc, char* argv[])
           Hermes::Mixins::Loggable::Static::info("Decreasing tau from %g to %g s and restarting time step.", 
                time_step, time_step * TIME_STEP_DEC_RATIO);
           time_step *= TIME_STEP_DEC_RATIO;
+          delete ref_space->get_mesh();
           delete ref_space;
           continue;
         }
@@ -277,6 +278,7 @@ int main(int argc, char* argv[])
           Hermes::Mixins::Loggable::Static::info("rel_err_time = %g%% is below lower limit %g%%", rel_err_time, TIME_ERR_TOL_LOWER);
           Hermes::Mixins::Loggable::Static::info("Increasing tau from %g to %g s.", time_step, time_step * TIME_STEP_INC_RATIO);
           time_step *= TIME_STEP_INC_RATIO;
+          delete ref_space->get_mesh();
           delete ref_space;
           continue;
         }
@@ -333,7 +335,10 @@ int main(int argc, char* argv[])
       // Clean up.
       delete adaptivity;
       if(!done)
+      {
+        delete ref_space->get_mesh();
         delete ref_space;
+      }
       delete space_error_fn;
     }
     while (done == false);
