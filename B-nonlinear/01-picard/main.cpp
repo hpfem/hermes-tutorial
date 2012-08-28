@@ -84,7 +84,18 @@ int main(int argc, char* argv[])
   PicardSolver<double> picard(&dp, &sln_prev_iter);
 
   // Perform the Picard's iteration (Anderson acceleration on by default).
-  picard.solve(PICARD_TOL, PICARD_MAX_ITER, PICARD_NUM_LAST_ITER_USED, PICARD_ANDERSON_BETA);
+  picard.set_picard_tol(PICARD_TOL);
+  picard.set_picard_max_iter(PICARD_MAX_ITER);
+  picard.set_num_last_vector_used(PICARD_NUM_LAST_ITER_USED);
+  picard.set_anderson_beta(PICARD_ANDERSON_BETA);
+  try
+  {
+    picard.solve();
+  }
+  catch(std::exception& e)
+  {
+    std::cout << e.what();
+  }
 
   // Translate the coefficient vector into a Solution. 
   Solution<double> sln;
