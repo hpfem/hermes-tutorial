@@ -232,8 +232,11 @@ int main(int argc, char* argv[])
          current_time, time_step, bt.get_size());
       try
       {
-        runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, 
-                                      &ref_sln, time_error_fn, false, false, NEWTON_TOL_FINE, NEWTON_MAX_ITER);
+        runge_kutta.setTime(current_time);
+        runge_kutta.setTimeStep(time_step);
+        runge_kutta.set_newton_max_iter(NEWTON_MAX_ITER);
+        runge_kutta.set_newton_tol(NEWTON_TOL_FINE);
+        runge_kutta.rk_time_step_newton(&sln_time_prev, &ref_sln, time_error_fn);
       }
       catch(Exceptions::Exception& e)
       {

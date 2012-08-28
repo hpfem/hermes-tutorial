@@ -1,3 +1,3 @@
-project(P04-06-exact)
+project(D-06-exact)
 add_executable(${PROJECT_NAME} main.cpp definitions.cpp)
 set_common_target_properties(${PROJECT_NAME} "HERMES2D") 

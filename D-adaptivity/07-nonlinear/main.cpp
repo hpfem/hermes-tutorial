@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
   // good initial guess for the Newton's method on the fine mesh.
   try
   {
-    newton_coarse.solve(coeff_vec_coarse, NEWTON_TOL_COARSE, NEWTON_MAX_ITER);
+    newton_coarse.solve(coeff_vec_coarse);
   }
   catch(std::exception& e)
   {
@@ -161,8 +161,12 @@ int main(int argc, char* argv[])
   Solution<double>::vector_to_solution(newton_coarse.get_sln_vector(), &space, &sln);
 
   // Cleanup after the Newton loop on the coarse mesh.
+  DiscreteProblem<double> dp(&wf, &space);
   delete [] coeff_vec_coarse;
+  NewtonSolver<double> newton(&dp);
+  newton.set_verbose_output(Hermes::Mixins::Loggable::Static::info);
 
+    
   // Adaptivity loop.
   int as = 1; bool done = false;
   do
@@ -173,7 +177,6 @@ int main(int argc, char* argv[])
     Space<double>* ref_space = Space<double>::construct_refined_space(&space);
 
     // Initialize discrete problem on the reference mesh.
-    DiscreteProblem<double> dp(&wf, ref_space);
 
     // Calculate initial coefficient vector on the reference mesh.
     double* coeff_vec = new double[ref_space->get_num_dofs()];
@@ -188,19 +191,15 @@ int main(int argc, char* argv[])
       // In all other steps, project the previous fine mesh solution.
       Hermes::Mixins::Loggable::Static::info("Projecting previous fine mesh solution to obtain initial vector on new fine mesh.");
       OGProjection<double> ogProjection; ogProjection.project_global(ref_space, &ref_sln, coeff_vec);
-      delete ref_sln.get_space();
-      delete ref_sln.get_mesh();
     }
 
     // Initialize Newton solver on fine mesh.
     Hermes::Mixins::Loggable::Static::info("Solving on fine mesh:");
-    NewtonSolver<double> newton(&dp);
-    newton.set_verbose_output(Hermes::Mixins::Loggable::Static::info);
-
     // Perform Newton's iteration.
+    newton.set_space(ref_space);
     try
     {
-      newton.solve(coeff_vec, NEWTON_TOL_FINE, NEWTON_MAX_ITER);
+      newton.solve(coeff_vec);
     }
     catch(std::exception& e)
     {

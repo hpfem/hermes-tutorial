@@ -151,6 +151,9 @@ int main(int argc, char* argv[])
   view.show(&sln_time_prev);
   ordview.show(&space);
   
+  // Initialize Runge-Kutta time stepping.
+  RungeKutta<double> runge_kutta(&wf, &space, &bt);
+      
   // Time stepping loop.
   double current_time = 0; int ts = 1;
   do 
@@ -185,16 +188,14 @@ int main(int argc, char* argv[])
       Space<double>* ref_space = Space<double>::construct_refined_space(&space);
       int ndof_ref = Space<double>::get_num_dofs(ref_space);
 
-      // Initialize Runge-Kutta time stepping.
-      RungeKutta<double> runge_kutta(&wf, ref_space, &bt);
-
       // Perform one Runge-Kutta time step according to the selected Butcher's table.
-      Hermes::Mixins::Loggable::Static::info("Runge-Kutta time step (t = %g s, tau = %g s, stages: %d).",
-           current_time, time_step, bt.get_size());
       try
       {
-        runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, &sln_time_new, 
-                                    false, true, NEWTON_TOL, NEWTON_MAX_ITER);
+        runge_kutta.set_space(ref_space);
+        runge_kutta.set_verbose_output(true);
+        runge_kutta.setTime(current_time);
+        runge_kutta.setTimeStep(time_step);
+        runge_kutta.rk_time_step_newton(&sln_time_prev, &sln_time_new);
       }
       catch(Exceptions::Exception& e)
       {
@@ -248,10 +249,6 @@ int main(int argc, char* argv[])
       }
     }
     while (done == false);
-
-    // Copy last reference solution into sln_time_prev.
-    if(ts == 2)
-      delete sln_time_prev.get_space();
 
     sln_time_prev.copy(&sln_time_new);
 

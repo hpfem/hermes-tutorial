@@ -47,7 +47,7 @@ const int INIT_REF_BDY = 5;
 const bool MULTI = true;                          
 // This is a quantitative parameter of the adapt(...) function and
 // it has different meanings for various adaptive strategies.
-const double THRESHOLD = 0.3;                     
+const double THRESHOLD = 1.3;                     
 // Adaptive strategy:
 // STRATEGY = 0 ... refine elements until sqrt(THRESHOLD) times total
 //   error is processed. If more elements have similar errors, refine
@@ -57,7 +57,7 @@ const double THRESHOLD = 0.3;
 // STRATEGY = 2 ... refine all elements whose error is larger
 //   than THRESHOLD.
 // More adaptive strategies can be created in adapt_ortho_h1.cpp.
-const int STRATEGY = 1;                           
+const int STRATEGY = 0;                           
 // Predefined list of element refinement candidates. Possible values are
 // H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO,
 // H2D_HP_ANISO_H, H2D_HP_ANISO_P, H2D_HP_ANISO.
@@ -150,7 +150,6 @@ int main(int argc, char* argv[])
   SimpleGraph graph_dof_est, graph_cpu_est; 
   SimpleGraph graph_dof_exact, graph_cpu_exact;
 
-  DiscreteProblem<double> dp(&wf, Hermes::vector<const Space<double> *>(&u_space, &v_space));
 
   // Adaptivity loop:
   int as = 1; 
@@ -171,10 +170,13 @@ int main(int argc, char* argv[])
 
     // Initialize reference problem.
     Hermes::Mixins::Loggable::Static::info("Solving on reference mesh.");
-
-    dp.set_spaces(ref_spaces_const);
-
+    
+    DiscreteProblem<double> dp(&wf, ref_spaces_const);
+    dp.setDoNotUseCache();
     NewtonSolver<double> newton(&dp);
+    newton.set_newton_tol(1e-1);
+    //dp.set_spaces(ref_spaces_const);
+
     //newton.set_verbose_output(false);
 
     // Time measurement.
@@ -266,9 +268,6 @@ int main(int argc, char* argv[])
 
     // Clean up.
     delete adaptivity;
-    for(unsigned int i = 0; i < ref_spaces->size(); i++)
-      delete (*ref_spaces)[i]->get_mesh();
-    delete ref_spaces;
     
     // Increase counter.
     as++;

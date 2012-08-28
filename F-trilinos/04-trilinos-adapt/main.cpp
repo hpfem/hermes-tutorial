@@ -55,7 +55,7 @@ const int MESH_REGULARITY = -1;
 const double CONV_EXP = 0.5;               
 // Stopping criterion for adaptivity (rel. error tolerance between the
 // fine mesh and coarse mesh solution in percent).
-const double ERR_STOP = 1.0;               
+const double ERR_STOP = 26.0;               
 // Adaptivity process stops when the number of degrees of freedom grows
 // over this limit. This is to prevent h-adaptivity to go on forever.
 const int NDOF_STOP = 60000;               
@@ -135,6 +135,7 @@ int main(int argc, char* argv[])
   sview.show_mesh(false);
   sview.fix_scale_width(50);
   OrderView  oview("Polynomial orders", new WinGeom(450, 0, 420, 350));
+  OrderView  oviewa("Polynomial orders", new WinGeom(450, 0, 420, 350));
 
   // DOF and CPU convergence graphs.
   SimpleGraph graph_dof, graph_cpu, graph_dof_exact, graph_cpu_exact;
@@ -212,6 +213,7 @@ int main(int argc, char* argv[])
     // View the coarse mesh solution and polynomial orders.
     sview.show(&sln);
     oview.show(&space);
+    oviewa.show(ref_space);
 
     // Calculate element errors and total error estimate.
     Hermes::Mixins::Loggable::Static::info("Calculating error estimate and exact error.");

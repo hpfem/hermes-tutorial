@@ -41,7 +41,7 @@ const bool VTK_VISUALIZATION = false;
 const int P_INIT = 2;                             
 // This is a quantitative parameter of the adapt(...) function and
 // it has different meanings for various adaptive strategies.
-const double THRESHOLD = 0.2;                     
+const double THRESHOLD = 0.8;                     
 // Adaptive strategy:
 // STRATEGY = 0 ... refine elements until sqrt(THRESHOLD) times total
 //   error is processed. If more elements have similar errors, refine
@@ -64,7 +64,7 @@ const CandList CAND_LIST = H2D_HP_ANISO_H;
 // their notoriously bad performance.
 const int MESH_REGULARITY = -1;                   
 // Stopping criterion for adaptivity.
-const double ERR_STOP = 1.0;                      
+const double ERR_STOP = 0.5;                      
 // This parameter influences the selection of candidates in hp-adaptivity. 
 // Default value is 1.0.
 const double CONV_EXP = 1.0;                      
@@ -118,6 +118,8 @@ int main(int argc, char* argv[])
   Hermes::Mixins::TimeMeasurable cpu_time;
 
   DiscreteProblem<double> dp(&wf, &space);
+  NewtonSolver<double> newton(&dp);
+  newton.set_verbose_output(true);
 
   // Adaptivity loop:
   int as = 1; bool done = false;
@@ -135,10 +137,8 @@ int main(int argc, char* argv[])
     // Initialize fine mesh problem.
     Hermes::Mixins::Loggable::Static::info("Solving on fine mesh.");
     
-    dp.set_space(ref_space);
+    newton.set_space(ref_space);
 
-    NewtonSolver<double> newton(&dp);
-    newton.set_verbose_output(true);
 
     // Perform Newton's iteration.
     try

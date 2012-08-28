@@ -86,8 +86,7 @@ int main(int argc, char* argv[])
   // Perform Newton's iteration.
   try
   {
-    // NULL = start from zero initial vector, 1e-7 = tolerance.
-    newton.solve(NULL, 1e-7);
+    newton.solve();
   }
   catch(std::exception& e)
   {

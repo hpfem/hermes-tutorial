@@ -80,7 +80,9 @@ int main(int argc, char* argv[])
   // Perform Newton's iteration.
   try
   {
-    newton.solve(coeff_vec, NEWTON_TOL, NEWTON_MAX_ITER);
+    newton.set_newton_max_iter(NEWTON_MAX_ITER);
+    newton.set_newton_tol(NEWTON_TOL);
+    newton.solve(coeff_vec);
   }
   catch(std::exception& e)
   {

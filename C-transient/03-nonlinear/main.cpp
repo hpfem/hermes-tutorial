@@ -125,14 +125,17 @@ int main(int argc, char* argv[])
     slns_time_new.push_back(&sln_time_new);
     try
     {
-      runge_kutta.rk_time_step_newton(current_time, time_step, slns_time_prev, slns_time_new, 
-          freeze_jacobian, block_diagonal_jacobian, true, NEWTON_TOL, 
-          NEWTON_MAX_ITER, damping_coeff, max_allowed_residual_norm);
+      runge_kutta.setTime(current_time);
+      runge_kutta.setTimeStep(time_step);
+      runge_kutta.set_newton_max_iter(NEWTON_MAX_ITER);
+      runge_kutta.set_newton_tol(NEWTON_TOL);
+      runge_kutta.set_newton_max_allowed_residual_norm(max_allowed_residual_norm);
+      
+      runge_kutta.rk_time_step_newton(slns_time_prev, slns_time_new);
     }
     catch(Exceptions::Exception& e)
     {
       std::cout << e.what();
-      
     }
 
     // Update time.
