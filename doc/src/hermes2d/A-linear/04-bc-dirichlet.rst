@@ -130,5 +130,3 @@ $A = 1$, $B = 1$ and $C = 20$ is shown below:
    :scale: 50% 
    :figclass: align-center
    :alt: Solution of the Dirichlet problem.
-
-

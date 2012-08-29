@@ -96,15 +96,9 @@ The adaptivity workflow is standard. First we construct the reference spaces::
     Hermes::vector<Space<double> *>* ref_spaces = 
       Space<double>::construct_refined_spaces(Hermes::vector<Space<double> *>(&u_space, &v_space));
 
-Next we initialize the discrete problem on the fine meshes::
+Next we pass the new reference Spaces to the Newton solver::
 
-    // Initialize reference problem.
-    DiscreteProblem<double> dp(&wf, *ref_spaces);
-
-Then we initialize the Newton solver::
-
-    NewtonSolver<double> newton(&dp, matrix_solver);
-    newton.set_verbose_output(false);
+    newton.set_spaces(ref_spaces);
 
 And we solve the problem using the Newton's method::
 
@@ -116,7 +110,7 @@ And we solve the problem using the Newton's method::
     catch(Hermes::Exceptions::Exception e)
     {
       e.printMsg();
-      error("Newton's iteration failed.");
+      
     }
 
 Next we translate the coefficient vector into the two Solutions,

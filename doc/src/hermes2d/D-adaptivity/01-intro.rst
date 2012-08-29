@@ -141,14 +141,9 @@ the mesh globally::
     // Construct globally refined mesh and setup fine mesh space.
     Space<double>* ref_space = Space<double>::construct_refined_space(&space);
 
-Next we initialize the discrete problem on the refined mesh::    
+The new spaces have to be set to the Newton solver that we already created (outside of the adaptivity loop)::
 
-    DiscreteProblem<double> dp(&wf, ref_space);
-
-The Newton solver is initialized and optionally, the output is muted::
-
-    NewtonSolver<double> newton(&dp, matrix_solver);
-    newton.set_verbose_output(false);
+    newton.set_space(ref_space);
 
 The Newton's method is used to solve the fine mesh problem::
 
@@ -160,10 +155,10 @@ The Newton's method is used to solve the fine mesh problem::
     catch(Hermes::Exceptions::Exception e)
     {
       e.printMsg();
-      error("Newton's iteration failed.");
+      
     }
 
-The coefficient vector is translated into a Solution::
+The coefficient vector is translated into a Solution. The pointer(s) to Space(s) needs to be constant, but we omit that here for simplicity::
 
     // Translate the resulting coefficient vector into the instance of Solution.
     Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
@@ -173,7 +168,7 @@ part for error calculation::
 
     // Project the fine mesh solution onto the coarse mesh.
     info("Projecting fine mesh solution on coarse mesh.");
-    OGProjection<double>::project_global(&space, &ref_sln, &sln, matrix_solver);
+    OGProjection<double> ogProjection; ogProjection.project_global(&space, &ref_sln, &sln);
 
 The function project_global() is very general, and it can accept multiple 
 spaces, multiple functions, and various projection norms as parameters. For more details,

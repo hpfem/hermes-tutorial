@@ -18,8 +18,8 @@ step. Therefore also the initial coefficient vector for NOX has to change.
 Here, for simplicity, we always start from the zero vector::
 
     // Initial coefficient vector for the Newton's method.  
-    scalar* coeff_vec = new scalar[ndof_ref];
-    memset(coeff_vec, 0, ndof_ref * sizeof(scalar));
+    double* coeff_vec = new double[ndof_ref];
+    memset(coeff_vec, 0, ndof_ref * sizeof(double));
 
 Indeed this is inefficient since lots of useful information from the previous 
 reference solution is thrown away. Correctly one should project the last 
@@ -35,7 +35,7 @@ In each adaptivity step we initialize a new NOX solver and preconditioner:
     .
 
     // Initialize NOX solver.
-    NoxSolver solver(&dp, message_type, "GMRES", "Newton", ls_tolerance, "", flag_absresid, abs_resid, 
+    NewtonSolverNOX<double> solver(&dp, message_type, "GMRES", "Newton", ls_tolerance, "", flag_absresid, abs_resid, 
                      flag_relresid, rel_resid, max_iters);
 
     // Select preconditioner.
@@ -50,7 +50,7 @@ In each adaptivity step we initialize a new NOX solver and preconditioner:
     .
 
     // Initialize NOX solver.
-    NoxSolver solver(&dp, message_type, "GMRES", "Newton", ls_tolerance, "", flag_absresid,
+    NewtonSolverNOX<double> solver(&dp, message_type, "GMRES", "Newton", ls_tolerance, "", flag_absresid,
                      abs_resid, flag_relresid, rel_resid, max_iters);
 
     // Select preconditioner.
@@ -104,7 +104,7 @@ Projecting fine mesh solution on coarse mesh
 This step is common to all hp-adaptivity algorithms in Hermes::
 
     info("Projecting reference solution on coarse mesh.");
-    OGProjection::project_global(&space, &ref_sln, &sln, matrix_solver);
+    OGProjection<double> ogProjection; ogProjection.project_global(&space, &ref_sln, &sln);
 
 
 The rest

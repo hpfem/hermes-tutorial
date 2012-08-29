@@ -326,7 +326,7 @@ Next, an instance of the corresponding weak form class is created:
 
     // Initialize the weak formulation.
     CustomWeakFormPoisson wf("Aluminum", new Hermes1DFunction<double>(lambda_al), "Copper", 
-                             new Hermes1DFunction<double>(lambda_cu), new Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
+                             new Hermes1DFunction<double>(lambda_cu), new Hermes2DFunction<double>(-src_term));
 
 .. latexcode::
     .
@@ -334,7 +334,7 @@ Next, an instance of the corresponding weak form class is created:
     // Initialize the weak formulation.
     CustomWeakFormPoisson wf("Aluminum", new Hermes1DFunction<double>(lambda_al), "Copper", 
                              new Hermes1DFunction<double>(lambda_cu), 
-                             new Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
+                             new Hermes2DFunction<double>(-src_term));
 
 Setting constant Dirichlet boundary conditions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -427,15 +427,13 @@ maximum allowed number of 100 iterations::
     catch(Hermes::Exceptions::Exception e)
     {
       e.printMsg();
-      error("Newton's iteration failed.");
+      
     }
 
 The method solve() comes in two basic versions::
 
-    void solve(Scalar* coeff_vec = NULL, double newton_tol = 1e-8, 
-        int newton_max_iter = 100, bool residual_as_function = false);
-    void solve_keep_jacobian(Scalar* coeff_vec = NULL, double newton_tol = 1e-8, 
-        int newton_max_iter = 100, bool residual_as_function = false);
+    void solve(Scalar* coeff_vec = NULL);
+    void solve_keep_jacobian(Scalar* coeff_vec = NULL);
 
 The latter keeps the Jacobian constant during the Newton's iteration loop. Their 
 detailed description, as well as additional useful methods of the NewtonSolver class,
@@ -592,6 +590,3 @@ HERMES_FN_VAL_0 stands for the function value of solution component 0
 HERMES_FN_VAL_1 would mean the function value of the second solution component
 (relevant for vector-valued Hcurl or Hdiv elements only), 
 HERMES_FN_DX_0 means the x-derivative of the first solution component, etc.
-
-
-

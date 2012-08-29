@@ -41,13 +41,13 @@ can be used as in the previous example::
 
   // Project the initial condition on the FE space to obtain initial
   // coefficient vector for the Newton's method.
-  scalar* coeff_vec = new scalar[ndof];
+  double* coeff_vec = new double[ndof];
   // We can start with a zero vector.
   memset(coeff_vec, 0, ndof * sizeof(double));
   // Or we can project the initial condition to obtain the initial coefficient vector.
   //info("Projecting to obtain initial vector for the Newton's method.");
   //CustomInitialSolution sln_tmp(&mesh);
-  //OGProjection::project_global(&space, &sln_tmp, coeff_vec, matrix_solver);
+  //OGProjection<double> ogProjection; ogProjection.project_global(&space, &sln_tmp, coeff_vec);
 
 Initializing NOX
 ~~~~~~~~~~~~~~~~
@@ -57,7 +57,7 @@ Initializing NOX
 
     // Initialize the NOX solver with the vector "coeff_vec".
     info("Initializing NOX.");
-    NoxSolver nox_solver(&dp2, message_type, "GMRES", "Newton", ls_tolerance, "", flag_absresid, abs_resid, 
+    NewtonSolverNOX<double> nox_solver(&dp2, message_type, "GMRES", "Newton", ls_tolerance, "", flag_absresid, abs_resid, 
                          flag_relresid, rel_resid, max_iters);
     nox_solver.set_init_sln(coeff_vec);
 
@@ -66,7 +66,7 @@ Initializing NOX
 
     // Initialize the NOX solver with the vector "coeff_vec".
     info("Initializing NOX.");
-    NoxSolver nox_solver(&dp2, message_type, "GMRES", "Newton", ls_tolerance, "", flag_absresid,
+    NewtonSolverNOX<double> nox_solver(&dp2, message_type, "GMRES", "Newton", ls_tolerance, "", flag_absresid,
                          abs_resid, flag_relresid, rel_resid, max_iters);
     nox_solver.set_init_sln(coeff_vec);
 

@@ -18,7 +18,7 @@ We solve a complex-valued vector potential problem
     -\Delta A + j \omega \gamma \mu A - \mu J_{ext} = 0
 
 in a two-dimensional cross-section containing a conductor and an iron object.
-Note: in 2D this is a scalar problem. A sketch of the computational domain 
+Note: in 2D this is a double problem. A sketch of the computational domain 
 is shown in the following picture:
 
 .. figure:: 04-complex/domain.png
@@ -39,7 +39,7 @@ Complex-valued weak forms
 
 The weak formulation consists entirely of default forms, its header looks as follows::
 
-    class CustomWeakForm : public WeakForm<std::complex<double> >
+    class CustomWeakForm<double> : public WeakForm<std::complex<double> >
     { 
     public:
       CustomWeakForm(std::string mat_air,  double mu_air,

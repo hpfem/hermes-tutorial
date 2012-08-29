@@ -166,22 +166,19 @@ Assembling and solving the discrete problem using Newton's method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When the spaces and weak forms are ready, one can initialize the 
-discrete problem::
-
-    // Initialize the FE problem.
-    DiscreteProblem<double> dp(&wf, Hermes::vector<Space<double> *>(&u1_space, &u2_space));
-
-Next we initialize the Newton solver and perform the Newton's iteration::
+Newton solver and adjust some parameters if necessary::
 
     // Initialize Newton solver.
-    NewtonSolver<double> newton(&dp);
+    NewtonSolver<double> newton(&wf, Hermes::vector<Space<double> *>(&u1_space, &u2_space));
     newton.set_verbose_output(true);
+		newton.set_newton_tol(NEWTON_TOL);
+		newton.set_newton_max_iter(NEWTON_MAX_ITER);
+    
+Next we perform the Newton's iteration::
 
     // Perform Newton's iteration.
     try
     {
-      newton.set_newton_tol(NEWTON_TOL);
-      newton.set_newton_max_iter(NEWTON_MAX_ITER);
       newton.solve();
     }
     catch(Hermes::Exceptions::Exception e)
@@ -202,7 +199,7 @@ Last, the coefficient vector is translated into two displacement solutions::
 
     // Translate the resulting coefficient vector into the Solution sln.
     Solution<double> u1_sln, u2_sln;
-    Solution<double>::vector_to_solutions(newton.get_sln_vector(), Hermes::vector<Space<double> *>(&u1_space, &u2_space), 
+    Solution<double>::vector_to_solutions(newton.get_sln_vector(), Hermes::vector<const Space<double> *>(&u1_space, &u2_space), 
         Hermes::vector<Solution<double> *>(&u1_sln, &u2_sln));
 
 Visualizing the Von Mises stress
@@ -233,8 +230,3 @@ displacements.
    :scale: 55% 
    :figclass: align-center
    :alt: Elastic stress plotted on deformed domain.
-
-
-
-
-

@@ -21,8 +21,8 @@ The part of the code that is relevant for this example is::
       int item = H2D_FN_VAL_0;
       double eps = HERMES_EPS_NORMAL;
       double max_abs = -1.0;
-      MeshFunction* xdisp = NULL; 
-      MeshFunction* ydisp = NULL;
+      MeshFunction<double>* xdisp = NULL; 
+      MeshFunction<double>* ydisp = NULL;
       double dmult = 1.0;
       lin.process_solution(&tsln, item, eps, max_abs, xdisp, ydisp, dmult);
       char* filename = new char[100];

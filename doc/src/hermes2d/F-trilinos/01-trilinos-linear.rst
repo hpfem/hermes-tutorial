@@ -32,7 +32,7 @@ As NOX is iterative, the initial condition matters::
     // Calculate initial vector for NOX.
     info("Projecting to obtain initial vector for the Newton's method.");
     ZeroSolution init_sln(&mesh);
-    OGProjection<double>::project_global(&space, &init_sln, coeff_vec);
+    OGProjection<double> ogProjection; ogProjection.project_global(&space, &init_sln, coeff_vec);
 
 Initializing NOX
 ~~~~~~~~~~~~~~~~

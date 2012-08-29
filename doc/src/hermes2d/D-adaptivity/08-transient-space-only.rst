@@ -80,16 +80,18 @@ method is called in each adaptivity step::
       // Perform one Runge-Kutta time step according to the selected Butcher's table.
       info("Runge-Kutta time step (t = %g s, tau = %g s, stages: %d).",
            current_time, time_step, bt.get_size());
-      bool verbose = true;
+
+			runge_kutta.setTime(current_time);
+			runge_kutta.setTimeStep(time_step);
+			
       try
       {
-        runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, &sln_time_new, 
-                                    true, verbose, NEWTON_TOL, NEWTON_MAX_ITER);
+        runge_kutta.rk_time_step_newton(&sln_time_prev, &sln_time_new);
       }
       catch(Exceptions::Exception& e)
       {
         e.printMsg();
-        error("Runge-Kutta time step failed");
+        
       }
 
 The value of current_time and the previous time level solution 

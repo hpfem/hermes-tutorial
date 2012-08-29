@@ -128,8 +128,16 @@ pointers to the discrete problem, Butcher's table, and
 matrix solver::
 
     // Initialize Runge-Kutta time stepping.
-    RungeKutta<double> runge_kutta(&dp, &bt, matrix_solver);
+    RungeKutta<double> runge_kutta(&wf, &space, &bt);
+		
 
+		// Some optional adjustments of default parameters
+		runge_kutta.set_newton_tol(NEWTON_TOL);
+		runge_kutta.set_newton_max_iter(NEWTON_MAX_ITER);
+		runge_kutta.set_verbose_output(true);
+		runge_kutta.set_newton_damping_coeff(1.0);
+		runge_kutta.set_newton_max_allowed_residual_norm(1e10);
+		
 Time-stepping loop
 ~~~~~~~~~~~~~~~~~~
 
@@ -141,18 +149,21 @@ The time-stepping loop has the form::
     {
       // Perform one Runge-Kutta time step according to the selected Butcher's table.
       info("Runge-Kutta time step (t = %g s, time step = %g s, stages: %d).", 
-	   current_time, time_step, bt.get_size());
-      bool freeze_jacobian = false;
-      bool block_diagonal_jacobian = false;
-      bool verbose = true;
-      double damping_coeff = 1.0;
-      double max_allowed_residual_norm = 1e10;
-      if (!runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, 
-				    &sln_time_new, freeze_jacobian, block_diagonal_jacobian, verbose,
-				    NEWTON_TOL, NEWTON_MAX_ITER, damping_coeff,
-				    max_allowed_residual_norm)) 
+	    current_time, time_step, bt.get_size());
+		 
+		  // This is important, these methods are shared by all the 'calculation' classes, i.e. RungeKutta, NewtonSolver, PicardSolver, LinearSolver,
+			DiscreteProblem, DiscreteProblemLinear.
+		  runge_kutta.setTime(current_time);
+      runge_kutta.setTimeStep(time_step);
+      
+		  try
       {
-	error("Runge-Kutta time step failed, try to decrease time step size.");
+        runge_kutta.rk_time_step_newton(&sln_time_prev, &sln_time_new);
+			}
+			catch(std::exception& e)
+      {
+				std::cout << e.what();
+				Hermes::Mixins::Loggable::Static::info("Runge-Kutta time step failed, try to decrease time step size.");
       }
 
       // Show the new time level solution.

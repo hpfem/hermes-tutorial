@@ -83,10 +83,10 @@ The matrix weak forms on the right- and left-hand side are standard:
       return result;
     }
 
-    scalar WeakFormEigenLeft::MatrixFormPotential::value(int n, double *wt, Func<scalar> *u_ext[], Func<double> *u, 
-		                                   Func<double> *v, Geom<double> *e, ExtData<scalar> *ext) const 
+    double WeakFormEigenLeft::MatrixFormPotential::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
+		                                   Func<double> *v, Geom<double> *e, ExtData<double> *ext) const 
     {
-      return matrix_form<double, scalar>(n, wt, u_ext, u, v, e, ext);
+      return matrix_form<double, double>(n, wt, u_ext, u, v, e, ext);
     }
 
     Ord WeakFormEigenLeft::MatrixFormPotential::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, 
@@ -125,11 +125,11 @@ The matrix weak forms on the right- and left-hand side are standard:
       return result;
     }
 
-    scalar WeakFormEigenLeft::MatrixFormPotential::value(int n, double *wt, Func<scalar>
+    double WeakFormEigenLeft::MatrixFormPotential::value(int n, double *wt, Func<double>
                               *u_ext[], Func<double> *u, Func<double> *v, 
-                              Geom<double> *e, ExtData<scalar> *ext) const 
+                              Geom<double> *e, ExtData<double> *ext) const 
     {
-      return matrix_form<double, scalar>(n, wt, u_ext, u, v, e, ext);
+      return matrix_form<double, double>(n, wt, u_ext, u, v, e, ext);
     }
 
     Ord WeakFormEigenLeft::MatrixFormPotential::ord(int n, double *wt, 

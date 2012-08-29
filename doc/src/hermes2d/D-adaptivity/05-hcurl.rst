@@ -72,7 +72,7 @@ Choice of projection norm
 The H2D_HCURL_NORM is used automatically for the projection, since 
 the projection takes place in an Hcurl space. The user does not have to 
 worry about this. If needed, the default norm can be overridden in 
-the function OGProjection::project_global().
+the function OGProjection<double> ogProjection; ogProjection.project_global().
 
 Showing real part of the solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

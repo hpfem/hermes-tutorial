@@ -60,7 +60,7 @@ an initial coefficient vector::
     info("Projecting to obtain initial vector for the Newton's method.");
     double* coeff_vec = new double[ndof];
     CustomInitialCondition init_sln(&mesh);
-    OGProjection<double>::project_global(&space, &init_sln, coeff_vec, matrix_solver); 
+    OGProjection<double> ogProjection; ogProjection.project_global(&space, &init_sln, coeff_vec); 
 
 The Newton's iteration loop
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,17 +68,16 @@ The Newton's iteration loop
 The Newton's iteration loop is done as in linear problems::
 
     // Initialize Newton solver.
-    NewtonSolver<double> newton(&dp, matrix_solver);
+    NewtonSolver<double> newton(&dp);
 
     // Perform Newton's iteration.
     try
     {
-      newton.solve(coeff_vec, NEWTON_TOL, NEWTON_MAX_ITER);
+      newton.solve(coeff_vec);
     }
     catch(Hermes::Exceptions::Exception e)
     {
       e.printMsg();
-      error("Newton's iteration failed.");
     }
 
 Note that the Newton's loop always handles a coefficient vector, not 

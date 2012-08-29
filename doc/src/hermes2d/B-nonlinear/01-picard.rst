@@ -129,14 +129,32 @@ The weak formulation is then initialized in the main.cpp file::
 Picard's iteration loop
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Next we initialize the Picard solver and perform the iteration loop::
+Next we initialize the Picard solver in one of possible ways::and perform the iteration loop::
 
-    // Initialize the Picard solver.
-    PicardSolver<double> picard(&dp, &sln_prev_iter, matrix_solver);
+    // 1 - Initialize the Picard solver with a DiscreteProblemLinear.
+		DiscreteProblemLinear<double> dp(&wf, &space);
+    PicardSolver<double> picard(&dp, &sln_prev_iter);
+		
+		// 2 - Initialize the Picard solver with WeakForm<double> and Space(s) directly.
+    PicardSolver<double> picard(&wf, &space, &sln_prev_iter);
+		
+		// Some parameter adjustments (if necessary)
+		picard.set_picard_tol(PICARD_TOL);
+		picard.set_picard_max_iter(PICARD_MAX_ITER);
+		picard.set_num_last_iter(PICARD_NUM_LAST_ITER_USED);
+		picard.set_anderson_beta(PICARD_ANDERSON_BETA);
+		
+To perform an iteration one uses::
 
     // Perform the Picard's iteration (Anderson acceleration on by default).
-    if (!picard.solve(PICARD_TOL, PICARD_MAX_ITER, PICARD_NUM_LAST_ITER_USED, 
-			PICARD_ANDERSON_BETA)) error("Picard's iteration failed.");
+    try
+		{
+			picard.solve();
+		}
+		catch(std::exception& e)
+		{
+			std::cout << e.what();
+		}
 
 Here PICARD_NUM_LAST_ITER_USED is the number of last iterates to use for the 
 acceleration. With PICARD_NUM_LAST_ITER_USED = 1 one has the original Picard's 

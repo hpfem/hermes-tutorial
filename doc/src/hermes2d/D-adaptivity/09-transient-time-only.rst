@@ -45,17 +45,17 @@ two approximations with different orders of accuracy)::
     // Perform one Runge-Kutta time step according to the selected Butcher's table.
     info("Runge-Kutta time step (t = %g, tau = %g, stages: %d).", 
          current_time, time_step, bt.get_size());
-    bool verbose = true;
-    try
-    {
-      runge_kutta.rk_time_step_newton(current_time, time_step, &sln_time_prev, 
-                                &sln_time_new, &time_error_fn, false, false, verbose, 
-                                NEWTON_TOL, NEWTON_MAX_ITER);
-    }
+
+		runge_kutta.setTime(current_time);
+		runge_kutta.setTimeStep(time_step);
+		
+		try
+		{
+			runge_kutta.rk_time_step_newton(&sln_time_prev, &sln_time_new);
+		}
     catch(Exceptions::Exception& e)
     {
       e.printMsg();
-      error("Runge-Kutta time step failed");
     }
 
 The solution sln_time_new contains the more accurate of the two solutions.
@@ -120,7 +120,7 @@ is what matters, it may be a good idea to use an AbsFilter::
     sprintf(title, "Temporal error, t = %g", current_time);
     eview.set_title(title);
     AbsFilter abs_tef(&time_error_fn);
-    eview.show(&abs_tef, HERMES_EPS_VERYHIGH);
+    eview.show(&abs_tef);
 
 Here, the option HERMES_EPS_VERYHIGH is used to render accurately a function
 that has very small values.

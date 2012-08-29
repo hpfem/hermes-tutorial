@@ -98,6 +98,8 @@ As this problem is linear, the Jacobian matrix just needs to be constructed once
 at the beginning, and it will not change during the computation. Thus instead of 
 the usual method NewtonSolver::solve() we use the method NewtonSolver::solve_keep_jacobian()::
 
+    // This is important in time-dependent examples, these methods are shared by all the 'calculation' classes, i.e. RungeKutta, NewtonSolver, PicardSolver, LinearSolver, DiscreteProblem, DiscreteProblemLinear.
+			
     // Perform Newton's iteration.
     try
     {
@@ -106,7 +108,7 @@ the usual method NewtonSolver::solve() we use the method NewtonSolver::solve_kee
     catch(Hermes::Exceptions::Exception e)
     {
       e.printMsg();
-      error("Newton's iteration failed.");
+      
     }
 
 Sample results

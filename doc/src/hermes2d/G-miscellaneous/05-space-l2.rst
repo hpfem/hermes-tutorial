@@ -17,7 +17,7 @@ The function to be projected is::
 
 See formula in the file definitions.cpp. The projection is done as follows::
 
-    OGProjection<double>::project_global(&space, &sln_exact, &sln, matrix_solver);
+    OGProjection<double> ogProjection; ogProjection.project_global(&space, &sln_exact, &sln);
 
 Sample basis functions visualized using the BaseView class:
 

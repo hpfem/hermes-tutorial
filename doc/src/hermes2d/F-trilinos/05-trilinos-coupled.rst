@@ -35,10 +35,10 @@ use diagonal blocks of the Jacobian for preconditioning:
       wf.add_matrix_form(1, 1, callback(precond_1_1));
     }
     wf.add_vector_form(0, callback(newton_linear_form_0), HERMES_ANY, 
-                       Hermes::Tuple<MeshFunction*>(&t_prev_time_1, &t_prev_time_2, &omega));
+                       Hermes::vector<MeshFunction<double>*>(&t_prev_time_1, &t_prev_time_2, &omega));
     wf.add_vector_form_surf(0, callback(newton_linear_form_0_surf), 3);
     wf.add_vector_form(1, callback(newton_linear_form_1), HERMES_ANY, 
-                       Hermes::Tuple<MeshFunction*>(&c_prev_time_1, &c_prev_time_2, &omega));
+                       Hermes::vector<MeshFunction<double>*>(&c_prev_time_1, &c_prev_time_2, &omega));
 
 .. latexcode::
     .
@@ -63,10 +63,10 @@ use diagonal blocks of the Jacobian for preconditioning:
       wf.add_matrix_form(1, 1, callback(precond_1_1));
     }
     wf.add_vector_form(0, callback(newton_linear_form_0), HERMES_ANY, 
-                       Hermes::Tuple<MeshFunction*>(&t_prev_time_1, &t_prev_time_2, &omega));
+                       Hermes::vector<MeshFunction<double>*>(&t_prev_time_1, &t_prev_time_2, &omega));
     wf.add_vector_form_surf(0, callback(newton_linear_form_0_surf), 3);
     wf.add_vector_form(1, callback(newton_linear_form_1), HERMES_ANY, 
-                       Hermes::Tuple<MeshFunction*>(&c_prev_time_1, &c_prev_time_2, &omega));
+                       Hermes::vector<MeshFunction<double>*>(&c_prev_time_1, &c_prev_time_2, &omega));
 
 Calculating initial condition for NOX
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,9 +79,9 @@ Next we project the initial conditions to obtain an initial coefficient vector f
     // Project the functions "t_prev_time_1" and "c_prev_time_1" on the FE space 
     // in order to obtain initial vector for NOX. 
     info("Projecting initial solutions on the FE meshes.");
-    scalar* coeff_vec = new scalar[ndof];
-    OGProjection::project_global(Hermes::Tuple<Space *>(t_space, c_space), 
-                                       Hermes::Tuple<MeshFunction*>(&t_prev_time_1, &c_prev_time_1),
+    double* coeff_vec = new double[ndof];
+    OGProjection<double> ogProjection; ogProjection.project_global(Hermes::vector<Space *>(t_space, c_space), 
+                                       Hermes::vector<MeshFunction<double>*>(&t_prev_time_1, &c_prev_time_1),
                                        coeff_vec);
 
 .. latexcode::
@@ -90,9 +90,9 @@ Next we project the initial conditions to obtain an initial coefficient vector f
     // Project the functions "t_prev_time_1" and "c_prev_time_1" on the FE space 
     // in order to obtain initial vector for NOX. 
     info("Projecting initial solutions on the FE meshes.");
-    scalar* coeff_vec = new scalar[ndof];
-    OGProjection::project_global(Hermes::Tuple<Space *>(t_space, c_space), 
-                                 Hermes::Tuple<MeshFunction*>(&t_prev_time_1,
+    double* coeff_vec = new double[ndof];
+    OGProjection<double> ogProjection; ogProjection.project_global(Hermes::vector<Space *>(t_space, c_space), 
+                                 Hermes::vector<MeshFunction<double>*>(&t_prev_time_1,
                                  &c_prev_time_1), coeff_vec);
 
 Initializing DiscreteProblem, NOX, and preconditioner
@@ -101,10 +101,10 @@ Initializing DiscreteProblem, NOX, and preconditioner
 Then we initialize the DiscreteProblem class, NOX solver, and preconditioner::
 
     // Initialize finite element problem.
-    DiscreteProblem dp(&wf, Hermes::Tuple<Space*>(t_space, c_space));
+    DiscreteProblem dp(&wf, Hermes::vector<Space*>(t_space, c_space));
 
     // Initialize NOX solver and preconditioner.
-    NoxSolver solver(&dp);
+    NewtonSolverNOX<double> solver(&dp);
     RCP<Precond> pc = rcp(new MlPrecond("sa"));
     if (PRECOND)
     {
@@ -145,8 +145,8 @@ The time stepping loop is as usual:
       solver.set_init_sln(coeff_vec);
       if (solver.solve())
       {
-        Solution::vector_to_solutions(solver.get_solution(), Hermes::Tuple<Space *>(t_space, c_space), 
-                  Hermes::Tuple<Solution *>(&t_prev_newton, &c_prev_newton));
+        Solution::vector_to_solutions(solver.get_solution(), Hermes::vector<const Space<double> *>(t_space, c_space), 
+                  Hermes::vector<Solution<double> *>(&t_prev_newton, &c_prev_newton));
 
         cpu_time.tick();
         info("Number of nonlin iterations: %d (norm of residual: %g)",
@@ -158,7 +158,7 @@ The time stepping loop is as usual:
         cpu_time.tick(HERMES_SKIP);
 
         // Visualization.
-        DXDYFilter omega_view(omega_fn, Hermes::Tuple<MeshFunction*>(&t_prev_newton, &c_prev_newton));
+        DXDYFilter omega_view(omega_fn, Hermes::vector<MeshFunction<double>*>(&t_prev_newton, &c_prev_newton));
         rview.set_min_max_range(0.0,2.0);
         rview.show(&omega_view);
         cpu_time.tick(HERMES_SKIP);
@@ -192,8 +192,8 @@ The time stepping loop is as usual:
       solver.set_init_sln(coeff_vec);
       if (solver.solve())
       {
-        Solution::vector_to_solutions(solver.get_solution(), Hermes::Tuple<Space *>
-                  (t_space, c_space), Hermes::Tuple<Solution *>(&t_prev_newton,
+        Solution::vector_to_solutions(solver.get_solution(), Hermes::vector<const Space<double> *>
+                  (t_space, c_space), Hermes::vector<Solution<double> *>(&t_prev_newton,
                   &c_prev_newton));
 
         cpu_time.tick();
@@ -207,7 +207,7 @@ The time stepping loop is as usual:
         cpu_time.tick(HERMES_SKIP);
 
         // Visualization.
-        DXDYFilter omega_view(omega_fn, Hermes::Tuple<MeshFunction*>(&t_prev_newton,
+        DXDYFilter omega_view(omega_fn, Hermes::vector<MeshFunction<double>*>(&t_prev_newton,
                               &c_prev_newton));
         rview.set_min_max_range(0.0,2.0);
         rview.show(&omega_view);

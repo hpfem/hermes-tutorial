@@ -22,7 +22,7 @@ First we calculate an initial coefficient vector $\bfY_0$ by projecting
 the initial condition on the coarse mesh::
 
     InitialSolutionHeatTransfer init_sln(&mesh);
-    OGProjection<double>::project_global(&space, &init_sln, coeff_vec_coarse, matrix_solver);
+    OGProjection<double> ogProjection; ogProjection.project_global(&space, &init_sln, coeff_vec_coarse);
 
 Then we solve the problem on the coarse mesh::
 
@@ -30,12 +30,12 @@ Then we solve the problem on the coarse mesh::
     // good initial guess for the Newton's method on the fine mesh.
     try
     {
-      newton_coarse.solve(coeff_vec_coarse, NEWTON_TOL_COARSE, NEWTON_MAX_ITER);
+      newton_coarse.solve(coeff_vec_coarse);
     }
     catch(Hermes::Exceptions::Exception e)
     {
       e.printMsg();
-      error("Newton's iteration failed.");
+      
     }
 
 The resulting coefficient vector is translated into a coarse mesh solution::
@@ -60,13 +60,13 @@ solution::
     {
       // In the first step, project the coarse mesh solution.
       info("Projecting coarse mesh solution to obtain initial vector on new fine mesh.");
-      OGProjection<double>::project_global(ref_space, &sln, coeff_vec, matrix_solver);
+      OGProjection<double> ogProjection; ogProjection.project_global(ref_space, &sln, coeff_vec);
     }
     else
     {
       // In all other steps, project the previous fine mesh solution.
       info("Projecting previous fine mesh solution to obtain initial vector on new fine mesh.");
-      OGProjection<double>::project_global(ref_space, &ref_sln, coeff_vec, matrix_solver);
+      OGProjection<double> ogProjection; ogProjection.project_global(ref_space, &ref_sln, coeff_vec);
     }
 
 Sample results

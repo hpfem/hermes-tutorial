@@ -68,24 +68,30 @@ The time stepping loop is analogous to the previous example::
     {
       // Perform one Runge-Kutta time step according to the selected Butcher's table.
       info("Runge-Kutta time step (t = %g s, tau = %g s, stages: %d).",
-	   current_time, time_step, bt.get_size());
-      bool freeze_jacobian = false;
-      bool block_diagonal_jacobian = false;
-      bool verbose = true;
-      double damping_coeff = 1.0;
-      double max_allowed_residual_norm = 1e10;
+	    current_time, time_step, bt.get_size());
+		 
+ 		  runge_kutta.set_newton_tol(NEWTON_TOL);
+			runge_kutta.set_newton_max_iter(NEWTON_MAX_ITER);
+			runge_kutta.set_verbose_output(true);
+			runge_kutta.set_newton_damping_coeff(1.0);
+			runge_kutta.set_newton_max_allowed_residual_norm(1e10);
+		 
       Hermes::vector<Solution<double>*> slns_time_prev;
       slns_time_prev.push_back(&sln_time_prev);
       Hermes::vector<Solution<double>*> slns_time_new;
       slns_time_new.push_back(&sln_time_new);
 
-      if (!runge_kutta.rk_time_step_newton(current_time, time_step, slns_time_prev, slns_time_new, 
-					   freeze_jacobian, block_diagonal_jacobian, verbose, NEWTON_TOL, 
-					   NEWTON_MAX_ITER, damping_coeff,
-					   max_allowed_residual_norm)) 
-      {
-	error("Runge-Kutta time step failed, try to decrease time step size.");
-      }
+			runge_kutta.setTime(current_time);
+      runge_kutta.setTimeStep(time_step);
+      
+			try
+			{
+				runge_kutta.rk_time_step_newton(slns_time_prev, slns_time_new);
+			}
+			catch(Exceptions::Exception& e)
+			{
+				std::cout << e.what();
+			}
 
       // Update time.
       current_time += time_step;
@@ -94,7 +100,7 @@ The time stepping loop is analogous to the previous example::
       char title[100];
       sprintf(title, "Solution, t = %g", current_time);
       sview.set_title(title);
-      sview.show(&sln_time_new, HERMES_EPS_VERYHIGH);
+      sview.show(&sln_time_new);
       oview.show(&space);
 
       // Copy solution for the new time step.
