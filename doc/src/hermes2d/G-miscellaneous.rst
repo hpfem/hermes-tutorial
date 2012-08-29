@@ -8,11 +8,11 @@ into the previous sections.
 .. toctree::
    :maxdepth: 2
 
-   P08-miscellaneous/01-nurbs-mesh
-   P08-miscellaneous/02-nurbs
-   P08-miscellaneous/03-space-hcurl
-   P08-miscellaneous/04-space-hdiv
-   P08-miscellaneous/05-space-l2
+   G-miscellaneous/01-nurbs-mesh
+   G-miscellaneous/02-nurbs
+   G-miscellaneous/03-space-hcurl
+   G-miscellaneous/04-space-hdiv
+   G-miscellaneous/05-space-l2
 
 
 

@@ -9,9 +9,9 @@ of arbitrary Butcher's tables.
 .. toctree::
    :maxdepth: 2
 
-   P03-transient/01-implicit-euler  
-   P03-transient/02-runge-kutta
-   P03-transient/03-nonlinear 
+   C-transient/01-implicit-euler  
+   C-transient/02-runge-kutta
+   C-transient/03-nonlinear 
 
 
 

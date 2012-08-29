@@ -7,10 +7,10 @@ and Newton's methods to solve nonlinear problems.
 .. toctree::
     :maxdepth: 2
 
-    P02-nonlinear/01-picard 
-    P02-nonlinear/newton-intro
-    P02-nonlinear/02-newton-analytic 
-    P02-nonlinear/03-newton-spline
+    B-nonlinear/01-picard 
+    B-nonlinear/newton-intro
+    B-nonlinear/02-newton-analytic 
+    B-nonlinear/03-newton-spline
 
 
 

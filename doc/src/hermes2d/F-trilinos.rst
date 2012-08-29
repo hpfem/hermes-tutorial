@@ -6,12 +6,12 @@ This section shows how to use Trilinos and in particular the NOX solver.
 .. toctree::
     :maxdepth: 2
 
-    P07-trilinos/jfnk 
-    P07-trilinos/01-trilinos-linear  
-    P07-trilinos/02-trilinos-nonlinear  
-    P07-trilinos/03-trilinos-timedep  
-    P07-trilinos/04-trilinos-adapt
-    P07-trilinos/05-trilinos-coupled
+    F-trilinos/jfnk 
+    F-trilinos/01-trilinos-linear  
+    F-trilinos/02-trilinos-nonlinear  
+    F-trilinos/03-trilinos-timedep  
+    F-trilinos/04-trilinos-adapt
+    F-trilinos/05-trilinos-coupled
 
 
 

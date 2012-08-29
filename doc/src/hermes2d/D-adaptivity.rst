@@ -12,20 +12,20 @@ of freedom than conventional FEM codes.
 .. toctree::
     :maxdepth: 2
 
-    P04-adaptivity/intro-1   
-    P04-adaptivity/intro-2
-    P04-adaptivity/01-intro
-    P04-adaptivity/01-intro-matrix-free
-    P04-adaptivity/02-kelly
-    P04-adaptivity/intro-3
-    P04-adaptivity/03-system
-    P04-adaptivity/04-complex
-    P04-adaptivity/05-hcurl
-    P04-adaptivity/06-exact
-    P04-adaptivity/07-nonlinear
-    P04-adaptivity/08-transient-space-only
-    P04-adaptivity/09-transient-time-only
-    P04-adaptivity/10-transient-space-and-time
+    D-adaptivity/intro-1   
+    D-adaptivity/intro-2
+    D-adaptivity/01-intro
+    D-adaptivity/01-intro-matrix-free
+    D-adaptivity/02-kelly
+    D-adaptivity/intro-3
+    D-adaptivity/03-system
+    D-adaptivity/04-complex
+    D-adaptivity/05-hcurl
+    D-adaptivity/06-exact
+    D-adaptivity/07-nonlinear
+    D-adaptivity/08-transient-space-only
+    D-adaptivity/09-transient-time-only
+    D-adaptivity/10-transient-space-and-time
 
 
 
