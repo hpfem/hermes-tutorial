@@ -454,8 +454,7 @@ Solution via the function Solution<Scalar>::vector_to_solution()::
 2 - linear formulation
 -----------------------------
 
-Here the problem is solved as a linear one. We do not need to adjust the weak formulation, as in the linear
-setting, the previous Newton's iterations will be set to zero.
+Here the problem is solved as a linear one. We do not need to adjust the weak formulation we used for the Newton's method, as in the linear setting, the previous Newton's iterations will be set to zero.
 
 Initializing linear solver
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -477,6 +476,8 @@ Solving
 In the same way as in the Newton's method, there is a method solve()::
 
     void LinearSolver::solve();
+
+We can see that the linear solver is more lightweight to use than the Newton's method.
     
 Translating the coefficient vector into a solution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

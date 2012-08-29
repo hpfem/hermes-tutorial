@@ -162,8 +162,8 @@ Even if your weak forms are symmetric, it is recommended to start with the
 default (and safe) flag HERMES_NONSYM. Once the model works, it can be optimized using the
 flag HERMES_SYM.
 
-Assembling and solving the discrete problem
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Assembling and solving the discrete problem using Newton's method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When the spaces and weak forms are ready, one can initialize the 
 discrete problem::
@@ -174,19 +174,19 @@ discrete problem::
 Next we initialize the Newton solver and perform the Newton's iteration::
 
     // Initialize Newton solver.
-    NewtonSolver<double> newton(&dp, matrix_solver);
+    NewtonSolver<double> newton(&dp);
     newton.set_verbose_output(true);
 
     // Perform Newton's iteration.
     try
     {
-      // NULL = zero initial coefficient vector.
-      newton.solve(NULL, NEWTON_TOL, NEWTON_MAX_ITER);
+      newton.set_newton_tol(NEWTON_TOL);
+      newton.set_newton_max_iter(NEWTON_MAX_ITER);
+      newton.solve();
     }
     catch(Hermes::Exceptions::Exception e)
     {
       e.printMsg();
-      error("Newton's iteration failed.");
     }
 
 **Note that two steps are taken although the problem is linear**::
