@@ -22,13 +22,13 @@ Solving 2D Problems
 .. toctree::
     :maxdepth: 1
 
-    src/hermes2d/P01-linear
-    src/hermes2d/P02-nonlinear
-    src/hermes2d/P03-transient
-    src/hermes2d/P04-adaptivity
-    src/hermes2d/P06-fvm-and-dg
-    src/hermes2d/P07-trilinos
-    src/hermes2d/P08-miscellaneous
+    src/hermes2d/A-linear
+    src/hermes2d/B-nonlinear
+    src/hermes2d/C-transient
+    src/hermes2d/D-adaptivity
+    src/hermes2d/E-fvm-and-dg
+    src/hermes2d/F-trilinos
+    src/hermes2d/G-miscellaneous
 
 Solving 1D Problems
 -------------------
@@ -40,6 +40,6 @@ Selected 1D problems are part of the repository "hermes-examples". To clone it, 
 Solving Eigenproblems
 ---------------------
 
-Eigenproblems are supported in the legacy code but not in Version 1.0,
+Eigenproblems are supported in the legacy code but not in the OpenMP version,
 because of their Python dependency (PySparse). Implementation of a C++
-eigensolver class is scheduled for the next release.
+eigensolver class is scheduled for near future.
