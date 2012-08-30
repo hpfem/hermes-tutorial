@@ -84,6 +84,10 @@ this works.
 Consistent approach to linear and nonlinear problems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+This is an approach to linear problems as to nonlinear ones (I.e. using Newton's method for linear problems as well).
+That would be the section '1 - nonlinear formulation' further down on this page.
+However, in the section '2 - linear formulation', the linear approach one can also use is explained.
+
 First assume that $\lambda = \lambda_{al}$ in $\Omega_{al}$ and 
 $\lambda = \lambda_{cu}$ in $\Omega_{cu}$ where both $\lambda_{al}$ and $\lambda_{cu}$
 are constants. Then the problem is linear and the weak form for the Jacobian is 
