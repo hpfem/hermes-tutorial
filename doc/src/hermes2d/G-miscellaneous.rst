@@ -1,4 +1,4 @@
-Tutorial Part VIII (Miscellaneous Techniques)
+Tutorial Part G (Miscellaneous Techniques)
 =============================================
 
 This section contains various examples and techniques 

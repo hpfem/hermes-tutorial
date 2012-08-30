@@ -1,4 +1,4 @@
-Tutorial Part II (Nonlinear Problems)
+Tutorial Part B (Nonlinear Problems)
 ======================================
 
 In this chapter we illustrate how to use the Picard's 

@@ -1,4 +1,4 @@
-Tutorial Part VII (Using Trilinos)
+Tutorial Part F (Using Trilinos)
 ==================================
 
 This section shows how to use Trilinos and in particular the NOX solver.

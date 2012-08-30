@@ -1,4 +1,4 @@
-Tutorial Part IV (Automatic Adaptivity)
+Tutorial Part D (Automatic Adaptivity)
 =======================================
 
 So far we have not paid any attention to the accuracy of results. In general, 

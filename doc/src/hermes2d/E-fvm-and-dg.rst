@@ -1,4 +1,4 @@
-Tutorial Part VI (FVM and DG)
+Tutorial Part E (FVM and DG)
 =============================
 
 Coming soon.
