@@ -23,12 +23,12 @@ CustomWeakFormPicard::CustomWeakFormPicard(Solution<double>* prev_iter_sln,
 {
   // Jacobian.
   CustomJacobian* matrix_form = new CustomJacobian(0, 0, lambda);
-  matrix_form->ext.push_back(prev_iter_sln);
+  matrix_form->setExt(prev_iter_sln);
   add_matrix_form(matrix_form);
 
   // Residual.
   CustomResidual* vector_form = new CustomResidual(0, lambda, f);
-  vector_form->ext.push_back(prev_iter_sln);
+  vector_form->setExt(prev_iter_sln);
   add_vector_form(vector_form);
 }
 

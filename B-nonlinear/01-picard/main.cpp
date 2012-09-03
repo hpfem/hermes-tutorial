@@ -81,7 +81,8 @@ int main(int argc, char* argv[])
   DiscreteProblemLinear<double> dp(&wf, &space);
 
   // Initialize the Picard solver.
-  PicardSolver<double> picard(&dp, &sln_prev_iter);
+  PicardSolver<double> picard(&dp);
+  picard.setPreviousSolution(&sln_prev_iter);
 
   // Perform the Picard's iteration (Anderson acceleration on by default).
   picard.set_picard_tol(PICARD_TOL);
