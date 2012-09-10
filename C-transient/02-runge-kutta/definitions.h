@@ -22,9 +22,12 @@ private:
   public:
     CustomFormResidualSurf(int i, std::string area, double alpha, double rho,
                            double heatcap, double* current_time_ptr, double temp_init, double t_final)
-          : VectorFormSurf<double>(i, area), alpha(alpha), rho(rho),
+          : VectorFormSurf<double>(i), alpha(alpha), rho(rho),
                                      heatcap(heatcap), current_time_ptr(current_time_ptr),
-                                     temp_init(temp_init), t_final(t_final) {};
+                                     temp_init(temp_init), t_final(t_final) 
+    {
+      this->setArea(area);
+    };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e,
                          ExtData<double> *ext) const;

@@ -257,7 +257,7 @@ int main(int argc, char* argv[])
         time_error_view.set_title(title);
         time_error_view.show_mesh(false);
         AbsFilter abs_tef(time_error_fn);
-        time_error_view.show(&abs_tef);
+        time_error_view.show(&abs_tef, HERMES_EPS_HIGH);
 
         rel_err_time = Global<double>::calc_norm(time_error_fn, HERMES_H1_NORM) / 
                        Global<double>::calc_norm(&ref_sln, HERMES_H1_NORM) * 100;
@@ -307,7 +307,7 @@ int main(int argc, char* argv[])
       space_error_view.set_title(title);
       space_error_view.show_mesh(false);
       AbsFilter abs_sef(space_error_fn);
-      space_error_view.show(&abs_sef);
+      space_error_view.show(&abs_sef, HERMES_EPS_HIGH);
 
       // Calculate element errors and spatial error estimate.
       Hermes::Mixins::Loggable::Static::info("Calculating spatial error estimate.");

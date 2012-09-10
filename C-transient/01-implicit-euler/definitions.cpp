@@ -18,7 +18,7 @@ CustomWeakFormHeatRK1::CustomWeakFormHeatRK1(std::string bdy_air, double alpha, 
   // Contribution of the diffusion term.
   add_vector_form(new DefaultResidualDiffusion<double>(0, HERMES_ANY, new Hermes1DFunction<double>(lambda / (rho * heatcap))));
   CustomVectorFormVol* vec_form_vol = new CustomVectorFormVol(0, time_step);
-  vec_form_vol->ext.push_back(prev_time_sln);
+  vec_form_vol->setExt(prev_time_sln);
   add_vector_form(vec_form_vol);
   // Contribution of the Newton boundary condition.
   add_vector_form_surf(new DefaultResidualSurf<double>(0, bdy_air, new Hermes2DFunction<double>(alpha / (rho * heatcap))));

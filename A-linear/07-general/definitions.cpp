@@ -63,8 +63,9 @@ CustomWeakFormGeneral::CustomWeakFormGeneral(std::string bdy_vertical) : WeakFor
 }
 
 CustomWeakFormGeneral::MatrixFormVolGeneral::MatrixFormVolGeneral(int i, int j) 
-  : MatrixFormVol<double>(i, j, HERMES_ANY, HERMES_SYM) 
+  : MatrixFormVol<double>(i, j) 
 { 
+  this->setSymFlag(HERMES_SYM);
 }
 
 double CustomWeakFormGeneral::MatrixFormVolGeneral::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
@@ -138,8 +139,9 @@ double CustomWeakFormGeneral::VectorFormVolGeneral::rhs(double x, double y) cons
 }
 
 CustomWeakFormGeneral::VectorFormSurfGeneral::VectorFormSurfGeneral(int i, std::string area) 
-  : VectorFormSurf<double>(i, area) 
+  : VectorFormSurf<double>(i) 
 { 
+  this->setArea(area);
 }
 
 double CustomWeakFormGeneral::VectorFormSurfGeneral::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 

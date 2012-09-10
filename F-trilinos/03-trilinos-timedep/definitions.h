@@ -18,7 +18,7 @@ private:
   {
   public:
     JacobianFormVol(int i, int j, double heatcap, double rho, double lambda, double tau) 
-            : MatrixFormVol<double>(i, j, HERMES_ANY, HERMES_SYM), heatcap(heatcap), rho(rho), lambda(lambda), tau(tau) {};
+      : MatrixFormVol<double>(i, j), heatcap(heatcap), rho(rho), lambda(lambda), tau(tau) { this->setSymFlag(HERMES_SYM); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
                          Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
@@ -35,7 +35,7 @@ private:
   {
   public:
     JacobianFormSurf(int i, int j, Hermes::vector<std::string> newton_boundaries, double alpha, double lambda) 
-            : MatrixFormSurf<double>(i, j, newton_boundaries), alpha(alpha), lambda(lambda) {};
+      : MatrixFormSurf<double>(i, j), alpha(alpha), lambda(lambda) { this->setAreas(newton_boundaries); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
                          Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
@@ -70,7 +70,7 @@ private:
   {
   public:
     ResidualFormSurf(int i, Hermes::vector<std::string> newton_boundaries, double alpha, double lambda, double temp_ext) 
-            : VectorFormSurf<double>(i, newton_boundaries), alpha(alpha), lambda(lambda), temp_ext(temp_ext)  {};
+      : VectorFormSurf<double>(i), alpha(alpha), lambda(lambda), temp_ext(temp_ext)  { this->setAreas(newton_boundaries); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
                          Geom<double> *e, ExtData<double> *ext) const;

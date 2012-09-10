@@ -5,7 +5,7 @@ CustomWeakForm::CustomWeakForm(std::string left_bottom_bnd_part, bool DG) : Weak
   add_vector_form(new VectorFormVol(0));
   add_matrix_form_surf(new MatrixFormSurface(0, 0));
   if(DG)
-    add_matrix_form_surf(new MatrixFormInterface(0, 0));
+    add_matrix_form_DG(new MatrixFormInterface(0, 0));
   add_vector_form_surf(new VectorFormSurface(0, left_bottom_bnd_part));
 };
 
@@ -61,7 +61,7 @@ Real CustomWeakForm::VectorFormVol::F(Real x, Real y) const {
 }
 
 
-CustomWeakForm::MatrixFormSurface::MatrixFormSurface(int i, int j) : Hermes::Hermes2D::MatrixFormSurf<double>(i, j, HERMES_ANY) { }
+CustomWeakForm::MatrixFormSurface::MatrixFormSurface(int i, int j) : Hermes::Hermes2D::MatrixFormSurf<double>(i, j) { }
 
 template<typename Real, typename Scalar>
 Scalar CustomWeakForm::MatrixFormSurface::matrix_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
@@ -89,7 +89,7 @@ Hermes::Hermes2D::MatrixFormSurf<double>* CustomWeakForm::MatrixFormSurface::clo
   return new CustomWeakForm::MatrixFormSurface(*this);
 }
 
-CustomWeakForm::MatrixFormInterface::MatrixFormInterface(int i, int j) : Hermes::Hermes2D::MatrixFormSurf<double>(i, j, H2D_DG_INNER_EDGE) { }
+CustomWeakForm::MatrixFormInterface::MatrixFormInterface(int i, int j) : Hermes::Hermes2D::MatrixFormDG<double>(i, j) { }
 
 template<typename Real, typename Scalar>
 Scalar CustomWeakForm::MatrixFormInterface::matrix_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext) const {
@@ -112,12 +112,12 @@ Ord CustomWeakForm::MatrixFormInterface::ord(int n, double *wt, Func<Ord> *u_ext
   return matrix_form<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
 }
 
-Hermes::Hermes2D::MatrixFormSurf<double>* CustomWeakForm::MatrixFormInterface::clone()
+Hermes::Hermes2D::MatrixFormDG<double>* CustomWeakForm::MatrixFormInterface::clone()
 {
   return new CustomWeakForm::MatrixFormInterface(*this);
 }
 
-CustomWeakForm::VectorFormSurface::VectorFormSurface(int i, std::string left_bottom_bnd_part) : Hermes::Hermes2D::VectorFormSurf<double>(i, left_bottom_bnd_part) { }
+CustomWeakForm::VectorFormSurface::VectorFormSurface(int i, std::string left_bottom_bnd_part) : Hermes::Hermes2D::VectorFormSurf<double>(i) { this->setArea(left_bottom_bnd_part); }
 
 double CustomWeakForm::VectorFormSurface::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<double> *ext) const {
   double result = 0;

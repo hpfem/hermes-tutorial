@@ -57,7 +57,7 @@ private:
     Hermes::Hermes2D::MatrixFormSurf<double>* clone();
   };
 
-  class MatrixFormInterface : public Hermes::Hermes2D::MatrixFormSurf<double>
+  class MatrixFormInterface : public Hermes::Hermes2D::MatrixFormDG<double>
   {
   public:
     MatrixFormInterface(int i, int j);
@@ -68,7 +68,7 @@ private:
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const;
-    Hermes::Hermes2D::MatrixFormSurf<double>* clone();
+    Hermes::Hermes2D::MatrixFormDG<double>* clone();
   };
 
   class VectorFormSurface : public Hermes::Hermes2D::VectorFormSurf<double>

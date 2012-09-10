@@ -16,7 +16,7 @@ private:
   {
   public:
     PreconditionerForm_0(double tau, double Le) 
-            : MatrixFormVol<double>(0, 0, HERMES_ANY, HERMES_SYM), tau(tau), Le(Le) {};
+            : MatrixFormVol<double>(0, 0), tau(tau), Le(Le) {this->setSymFlag(HERMES_SYM);};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
                          Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
@@ -32,7 +32,7 @@ private:
   {
   public:
     PreconditionerForm_1(double tau, double Le) 
-            : MatrixFormVol<double>(1, 1, HERMES_ANY, HERMES_SYM), tau(tau), Le(Le) {};
+            : MatrixFormVol<double>(1, 1), tau(tau), Le(Le) {this->setSymFlag(HERMES_SYM);};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
                          Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
@@ -48,7 +48,7 @@ private:
   {
   public:
     JacobianFormVol_0_0(double tau) 
-            : MatrixFormVol<double>(0, 0, HERMES_ANY, HERMES_SYM), tau(tau) {};
+            : MatrixFormVol<double>(0, 0), tau(tau) {this->setSymFlag(HERMES_SYM);};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
                          Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
@@ -64,7 +64,7 @@ private:
   {
   public:
     JacobianFormVol_0_1(double tau) 
-            : MatrixFormVol<double>(0, 1, HERMES_ANY, HERMES_SYM), tau(tau) {};
+            : MatrixFormVol<double>(0, 1), tau(tau) {this->setSymFlag(HERMES_SYM);};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
                          Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
@@ -80,7 +80,7 @@ private:
   {
   public:
     JacobianFormVol_1_0(double tau) 
-            : MatrixFormVol<double>(1, 0, HERMES_ANY, HERMES_SYM), tau(tau) {};
+            : MatrixFormVol<double>(1, 0), tau(tau) {this->setSymFlag(HERMES_SYM);};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
                          Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
@@ -96,7 +96,7 @@ private:
   {
   public:
     JacobianFormVol_1_1(double tau, double Le) 
-            : MatrixFormVol<double>(1, 1, HERMES_ANY, HERMES_SYM), tau(tau), Le(Le) {};
+            : MatrixFormVol<double>(1, 1), tau(tau), Le(Le) { this->setSymFlag(HERMES_SYM);};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
                          Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
@@ -112,7 +112,7 @@ private:
   {
   public:
     JacobianFormSurf_0_0(std::string bnd_marker, double kappa) 
-            : MatrixFormSurf<double>(0, 0, bnd_marker), kappa(kappa) {};
+      : MatrixFormSurf<double>(0, 0), kappa(kappa) { this->setArea(bnd_marker); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
                          Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
@@ -162,7 +162,7 @@ private:
   {
   public:
     ResidualFormSurf_0(std::string bnd_marker, double kappa) 
-            : VectorFormSurf<double>(0, bnd_marker), kappa(kappa)  {};
+            : VectorFormSurf<double>(0), kappa(kappa)  { this->setArea(bnd_marker); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
                          Geom<double> *e, ExtData<double> *ext) const;

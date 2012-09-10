@@ -11,7 +11,7 @@ CustomWeakForm::CustomWeakForm(Hermes::vector<std::string> newton_boundaries, do
 
   // Residual forms - volumetric.
   ResidualFormVol* res_form = new ResidualFormVol(0, heatcap, rho, lambda, tau);
-  res_form->ext.push_back(sln_prev_time);
+  res_form->setExt(sln_prev_time);
   add_vector_form(res_form);
 
   // Residual forms - surface.
