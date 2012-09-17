@@ -40,7 +40,7 @@ private:
           : VectorFormSurf<double>(i), alpha(alpha), rho(rho), heatcap(heatcap), time_step(time_step), current_time_ptr(current_time_ptr),
                                      temp_init(temp_init), t_final(t_final) 
     {
-      this->setArea(area);
+      this->set_area(area);
     };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;

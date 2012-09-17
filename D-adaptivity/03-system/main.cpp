@@ -172,7 +172,6 @@ int main(int argc, char* argv[])
     Hermes::Mixins::Loggable::Static::info("Solving on reference mesh.");
     
     DiscreteProblem<double> dp(&wf, ref_spaces_const);
-    dp.setDoNotUseCache();
     NewtonSolver<double> newton(&dp);
     newton.set_newton_tol(1e-1);
     //dp.set_spaces(ref_spaces_const);

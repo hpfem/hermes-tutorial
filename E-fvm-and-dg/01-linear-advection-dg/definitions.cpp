@@ -117,7 +117,7 @@ Hermes::Hermes2D::MatrixFormDG<double>* CustomWeakForm::MatrixFormInterface::clo
   return new CustomWeakForm::MatrixFormInterface(*this);
 }
 
-CustomWeakForm::VectorFormSurface::VectorFormSurface(int i, std::string left_bottom_bnd_part) : Hermes::Hermes2D::VectorFormSurf<double>(i) { this->setArea(left_bottom_bnd_part); }
+CustomWeakForm::VectorFormSurface::VectorFormSurface(int i, std::string left_bottom_bnd_part) : Hermes::Hermes2D::VectorFormSurf<double>(i) { this->set_area(left_bottom_bnd_part); }
 
 double CustomWeakForm::VectorFormSurface::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<double> *ext) const {
   double result = 0;

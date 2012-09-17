@@ -141,7 +141,7 @@ double CustomWeakFormGeneral::VectorFormVolGeneral::rhs(double x, double y) cons
 CustomWeakFormGeneral::VectorFormSurfGeneral::VectorFormSurfGeneral(int i, std::string area) 
   : VectorFormSurf<double>(i) 
 { 
-  this->setArea(area);
+  this->set_area(area);
 }
 
 double CustomWeakFormGeneral::VectorFormSurfGeneral::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
