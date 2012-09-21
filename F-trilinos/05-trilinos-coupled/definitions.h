@@ -112,7 +112,7 @@ private:
   {
   public:
     JacobianFormSurf_0_0(std::string bnd_marker, double kappa) 
-      : MatrixFormSurf<double>(0, 0), kappa(kappa) { this->setArea(bnd_marker); };
+      : MatrixFormSurf<double>(0, 0), kappa(kappa) { this->set_area(bnd_marker); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
                          Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
@@ -162,7 +162,7 @@ private:
   {
   public:
     ResidualFormSurf_0(std::string bnd_marker, double kappa) 
-            : VectorFormSurf<double>(0), kappa(kappa)  { this->setArea(bnd_marker); };
+            : VectorFormSurf<double>(0), kappa(kappa)  { this->set_area(bnd_marker); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
                          Geom<double> *e, ExtData<double> *ext) const;

@@ -35,7 +35,7 @@ private:
   {
   public:
     JacobianFormSurf(int i, int j, Hermes::vector<std::string> newton_boundaries, double alpha, double lambda) 
-      : MatrixFormSurf<double>(i, j), alpha(alpha), lambda(lambda) { this->setAreas(newton_boundaries); };
+      : MatrixFormSurf<double>(i, j), alpha(alpha), lambda(lambda) { this->set_areas(newton_boundaries); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
                          Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
@@ -70,7 +70,7 @@ private:
   {
   public:
     ResidualFormSurf(int i, Hermes::vector<std::string> newton_boundaries, double alpha, double lambda, double temp_ext) 
-      : VectorFormSurf<double>(i), alpha(alpha), lambda(lambda), temp_ext(temp_ext)  { this->setAreas(newton_boundaries); };
+      : VectorFormSurf<double>(i), alpha(alpha), lambda(lambda), temp_ext(temp_ext)  { this->set_areas(newton_boundaries); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
                          Geom<double> *e, ExtData<double> *ext) const;

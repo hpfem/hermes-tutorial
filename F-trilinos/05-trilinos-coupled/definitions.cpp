@@ -5,18 +5,18 @@ CustomWeakForm::CustomWeakForm(double Le, double alpha, double beta, double kapp
   if (!JFNK || (JFNK && PRECOND == 1))
   {
     MatrixFormVol<double>* mfv = new JacobianFormVol_0_0(tau);
-    mfv->setExt(omega_dt);
+    mfv->set_ext(omega_dt);
     add_matrix_form(mfv);
     MatrixFormSurf<double>* mfs = new JacobianFormSurf_0_0("Outer", kappa);
     add_matrix_form_surf(mfs);
     mfv = new JacobianFormVol_0_1(tau);
-    mfv->setExt(omega_dc);
+    mfv->set_ext(omega_dc);
     add_matrix_form(mfv);
     mfv = new JacobianFormVol_1_0(tau);
-    mfv->setExt(omega_dt);
+    mfv->set_ext(omega_dt);
     add_matrix_form(mfv);
     mfv = new JacobianFormVol_1_1(tau, Le);
-    mfv->setExt(omega_dc);
+    mfv->set_ext(omega_dc);
     add_matrix_form(mfv);
   }
   else if (PRECOND == 2)
@@ -28,12 +28,12 @@ CustomWeakForm::CustomWeakForm(double Le, double alpha, double beta, double kapp
   }
 
   VectorFormVol<double>* vfv = new ResidualFormVol_0(tau);
-  vfv->setExt(Hermes::vector<MeshFunction<double>*>(t_prev_time_1, t_prev_time_2, omega));
+  vfv->set_ext(Hermes::vector<MeshFunction<double>*>(t_prev_time_1, t_prev_time_2, omega));
   add_vector_form(vfv);
   VectorFormSurf<double>* vfs = new ResidualFormSurf_0("Outer", kappa);
   add_vector_form_surf(vfs);
   vfv = new ResidualFormVol_1(tau, Le);
-  vfv->setExt(Hermes::vector<MeshFunction<double>*>(c_prev_time_1, c_prev_time_2, omega));
+  vfv->set_ext(Hermes::vector<MeshFunction<double>*>(c_prev_time_1, c_prev_time_2, omega));
   add_vector_form(vfv);
 }
 
