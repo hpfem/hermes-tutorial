@@ -49,7 +49,7 @@ public:
 
   virtual Ord ord(Ord x, Ord y) const;
   
-  MeshFunction<double>* clone();
+  MeshFunction<double>* clone() const;
 };
 
 /* Weak form */
@@ -67,12 +67,12 @@ private:
     JacobianFormVol(int i, int j) : MatrixFormVol<double>(i, j) { this->setSymFlag(HERMES_SYM); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                 Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+                 Func<double> *v, Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-            Geom<Ord> *e, ExtData<Ord> *ext) const;
+            Geom<Ord> *e, Func<Ord> **ext) const;
     
-    MatrixFormVol<double>* clone();
+    MatrixFormVol<double>* clone() const;
   };
 
   class ResidualFormVol : public VectorFormVol<double>
@@ -81,12 +81,12 @@ private:
     ResidualFormVol(int i, CustomRightHandSide* rhs) : VectorFormVol<double>(i), rhs(rhs) {};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
-                         Geom<double> *e, ExtData<double> *ext) const;
+                         Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
+                    Geom<Ord> *e, Func<Ord> **ext) const;
 
-    VectorFormVol<double>* clone();
+    VectorFormVol<double>* clone() const;
 
   private:
     // Problem parameters.
@@ -99,12 +99,12 @@ private:
     PrecondFormVol(int i, int j) : MatrixFormVol<double>(i, j) { this->setSymFlag(HERMES_SYM); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                 Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+                 Func<double> *v, Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-            Geom<Ord> *e, ExtData<Ord> *ext) const;
+            Geom<Ord> *e, Func<Ord> **ext) const;
     
-    MatrixFormVol<double>* clone();
+    MatrixFormVol<double>* clone() const;
   };
 };
 

@@ -21,12 +21,12 @@ private:
       : MatrixFormVol<double>(i, j), heatcap(heatcap), rho(rho), lambda(lambda), tau(tau) { this->setSymFlag(HERMES_SYM); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                         Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+                         Func<double> *v, Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
+                    Geom<Ord> *e, Func<Ord> **ext) const;
     
-    MatrixFormVol<double>* clone();
+    MatrixFormVol<double>* clone() const;
 
     double heatcap, rho, lambda, tau;
   };
@@ -38,12 +38,12 @@ private:
       : MatrixFormSurf<double>(i, j), alpha(alpha), lambda(lambda) { this->set_areas(newton_boundaries); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                         Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+                         Func<double> *v, Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
+                    Geom<Ord> *e, Func<Ord> **ext) const;
     
-    MatrixFormSurf<double>* clone();
+    MatrixFormSurf<double>* clone() const;
 
     double alpha, lambda;
   };
@@ -55,12 +55,12 @@ private:
             : VectorFormVol<double>(i), heatcap(heatcap), rho(rho), lambda(lambda), tau(tau)  {};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
-                         Geom<double> *e, ExtData<double> *ext) const;
+                         Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
+                    Geom<Ord> *e, Func<Ord> **ext) const;
     
-    VectorFormVol<double>* clone();
+    VectorFormVol<double>* clone() const;
 
   private:
     double heatcap, rho, lambda, tau;
@@ -73,12 +73,12 @@ private:
       : VectorFormSurf<double>(i), alpha(alpha), lambda(lambda), temp_ext(temp_ext)  { this->set_areas(newton_boundaries); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
-                         Geom<double> *e, ExtData<double> *ext) const;
+                         Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
+                    Geom<Ord> *e, Func<Ord> **ext) const;
     
-    VectorFormSurf<double>* clone();
+    VectorFormSurf<double>* clone() const;
 
   private:
     double alpha, lambda, temp_ext;

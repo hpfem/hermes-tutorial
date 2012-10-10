@@ -18,7 +18,7 @@ Ord InitialSolutionHeatTransfer::ord(Ord x, Ord y) const
   return (x + 10) * (y + 10) / 100. + 2.;
 }
 
-MeshFunction<double>* InitialSolutionHeatTransfer::clone()
+MeshFunction<double>* InitialSolutionHeatTransfer::clone() const
 {
   Mesh* new_mesh = new Mesh();
   new_mesh->copy(this->mesh);

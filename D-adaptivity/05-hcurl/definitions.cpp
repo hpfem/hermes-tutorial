@@ -116,7 +116,7 @@ CustomWeakForm::CustomVectorFormSurf::CustomVectorFormSurf()
 }
 
 std::complex<double> CustomWeakForm::CustomVectorFormSurf::value(int n, double *wt, Func<std::complex<double> > *u_ext[], 
-  Func<double> *v, Geom<double> *e, ExtData<std::complex<double> > *ext) const 
+  Func<double> *v, Geom<double> *e, Func<std::complex<double> > **ext) const 
 {
   std::complex<double> result = 0;
   #pragma omp critical (jv)
@@ -139,12 +139,12 @@ std::complex<double> CustomWeakForm::CustomVectorFormSurf::value(int n, double *
 }
 
 Hermes::Ord CustomWeakForm::CustomVectorFormSurf::ord(int n, double *wt, Func<Hermes::Ord> *u_ext[], Func<Hermes::Ord> *v,
-  Geom<Hermes::Ord> *e, ExtData<Hermes::Ord> *ext) const 
+  Geom<Hermes::Ord> *e, Func<Hermes::Ord> **ext) const 
 {
   return Hermes::Ord(10);
 }
 
-VectorFormSurf<std::complex<double> >* CustomWeakForm::CustomVectorFormSurf::clone()
+VectorFormSurf<std::complex<double> >* CustomWeakForm::CustomVectorFormSurf::clone() const
 {
   return new CustomVectorFormSurf();
 }

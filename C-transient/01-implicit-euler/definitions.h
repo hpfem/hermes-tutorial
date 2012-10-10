@@ -22,13 +22,13 @@ private:
     CustomVectorFormVol(int i, double time_step)
           : VectorFormVol<double>(i), time_step(time_step) {};
 
-    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, Func<double> **ext) const;
 
-    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const;
+    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const;
 
     double time_step;
 
-    VectorFormVol<double>* clone();
+    VectorFormVol<double>* clone() const;
   };
 
   // This form is custom since it contains time-dependent exterior temperature.
@@ -43,9 +43,9 @@ private:
       this->set_area(area);
     };
 
-    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, Func<double> **ext) const;
 
-    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const;
+    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const;
 
     // Time-dependent exterior temperature.
     template<typename Real>
@@ -53,6 +53,6 @@ private:
 
     double alpha, rho, heatcap, time_step, *current_time_ptr, temp_init, t_final;
     
-    VectorFormSurf<double>* clone();
+    VectorFormSurf<double>* clone() const;
   };
 };

@@ -2,21 +2,19 @@
 
 CustomWeakForm::CustomWeakForm(double Le, double alpha, double beta, double kappa, double x1, double tau, bool JFNK, int PRECOND, Hermes::Hermes2D::Filter<double>* omega, Hermes::Hermes2D::Filter<double>* omega_dt, Hermes::Hermes2D::Filter<double>* omega_dc, Solution<double>* t_prev_time_1, Solution<double>* c_prev_time_1, Solution<double>* t_prev_time_2, Solution<double>* c_prev_time_2) : WeakForm<double>(2, JFNK ? true : false), Le(Le), alpha(alpha), beta(beta), kappa(kappa), x1(x1)
 {
+  this->set_ext(Hermes::vector<MeshFunction<double>*>(omega_dt, omega_dc, t_prev_time_1, t_prev_time_2, c_prev_time_1, c_prev_time_2, omega));
+
   if (!JFNK || (JFNK && PRECOND == 1))
   {
     MatrixFormVol<double>* mfv = new JacobianFormVol_0_0(tau);
-    mfv->set_ext(omega_dt);
     add_matrix_form(mfv);
     MatrixFormSurf<double>* mfs = new JacobianFormSurf_0_0("Outer", kappa);
     add_matrix_form_surf(mfs);
     mfv = new JacobianFormVol_0_1(tau);
-    mfv->set_ext(omega_dc);
     add_matrix_form(mfv);
     mfv = new JacobianFormVol_1_0(tau);
-    mfv->set_ext(omega_dt);
     add_matrix_form(mfv);
     mfv = new JacobianFormVol_1_1(tau, Le);
-    mfv->set_ext(omega_dc);
     add_matrix_form(mfv);
   }
   else if (PRECOND == 2)
@@ -28,20 +26,18 @@ CustomWeakForm::CustomWeakForm(double Le, double alpha, double beta, double kapp
   }
 
   VectorFormVol<double>* vfv = new ResidualFormVol_0(tau);
-  vfv->set_ext(Hermes::vector<MeshFunction<double>*>(t_prev_time_1, t_prev_time_2, omega));
   add_vector_form(vfv);
   VectorFormSurf<double>* vfs = new ResidualFormSurf_0("Outer", kappa);
   add_vector_form_surf(vfs);
   vfv = new ResidualFormVol_1(tau, Le);
-  vfv->set_ext(Hermes::vector<MeshFunction<double>*>(c_prev_time_1, c_prev_time_2, omega));
   add_vector_form(vfv);
 }
 
 double CustomWeakForm::JacobianFormVol_0_0::value(int n, double *wt, Func<double> *u_ext[], 
-                                Func<double> *vj, Func<double> *vi, Geom<double> *e, ExtData<double> *ext) const
+                                Func<double> *vj, Func<double> *vi, Geom<double> *e, Func<double> **ext) const
 {
   double result = 0;
-  Func<double>* domegadt = ext->fn[0];
+  Func<double>* domegadt = ext[0];
   for (int i = 0; i < n; i++)
     result += wt[i] * (  1.5 * vj->val[i] * vi->val[i] / tau
                       +  vj->dx[i] * vi->dx[i] + vj->dy[i] * vi->dy[i]
@@ -50,10 +46,10 @@ double CustomWeakForm::JacobianFormVol_0_0::value(int n, double *wt, Func<double
 }
 
 Ord CustomWeakForm::JacobianFormVol_0_0::ord(int n, double *wt, Func<Ord> *u_ext[], 
-                                Func<Ord> *vj, Func<Ord> *vi, Geom<Ord> *e, ExtData<Ord> *ext) const
+                                Func<Ord> *vj, Func<Ord> *vi, Geom<Ord> *e, Func<Ord> **ext) const
 {
   Ord result = Ord(0);
-  Func<Ord>* domegadt = ext->fn[0];
+  Func<Ord>* domegadt = ext[0];
   for (int i = 0; i < n; i++)
     result += wt[i] * (  1.5 * vj->val[i] * vi->val[i] / tau
                       +  vj->dx[i] * vi->dx[i] + vj->dy[i] * vi->dy[i]
@@ -62,7 +58,7 @@ Ord CustomWeakForm::JacobianFormVol_0_0::ord(int n, double *wt, Func<Ord> *u_ext
 }
 
 double CustomWeakForm::JacobianFormSurf_0_0::value(int n, double *wt, Func<double> *u_ext[], 
-                                     Func<double> *vj, Func<double> *vi, Geom<double> *e, ExtData<double> *ext) const
+                                     Func<double> *vj, Func<double> *vi, Geom<double> *e, Func<double> **ext) const
 {
   double result = 0;
   for (int i = 0; i < n; i++)
@@ -71,7 +67,7 @@ double CustomWeakForm::JacobianFormSurf_0_0::value(int n, double *wt, Func<doubl
 }
 
 Ord CustomWeakForm::JacobianFormSurf_0_0::ord(int n, double *wt, Func<Ord> *u_ext[], 
-                                     Func<Ord> *vj, Func<Ord> *vi, Geom<Ord> *e, ExtData<Ord> *ext) const
+                                     Func<Ord> *vj, Func<Ord> *vi, Geom<Ord> *e, Func<Ord> **ext) const
 {
   Ord result = Ord(0);
   for (int i = 0; i < n; i++)
@@ -80,50 +76,50 @@ Ord CustomWeakForm::JacobianFormSurf_0_0::ord(int n, double *wt, Func<Ord> *u_ex
 }
 
 double CustomWeakForm::JacobianFormVol_0_1::value(int n, double *wt, Func<double> *u_ext[], 
-                                Func<double> *vj, Func<double> *vi, Geom<double> *e, ExtData<double> *ext) const
+                                Func<double> *vj, Func<double> *vi, Geom<double> *e, Func<double> **ext) const
 {
   double result = 0;
-  Func<double>* domegady = ext->fn[0];
+  Func<double>* domegady = ext[1];
   for (int i = 0; i < n; i++)
     result += wt[i] * (- domegady->val[i] * vj->val[i] * vi->val[i] );
   return result;
 }
 
 Ord CustomWeakForm::JacobianFormVol_0_1::ord(int n, double *wt, Func<Ord> *u_ext[], 
-                                Func<Ord> *vj, Func<Ord> *vi, Geom<Ord> *e, ExtData<Ord> *ext) const
+                                Func<Ord> *vj, Func<Ord> *vi, Geom<Ord> *e, Func<Ord> **ext) const
 {
   Ord result = Ord(0);
-  Func<Ord>* domegady = ext->fn[0];
+  Func<Ord>* domegady = ext[1];
   for (int i = 0; i < n; i++)
     result += wt[i] * (- domegady->val[i] * vj->val[i] * vi->val[i] );
   return result;
 }
 
 double CustomWeakForm::JacobianFormVol_1_0::value(int n, double *wt, Func<double> *u_ext[], 
-                                Func<double> *vj, Func<double> *vi, Geom<double> *e, ExtData<double> *ext) const
+                                Func<double> *vj, Func<double> *vi, Geom<double> *e, Func<double> **ext) const
 {
   double result = 0;
-  Func<double>* domegadt = ext->fn[0];
+  Func<double>* domegadt = ext[0];
   for (int i = 0; i < n; i++)
     result += wt[i] * ( domegadt->val[i] * vj->val[i] * vi->val[i] );
   return result;
 }
 
 Ord CustomWeakForm::JacobianFormVol_1_0::ord(int n, double *wt, Func<Ord> *u_ext[], 
-                                Func<Ord> *vj, Func<Ord> *vi, Geom<Ord> *e, ExtData<Ord> *ext) const
+                                Func<Ord> *vj, Func<Ord> *vi, Geom<Ord> *e, Func<Ord> **ext) const
 {
   Ord result = Ord(0);
-  Func<Ord>* domegadt = ext->fn[0];
+  Func<Ord>* domegadt = ext[0];
   for (int i = 0; i < n; i++)
     result += wt[i] * ( domegadt->val[i] * vj->val[i] * vi->val[i] );
   return result;
 }
 
 double CustomWeakForm::JacobianFormVol_1_1::value(int n, double *wt, Func<double> *u_ext[], 
-                                Func<double> *vj, Func<double> *vi, Geom<double> *e, ExtData<double> *ext) const
+                                Func<double> *vj, Func<double> *vi, Geom<double> *e, Func<double> **ext) const
 {
   double result = 0;
-  Func<double>* domegady = ext->fn[0];
+  Func<double>* domegady = ext[1];
   for (int i = 0; i < n; i++)
     result += wt[i] * (  1.5 * vj->val[i] * vi->val[i] / tau
                       +  (vj->dx[i] * vi->dx[i] + vj->dy[i] * vi->dy[i]) / Le
@@ -132,10 +128,10 @@ double CustomWeakForm::JacobianFormVol_1_1::value(int n, double *wt, Func<double
 }
 
 Ord CustomWeakForm::JacobianFormVol_1_1::ord(int n, double *wt, Func<Ord> *u_ext[], 
-                                Func<Ord> *vj, Func<Ord> *vi, Geom<Ord> *e, ExtData<Ord> *ext) const
+                                Func<Ord> *vj, Func<Ord> *vi, Geom<Ord> *e, Func<Ord> **ext) const
 {
   Ord result = Ord(0);
-  Func<Ord>* domegady = ext->fn[0];
+  Func<Ord>* domegady = ext[1];
   for (int i = 0; i < n; i++)
     result += wt[i] * (  1.5 * vj->val[i] * vi->val[i] / tau
                       +  (vj->dx[i] * vi->dx[i] + vj->dy[i] * vi->dy[i]) / Le
@@ -144,13 +140,13 @@ Ord CustomWeakForm::JacobianFormVol_1_1::ord(int n, double *wt, Func<Ord> *u_ext
 }
 
 double CustomWeakForm::ResidualFormVol_0::value(int n, double *wt, Func<double> *u_ext[], 
-                            Func<double> *vi, Geom<double> *e, ExtData<double> *ext) const
+                            Func<double> *vi, Geom<double> *e, Func<double> **ext) const
 {
   double result = 0;
   Func<double>* titer = u_ext[0];
-  Func<double>* t_prev_time_1 = ext->fn[0];
-  Func<double>* t_prev_time_2 = ext->fn[1];
-  Func<double>* omega = ext->fn[2];
+  Func<double>* t_prev_time_1 = ext[2];
+  Func<double>* t_prev_time_2 = ext[3];
+  Func<double>* omega = ext[6];
   for (int i = 0; i < n; i++)
     result += wt[i] * ( (3.0 * titer->val[i] - 4.0 * t_prev_time_1->val[i] 
                          + t_prev_time_2->val[i]) * vi->val[i] / (2.0 * tau) +
@@ -160,13 +156,13 @@ double CustomWeakForm::ResidualFormVol_0::value(int n, double *wt, Func<double> 
 }
 
 Ord CustomWeakForm::ResidualFormVol_0::ord(int n, double *wt, Func<Ord> *u_ext[], 
-                            Func<Ord> *vi, Geom<Ord> *e, ExtData<Ord> *ext) const
+                            Func<Ord> *vi, Geom<Ord> *e, Func<Ord> **ext) const
 {
   Ord result = Ord(0);
   Func<Ord>* titer = u_ext[0];
-  Func<Ord>* t_prev_time_1 = ext->fn[0];
-  Func<Ord>* t_prev_time_2 = ext->fn[1];
-  Func<Ord>* omega = ext->fn[2];
+  Func<Ord>* t_prev_time_1 = ext[2];
+  Func<Ord>* t_prev_time_2 = ext[3];
+  Func<Ord>* omega = ext[6];
   for (int i = 0; i < n; i++)
     result += wt[i] * ( (3.0 * titer->val[i] - 4.0 * t_prev_time_1->val[i] 
                          + t_prev_time_2->val[i]) * vi->val[i] / (2.0 * tau) +
@@ -176,7 +172,7 @@ Ord CustomWeakForm::ResidualFormVol_0::ord(int n, double *wt, Func<Ord> *u_ext[]
 }
 
 double CustomWeakForm::ResidualFormSurf_0::value(int n, double *wt, Func<double> *u_ext[], 
-                                 Func<double> *vi, Geom<double> *e, ExtData<double> *ext) const
+                                 Func<double> *vi, Geom<double> *e, Func<double> **ext) const
 {
   double result = 0;
   Func<double>* t_prev_newton = u_ext[0];
@@ -186,7 +182,7 @@ double CustomWeakForm::ResidualFormSurf_0::value(int n, double *wt, Func<double>
 }
 
 Ord CustomWeakForm::ResidualFormSurf_0::ord(int n, double *wt, Func<Ord> *u_ext[], 
-                                 Func<Ord> *vi, Geom<Ord> *e, ExtData<Ord> *ext) const
+                                 Func<Ord> *vi, Geom<Ord> *e, Func<Ord> **ext) const
 {
   Ord result = Ord(0);
   Func<Ord>* t_prev_newton = u_ext[0];
@@ -196,13 +192,13 @@ Ord CustomWeakForm::ResidualFormSurf_0::ord(int n, double *wt, Func<Ord> *u_ext[
 }
 
 double CustomWeakForm::ResidualFormVol_1::value(int n, double *wt, Func<double> *u_ext[], 
-                            Func<double> *vi, Geom<double> *e, ExtData<double> *ext) const
+                            Func<double> *vi, Geom<double> *e, Func<double> **ext) const
 {
   double result = 0;
   Func<double>* c_prev_newton = u_ext[1];
-  Func<double>* c_prev_time_1 = ext->fn[0];
-  Func<double>* c_prev_time_2 = ext->fn[1];
-  Func<double>* omega = ext->fn[2];
+  Func<double>* c_prev_time_1 = ext[4];
+  Func<double>* c_prev_time_2 = ext[5];
+  Func<double>* omega = ext[6];
   for (int i = 0; i < n; i++)
 		result += wt[i] * ( (3.0 * c_prev_newton->val[i] - 4.0 * c_prev_time_1->val[i] + c_prev_time_2->val[i])
                          * vi->val[i] / (2.0 * tau) +
@@ -212,13 +208,13 @@ double CustomWeakForm::ResidualFormVol_1::value(int n, double *wt, Func<double> 
 }
 
 Ord CustomWeakForm::ResidualFormVol_1::ord(int n, double *wt, Func<Ord> *u_ext[], 
-                            Func<Ord> *vi, Geom<Ord> *e, ExtData<Ord> *ext) const
+                            Func<Ord> *vi, Geom<Ord> *e, Func<Ord> **ext) const
 {
   Ord result = Ord(0);
   Func<Ord>* c_prev_newton = u_ext[1];
-  Func<Ord>* c_prev_time_1 = ext->fn[0];
-  Func<Ord>* c_prev_time_2 = ext->fn[1];
-  Func<Ord>* omega = ext->fn[2];
+  Func<Ord>* c_prev_time_1 = ext[4];
+  Func<Ord>* c_prev_time_2 = ext[5];
+  Func<Ord>* omega = ext[6];
   for (int i = 0; i < n; i++)
 		result += wt[i] * ( (3.0 * c_prev_newton->val[i] - 4.0 * c_prev_time_1->val[i] + c_prev_time_2->val[i])
                          * vi->val[i] / (2.0 * tau) +
@@ -229,7 +225,7 @@ Ord CustomWeakForm::ResidualFormVol_1::ord(int n, double *wt, Func<Ord> *u_ext[]
 
 // Preconditioner weak forms.
 double CustomWeakForm::PreconditionerForm_0::value(int n, double *wt, Func<double>* u_ext[], Func<double> *vj, 
-                   Func<double> *vi, Geom<double> *e, ExtData<double> *ext) const
+                   Func<double> *vi, Geom<double> *e, Func<double> **ext) const
 {
   double result = 0;
   for (int i = 0; i < n; i++)
@@ -239,13 +235,13 @@ double CustomWeakForm::PreconditionerForm_0::value(int n, double *wt, Func<doubl
 }
 
 Ord CustomWeakForm::PreconditionerForm_0::ord(int n, double *wt, Func<Ord>* u_ext[], Func<Ord> *vj, 
-                   Func<Ord> *vi, Geom<Ord> *e, ExtData<Ord> *ext) const
+                   Func<Ord> *vi, Geom<Ord> *e, Func<Ord> **ext) const
 {
   return vj->val[0] * vi->val[0] +  vj->dx[0] * vi->dx[0] + vj->dy[0] * vi->dy[0];
 }
 
 double CustomWeakForm::PreconditionerForm_1::value(int n, double *wt, Func<double>* u_ext[], Func<double> *vj, 
-                   Func<double> *vi, Geom<double> *e, ExtData<double> *ext) const
+                   Func<double> *vi, Geom<double> *e, Func<double> **ext) const
 {
   double result = 0;
   for (int i = 0; i < n; i++)
@@ -255,7 +251,7 @@ double CustomWeakForm::PreconditionerForm_1::value(int n, double *wt, Func<doubl
 }
 
 Ord CustomWeakForm::PreconditionerForm_1::ord(int n, double *wt, Func<Ord>* u_ext[], Func<Ord> *vj, 
-                   Func<Ord> *vi, Geom<Ord> *e, ExtData<Ord> *ext) const
+                   Func<Ord> *vi, Geom<Ord> *e, Func<Ord> **ext) const
 {
   return vj->val[0] * vi->val[0] +  vj->dx[0] * vi->dx[0] + vj->dy[0] * vi->dy[0];
 }

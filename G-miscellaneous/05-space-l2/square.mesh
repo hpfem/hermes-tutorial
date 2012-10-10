@@ -6,7 +6,8 @@ vertices = [
 ]
 
 elements = [
-  [ 0, 1, 2, 3, "Mat" ]
+  [ 0, 1, 2, "Mat" ],
+  [ 0, 2, 3, "Mat" ]
 ]
 
 boundaries = [

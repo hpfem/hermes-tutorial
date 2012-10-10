@@ -83,7 +83,7 @@ Ord CustomExactSolution::ord(Ord x, Ord y) const
   return (1- 2*x) * y * (1 - y);
 }
 
-MeshFunction<double>* CustomExactSolution::clone()
+MeshFunction<double>* CustomExactSolution::clone() const
 {
   return new CustomExactSolution(*this);
 }
@@ -103,7 +103,7 @@ CustomWeakForm::CustomWeakForm(bool JFNK, bool precondition_jacobian, bool preco
 }
 
 double CustomWeakForm::JacobianFormVol::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                                              Func<double> *v, Geom<double> *e, ExtData<double> *ext) const 
+                                              Func<double> *v, Geom<double> *e, Func<double> **ext) const 
 {
   double result = 0;
   for (int i = 0; i < n; i++)
@@ -116,19 +116,19 @@ double CustomWeakForm::JacobianFormVol::value(int n, double *wt, Func<double> *u
 }
 
 Ord CustomWeakForm::JacobianFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                                         Geom<Ord> *e, ExtData<Ord> *ext) const 
+                                         Geom<Ord> *e, Func<Ord> **ext) const 
 {
   // Returning the sum of the degrees of the basis and test function plus two.
   return Ord(10);
 }
 
-MatrixFormVol<double>* CustomWeakForm::JacobianFormVol::clone()
+MatrixFormVol<double>* CustomWeakForm::JacobianFormVol::clone() const
 {
   return new CustomWeakForm::JacobianFormVol(*this);
 }
 
 double CustomWeakForm::ResidualFormVol::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
-                                              Geom<double> *e, ExtData<double> *ext) const 
+                                              Geom<double> *e, Func<double> **ext) const 
 {
   Func<double>* u = u_ext[0];
   double result = 0;
@@ -139,19 +139,19 @@ double CustomWeakForm::ResidualFormVol::value(int n, double *wt, Func<double> *u
 }
 
 Ord CustomWeakForm::ResidualFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                                         Geom<Ord> *e, ExtData<Ord> *ext) const 
+                                         Geom<Ord> *e, Func<Ord> **ext) const 
 {
   // Returning the sum of the degrees of the test function and solution plus two.
   return Ord(10);
 }
 
-VectorFormVol<double>* CustomWeakForm::ResidualFormVol::clone()
+VectorFormVol<double>* CustomWeakForm::ResidualFormVol::clone() const
 {
   return new CustomWeakForm::ResidualFormVol(*this);
 }
 
 double CustomWeakForm::PrecondFormVol::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                                             Func<double> *v, Geom<double> *e, ExtData<double> *ext) const 
+                                             Func<double> *v, Geom<double> *e, Func<double> **ext) const 
 {
   double result = 0;
   for (int i = 0; i < n; i++)
@@ -160,13 +160,13 @@ double CustomWeakForm::PrecondFormVol::value(int n, double *wt, Func<double> *u_
 }
 
 Ord CustomWeakForm::PrecondFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                                        Geom<Ord> *e, ExtData<Ord> *ext) const 
+                                        Geom<Ord> *e, Func<Ord> **ext) const 
 {
   // Returning the sum of the degrees of the basis and test function plus two.
   return Ord(10);
 }
 
-MatrixFormVol<double>* CustomWeakForm::PrecondFormVol::clone()
+MatrixFormVol<double>* CustomWeakForm::PrecondFormVol::clone() const
 {
   return new CustomWeakForm::PrecondFormVol(*this);
 }

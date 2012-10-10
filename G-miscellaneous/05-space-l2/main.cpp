@@ -13,9 +13,9 @@ using namespace Hermes::Hermes2D::Views;
 // The following parameters can be changed:
 
 // Number of initial uniform mesh refinements.
-const int INIT_REF_NUM = 1;                       
+const int INIT_REF_NUM = 4;                       
 // Polynomial degree of mesh elements.
-const int P_INIT = 3;                            
+const int P_INIT = 1;                            
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  

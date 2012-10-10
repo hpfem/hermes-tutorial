@@ -33,11 +33,11 @@ public:
     CustomVectorFormSurf();
 
     virtual std::complex<double> value(int n, double *wt, Func<std::complex<double> > *u_ext[], 
-      Func<double> *v, Geom<double> *e, ExtData<std::complex<double> > *ext) const ;
+      Func<double> *v, Geom<double> *e, Func<std::complex<double> > **ext) const ;
 
     virtual Hermes::Ord ord(int n, double *wt, Func<Hermes::Ord> *u_ext[], Func<Hermes::Ord> *v,
-      Geom<Hermes::Ord> *e, ExtData<Hermes::Ord> *ext) const ;
+      Geom<Hermes::Ord> *e, Func<Hermes::Ord> **ext) const ;
 
-    virtual VectorFormSurf<std::complex<double> >* clone();
+    virtual VectorFormSurf<std::complex<double> >* clone() const;
   };
 };

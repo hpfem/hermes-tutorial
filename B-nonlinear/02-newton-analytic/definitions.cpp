@@ -43,7 +43,7 @@ Ord CustomInitialCondition::ord(Ord x, Ord y) const
   return x*y;
 }
   
-MeshFunction<double>* CustomInitialCondition::clone()
+MeshFunction<double>* CustomInitialCondition::clone() const
 {
   return new CustomInitialCondition(this->mesh);
 }

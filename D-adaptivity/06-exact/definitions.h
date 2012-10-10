@@ -14,5 +14,5 @@ public:
 
   virtual Ord ord(Ord x, Ord y) const;
 
-  MeshFunction<double>* clone();
+  MeshFunction<double>* clone() const;
 };

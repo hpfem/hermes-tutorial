@@ -69,7 +69,7 @@ CustomWeakFormGeneral::MatrixFormVolGeneral::MatrixFormVolGeneral(int i, int j)
 }
 
 double CustomWeakFormGeneral::MatrixFormVolGeneral::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                                                          Func<double> *v, Geom<double> *e, ExtData<double> *ext) const 
+                                                          Func<double> *v, Geom<double> *e, Func<double> **ext) const 
 {
   double result = 0;
   for (int i=0; i < n; i++) {
@@ -87,13 +87,13 @@ double CustomWeakFormGeneral::MatrixFormVolGeneral::value(int n, double *wt, Fun
 }
 
 Ord CustomWeakFormGeneral::MatrixFormVolGeneral::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                                                     Geom<Ord> *e, ExtData<Ord> *ext) const 
+                                                     Geom<Ord> *e, Func<Ord> **ext) const 
 {
   // Returning the sum of the degrees of the basis and test function plus two.
   return u->val[0] * v->val[0] * e->x[0] * e->x[0]; 
 }
 
-MatrixFormVol<double>* CustomWeakFormGeneral::MatrixFormVolGeneral::clone()
+MatrixFormVol<double>* CustomWeakFormGeneral::MatrixFormVolGeneral::clone() const
 {
   return new MatrixFormVolGeneral(this->i, this->j);
 }
@@ -103,7 +103,7 @@ CustomWeakFormGeneral::VectorFormVolGeneral::VectorFormVolGeneral(int i) : Vecto
 }
 
 double CustomWeakFormGeneral::VectorFormVolGeneral::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
-                                                          Geom<double> *e, ExtData<double> *ext) const 
+                                                          Geom<double> *e, Func<double> **ext) const 
 {
   double result = 0;
   for (int i = 0; i < n; i++) {
@@ -122,13 +122,13 @@ double CustomWeakFormGeneral::VectorFormVolGeneral::value(int n, double *wt, Fun
 }
 
 Ord CustomWeakFormGeneral::VectorFormVolGeneral::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                                                     Geom<Ord> *e, ExtData<Ord> *ext) const 
+                                                     Geom<Ord> *e, Func<Ord> **ext) const 
 {
   // Returning the sum of the degrees of the test function and solution plus two.
   return u_ext[0]->val[0] * v->val[0] * e->x[0] * e->x[0];  
 }
 
-VectorFormVol<double>* CustomWeakFormGeneral::VectorFormVolGeneral::clone()
+VectorFormVol<double>* CustomWeakFormGeneral::VectorFormVolGeneral::clone() const
 {
   return new VectorFormVolGeneral(this->i);
 }
@@ -145,7 +145,7 @@ CustomWeakFormGeneral::VectorFormSurfGeneral::VectorFormSurfGeneral(int i, std::
 }
 
 double CustomWeakFormGeneral::VectorFormSurfGeneral::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
-                                                           Geom<double> *e, ExtData<double> *ext) const 
+                                                           Geom<double> *e, Func<double> **ext) const 
 {
   double result = 0;
   for (int i = 0; i < n; i++)
@@ -154,7 +154,7 @@ double CustomWeakFormGeneral::VectorFormSurfGeneral::value(int n, double *wt, Fu
 }
 
 Ord CustomWeakFormGeneral::VectorFormSurfGeneral::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                                                      Geom<Ord> *e, ExtData<Ord> *ext) const 
+                                                      Geom<Ord> *e, Func<Ord> **ext) const 
 {
   // Returning the polynomial degree of the test function plus two.
   return v->val[0] * e->x[0] * e->x[0];  
@@ -165,7 +165,7 @@ double CustomWeakFormGeneral::VectorFormSurfGeneral::g_N(double x, double y) con
   return 0;
 }
 
-VectorFormSurf<double>* CustomWeakFormGeneral::VectorFormSurfGeneral::clone()
+VectorFormSurf<double>* CustomWeakFormGeneral::VectorFormSurfGeneral::clone() const
 {
   return new VectorFormSurfGeneral(this->i);
 }

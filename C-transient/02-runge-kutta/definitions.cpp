@@ -18,7 +18,7 @@ CustomWeakFormHeatRK::CustomWeakFormHeatRK(std::string bdy_air, double alpha, do
 }
 
 double CustomWeakFormHeatRK::CustomFormResidualSurf::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e,
-                                                           ExtData<double> *ext) const 
+                                                           Func<double> **ext) const 
 {
   double T_ext = temp_ext(get_current_stage_time());
   double result = 0;
@@ -31,7 +31,7 @@ double CustomWeakFormHeatRK::CustomFormResidualSurf::value(int n, double *wt, Fu
   return alpha / (rho * heatcap) * result;
 }
 
-Ord CustomWeakFormHeatRK::CustomFormResidualSurf::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const 
+Ord CustomWeakFormHeatRK::CustomFormResidualSurf::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const 
 {
   Ord T_ext;
   Ord result;
@@ -44,7 +44,7 @@ Ord CustomWeakFormHeatRK::CustomFormResidualSurf::ord(int n, double *wt, Func<Or
   return alpha / (rho * heatcap) * result;
 }
 
-VectorFormSurf<double>* CustomWeakFormHeatRK::CustomFormResidualSurf::clone() 
+VectorFormSurf<double>* CustomWeakFormHeatRK::CustomFormResidualSurf::clone() const
 {
   return new CustomFormResidualSurf(*this);
 }

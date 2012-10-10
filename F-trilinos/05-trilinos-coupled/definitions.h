@@ -19,12 +19,12 @@ private:
             : MatrixFormVol<double>(0, 0), tau(tau), Le(Le) {this->setSymFlag(HERMES_SYM);};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                         Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+                         Func<double> *v, Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
+                    Geom<Ord> *e, Func<Ord> **ext) const;
 
-    virtual MatrixFormVol<double>* clone() { return new PreconditionerForm_0(tau, Le); }
+    virtual MatrixFormVol<double>* clone() const { return new PreconditionerForm_0(tau, Le); }
     double tau, Le;
   };
   
@@ -35,11 +35,11 @@ private:
             : MatrixFormVol<double>(1, 1), tau(tau), Le(Le) {this->setSymFlag(HERMES_SYM);};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                         Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+                         Func<double> *v, Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
-    virtual MatrixFormVol<double>* clone() { return new PreconditionerForm_1(tau, Le); }
+                    Geom<Ord> *e, Func<Ord> **ext) const;
+    virtual MatrixFormVol<double>* clone() const { return new PreconditionerForm_1(tau, Le); }
 
     double tau, Le;
   };
@@ -51,11 +51,11 @@ private:
             : MatrixFormVol<double>(0, 0), tau(tau) {this->setSymFlag(HERMES_SYM);};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                         Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+                         Func<double> *v, Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
-    virtual MatrixFormVol<double>* clone() { return new JacobianFormVol_0_0(tau); }
+                    Geom<Ord> *e, Func<Ord> **ext) const;
+    virtual MatrixFormVol<double>* clone() const { return new JacobianFormVol_0_0(tau); }
 
     double tau;
   };
@@ -67,11 +67,11 @@ private:
             : MatrixFormVol<double>(0, 1), tau(tau) {this->setSymFlag(HERMES_SYM);};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                         Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+                         Func<double> *v, Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
-    virtual MatrixFormVol<double>* clone() { return new JacobianFormVol_0_1(tau); }
+                    Geom<Ord> *e, Func<Ord> **ext) const;
+    virtual MatrixFormVol<double>* clone() const { return new JacobianFormVol_0_1(tau); }
 
     double tau;
   };
@@ -83,11 +83,11 @@ private:
             : MatrixFormVol<double>(1, 0), tau(tau) {this->setSymFlag(HERMES_SYM);};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                         Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+                         Func<double> *v, Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
-    virtual MatrixFormVol<double>* clone() { return new JacobianFormVol_1_0(tau); }
+                    Geom<Ord> *e, Func<Ord> **ext) const;
+    virtual MatrixFormVol<double>* clone() const { return new JacobianFormVol_1_0(tau); }
 
     double tau;
   };
@@ -99,11 +99,11 @@ private:
             : MatrixFormVol<double>(1, 1), tau(tau), Le(Le) { this->setSymFlag(HERMES_SYM);};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                         Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+                         Func<double> *v, Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
-    virtual MatrixFormVol<double>* clone() { return new JacobianFormVol_1_1(tau, Le); }
+                    Geom<Ord> *e, Func<Ord> **ext) const;
+    virtual MatrixFormVol<double>* clone() const { return new JacobianFormVol_1_1(tau, Le); }
 
     double tau, Le;
   };
@@ -115,11 +115,11 @@ private:
       : MatrixFormSurf<double>(0, 0), kappa(kappa) { this->set_area(bnd_marker); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                         Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+                         Func<double> *v, Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
-    virtual MatrixFormSurf<double>* clone() { return new JacobianFormSurf_0_0(this->areas[0], kappa); }
+                    Geom<Ord> *e, Func<Ord> **ext) const;
+    virtual MatrixFormSurf<double>* clone() const { return new JacobianFormSurf_0_0(this->areas[0], kappa); }
 
     double kappa;
   };
@@ -131,11 +131,11 @@ private:
             : VectorFormVol<double>(0), tau(tau)  {};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
-                         Geom<double> *e, ExtData<double> *ext) const;
+                         Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
-    virtual VectorFormVol<double>* clone() { return new ResidualFormVol_0(tau); }
+                    Geom<Ord> *e, Func<Ord> **ext) const;
+    virtual VectorFormVol<double>* clone() const { return new ResidualFormVol_0(tau); }
 
   private:
     double tau;
@@ -148,11 +148,11 @@ private:
             : VectorFormVol<double>(1), tau(tau), Le(Le)  {};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
-                         Geom<double> *e, ExtData<double> *ext) const;
+                         Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
-    virtual VectorFormVol<double>* clone() { return new ResidualFormVol_1(tau, Le); }
+                    Geom<Ord> *e, Func<Ord> **ext) const;
+    virtual VectorFormVol<double>* clone() const { return new ResidualFormVol_1(tau, Le); }
 
   private:
     double tau, Le;
@@ -165,11 +165,11 @@ private:
             : VectorFormSurf<double>(0), kappa(kappa)  { this->set_area(bnd_marker); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
-                         Geom<double> *e, ExtData<double> *ext) const;
+                         Geom<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                    Geom<Ord> *e, ExtData<Ord> *ext) const;
-    virtual VectorFormSurf<double>* clone() { return new ResidualFormSurf_0(this->areas[0], kappa); }
+                    Geom<Ord> *e, Func<Ord> **ext) const;
+    virtual VectorFormSurf<double>* clone() const { return new ResidualFormSurf_0(this->areas[0], kappa); }
 
   private:
     double kappa;
@@ -200,7 +200,7 @@ public:
     return -exp(x1 - x);
   }
   
-  virtual MeshFunction<double>* clone()
+  virtual MeshFunction<double>* clone() const
   {
     return new InitialSolutionTemperature(mesh, x1);
   }
@@ -227,7 +227,7 @@ public:
     return exp(Le*(x1 - x));
   }
 
-  virtual MeshFunction<double>* clone()
+  virtual MeshFunction<double>* clone() const
   {
     return new InitialSolutionConcentration(mesh, x1, Le);
   }
@@ -243,7 +243,7 @@ public:
   {
   }
 
-  virtual MeshFunction<double>* clone()
+  virtual MeshFunction<double>* clone() const
   {
     Hermes::vector<Solution<double>*> slns;
     Hermes::vector<int> items;
@@ -274,7 +274,7 @@ public:
   {
   }
 
-  virtual MeshFunction<double>* clone()
+  virtual MeshFunction<double>* clone() const
   {
     Hermes::vector<Solution<double>*> slns;
     Hermes::vector<int> items;
@@ -303,7 +303,7 @@ public:
   CustomFilterDt(Hermes::vector<Solution<double>*> solutions, double Le, double alpha, double beta, double kappa, double x1, double tau) : Hermes::Hermes2D::DXDYFilter<double>(solutions), Le(Le), alpha(alpha), beta(beta), kappa(kappa), x1(x1), tau(tau)
   {
   }
-  virtual MeshFunction<double>* clone()
+  virtual MeshFunction<double>* clone() const
   {
     Hermes::vector<Solution<double>*> slns;
     Hermes::vector<int> items;
