@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 
   // Initialize the Picard solver.
   PicardSolver<double> picard(&dp);
-  picard.setPreviousSolution(&sln_prev_iter);
+  picard.use_Anderson_acceleration(true);
 
   // Perform the Picard's iteration (Anderson acceleration on by default).
   picard.set_picard_tol(PICARD_TOL);
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
   picard.set_anderson_beta(PICARD_ANDERSON_BETA);
   try
   {
-    picard.solve();
+    picard.solve(&sln_prev_iter);
   }
   catch(std::exception& e)
   {
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
   // Visualise the solution and mesh.
   ScalarView s_view("Solution", new WinGeom(0, 0, 440, 350));
   s_view.show_mesh(false);
-  s_view.show(&sln_prev_iter);
+  s_view.show(&sln);
   OrderView o_view("Mesh", new WinGeom(450, 0, 420, 350));
   o_view.show(&space);
 

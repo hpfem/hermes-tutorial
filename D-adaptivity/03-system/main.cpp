@@ -159,12 +159,16 @@ int main(int argc, char* argv[])
     Hermes::Mixins::Loggable::Static::info("---- Adaptivity step %d:", as);
 
     // Construct globally refined reference mesh and setup reference space.
-    Hermes::vector<Space<double> *>* ref_spaces = 
-      Space<double>::construct_refined_spaces(Hermes::vector<Space<double> *>(&u_space, &v_space));
-    Space<double>* u_ref_space = (*ref_spaces)[0];
-    Space<double>* v_ref_space = (*ref_spaces)[1];
-   
-    Hermes::vector<const Space<double> *> ref_spaces_const((*ref_spaces)[0], (*ref_spaces)[1]);
+    Mesh::ReferenceMeshCreator u_ref_mesh_creator(&u_mesh);
+    Mesh* u_ref_mesh = u_ref_mesh_creator.create_ref_mesh();
+    Mesh::ReferenceMeshCreator v_ref_mesh_creator(&v_mesh);
+    Mesh* v_ref_mesh = v_ref_mesh_creator.create_ref_mesh();
+    Space<double>::ReferenceSpaceCreator u_ref_space_creator(&u_space, u_ref_mesh);
+    Space<double>* u_ref_space = u_ref_space_creator.create_ref_space();
+    Space<double>::ReferenceSpaceCreator v_ref_space_creator(&v_space, v_ref_mesh);
+    Space<double>* v_ref_space = v_ref_space_creator.create_ref_space();
+
+    Hermes::vector<const Space<double> *> ref_spaces_const(u_ref_space, v_ref_space);
 
     int ndof_ref = Space<double>::get_num_dofs(ref_spaces_const);
 

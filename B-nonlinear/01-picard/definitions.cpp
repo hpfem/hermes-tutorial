@@ -21,8 +21,6 @@ CustomWeakFormPicard::CustomWeakFormPicard(Solution<double>* prev_iter_sln,
                                            Hermes2DFunction<double>* f) 
   : WeakForm<double>(1)
 {
-  this->set_ext(prev_iter_sln);
-
   // Jacobian.
   CustomJacobian* matrix_form = new CustomJacobian(0, 0, lambda);
   add_matrix_form(matrix_form);
@@ -39,7 +37,7 @@ double CustomWeakFormPicard::CustomJacobian::value(int n, double *wt, Func<doubl
   double result = 0;
   for (int i = 0; i < n; i++) 
   {
-    result += wt[i] * lambda->value(ext[0]->val[i]) * (u->dx[i] * v->dx[i] + u->dy[i] * v->dy[i]);
+    result += wt[i] * lambda->value(u_ext[0]->val[i]) * (u->dx[i] * v->dx[i] + u->dy[i] * v->dy[i]);
   }
   return result;
 }
@@ -51,7 +49,7 @@ Ord CustomWeakFormPicard::CustomJacobian::ord(int n, double *wt, Func<Ord> *u_ex
   Ord result = Ord(0);
   for (int i = 0; i < n; i++) 
   {
-    result += wt[i] * lambda->value(ext[0]->val[i]) * (u->dx[i] * v->dx[i] + u->dy[i] * v->dy[i]);
+    result += wt[i] * lambda->value(u_ext[0]->val[i]) * (u->dx[i] * v->dx[i] + u->dy[i] * v->dy[i]);
   }
   return result;
 }

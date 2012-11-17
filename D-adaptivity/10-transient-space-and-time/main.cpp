@@ -87,7 +87,7 @@ MatrixSolverType matrix_solver = SOLVER_UMFPACK;
 bool ADAPTIVE_TIME_STEP_ON = true;                
 // If rel. temporal error is greater than this threshold, decrease time 
 // step size and repeat time step.
-const double TIME_ERR_TOL_UPPER = 1.0;            
+const double TIME_ERR_TOL_UPPER = 5.0;            
 // If rel. temporal error is less than this threshold, increase time step
 // but do not repeat time step (this might need further research).
 const double TIME_ERR_TOL_LOWER = 0.1;            
@@ -222,8 +222,10 @@ int main(int argc, char* argv[])
     bool done = false; int as = 1;
     double err_est;
     do {
-      // Construct globally refined reference mesh and setup reference space.
-      Space<double>* ref_space = Space<double>::construct_refined_space(&space);
+      Mesh::ReferenceMeshCreator ref_mesh_creator(&mesh);
+      Mesh* ref_mesh = ref_mesh_creator.create_ref_mesh();
+      Space<double>::ReferenceSpaceCreator ref_space_creator(&space, ref_mesh);
+      Space<double>* ref_space = ref_space_creator.create_ref_space();
 
       RungeKutta<double> runge_kutta(&wf, ref_space, &bt);
 
