@@ -23,7 +23,7 @@ const int P_INIT = 1;
 const bool DG_SHOCK_CAPTURING = true;
 // What parts to use.
 const bool WANT_DG = true;
-const bool WANT_FEM = false;
+const bool WANT_FEM = true;
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 MatrixSolverType matrix_solver_type = SOLVER_UMFPACK;
