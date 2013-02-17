@@ -1,4 +1,8 @@
-#include "definitions.h"
+#include "hermes2d.h"
+
+using namespace Hermes;
+using namespace Hermes::Hermes2D;
+/* Exact solution */
 
 #include "bessel.cpp"
 
@@ -60,92 +64,105 @@ static void exact_sol_der(double x, double y, std::complex<double>& e1dx, std::c
   e0dy = (t11*y+2.0/3.0*t15*y-2.0/3.0*t22*y)*t6*y*t29-t32*t2*t29+t36-t47-4.0/9.0*t48*t41*t53+4.0/3.0*t57*t59*t53*y;
 }
 
-CustomExactSolution::CustomExactSolution(const Mesh* mesh) : Hermes::Hermes2D::ExactSolutionVector<std::complex<double> >(mesh) {};
-
-CustomExactSolution::~CustomExactSolution() {};
-
-Scalar2<std::complex<double> > CustomExactSolution::value(double x, double y) const 
+class CustomExactSolution : public Hermes::Hermes2D::ExactSolutionVector<std::complex<double> >
 {
-  Scalar2<std::complex<double> >ex(0.0, 0.0);
-#pragma omp critical (custom)
+public:
+  CustomExactSolution(const Mesh* mesh) : Hermes::Hermes2D::ExactSolutionVector<std::complex<double> >(mesh) {};
+  ~CustomExactSolution() {};
+
+  virtual Scalar2<std::complex<double> > value(double x, double y) const 
   {
-  exact_sol_val(x, y,  ex[0], ex[1]);
-  }
-  return ex;
-};
-
-void CustomExactSolution::derivatives (double x, double y, Scalar2<std::complex<double> >& dx, Scalar2<std::complex<double> >& dy) const 
-{
-  std::complex<double> e1dx, e0dy;
+    Scalar2<std::complex<double> >ex(0.0, 0.0);
 #pragma omp critical (custom)
-  {
-  exact_sol_der(x, y, e1dx, e0dy);
-  }
-  dx[0] = 0;
-  dx[1] = e1dx;
-  dy[0] = e0dy;
-  dy[1] = 0;
-  return;
-};
-
-Hermes::Ord CustomExactSolution::ord(Hermes::Ord x, Hermes::Ord y) const 
-{
-  return Hermes::Ord(10);
-} 
-
-
-CustomWeakForm::CustomWeakForm(double mu_r, double kappa) : Hermes::Hermes2D::WeakForm<std::complex<double> >(1)
-{
-  std::complex<double> ii = std::complex<double>(0.0, 1.0);
-
-  // Jacobian.
-  add_matrix_form(new WeakFormsHcurl::DefaultJacobianCurlCurl<std::complex<double> >(0, 0, HERMES_ANY, 1.0/mu_r));
-  add_matrix_form(new WeakFormsHcurl::DefaultMatrixFormVol<std::complex<double> >(0, 0, HERMES_ANY, -sqr(kappa)));
-  add_matrix_form_surf(new WeakFormsHcurl::DefaultMatrixFormSurf<std::complex<double> >(0, 0, HERMES_ANY, -kappa*ii));
-
-  // Residual.
-  add_vector_form(new WeakFormsHcurl::DefaultResidualCurlCurl<std::complex<double> >(0, HERMES_ANY, 1.0/mu_r));
-  add_vector_form(new WeakFormsHcurl::DefaultResidualVol<std::complex<double> >(0, HERMES_ANY, -sqr(kappa)));
-  add_vector_form_surf(new WeakFormsHcurl::DefaultResidualSurf<std::complex<double> >(0, HERMES_ANY, -kappa*ii));
-  add_vector_form_surf(new CustomVectorFormSurf());
-};
-
-CustomWeakForm::CustomVectorFormSurf::CustomVectorFormSurf()
-  : VectorFormSurf<std::complex<double> >(0) 
-{
-}
-
-std::complex<double> CustomWeakForm::CustomVectorFormSurf::value(int n, double *wt, Func<std::complex<double> > *u_ext[], 
-  Func<double> *v, Geom<double> *e, Func<std::complex<double> > **ext) const 
-{
-  std::complex<double> result = 0;
-  #pragma omp critical (jv)
-      {
-    for (int i = 0; i < n; i++) {
-      double r = std::sqrt(e->x[i] * e->x[i] + e->y[i] * e->y[i]);
-      double theta = std::atan2(e->y[i], e->x[i]);
-      if (theta < 0) theta += 2.0*M_PI;
-      double j13    = jv(-1.0/3.0, r),    j23    = jv(+2.0/3.0, r);
-      double cost   = std::cos(theta),         sint   = std::sin(theta);
-      double cos23t = std::cos(2.0/3.0*theta), sin23t = std::sin(2.0/3.0*theta);
-
-      double Etau = e->tx[i] * (cos23t*sint*j13 - 2.0/(3.0*r)*j23*(cos23t*sint + sin23t*cost)) +
-        e->ty[i] * (-cos23t*cost*j13 + 2.0/(3.0*r)*j23*(cos23t*cost - sin23t*sint));
-
-      result += wt[i] * std::complex<double>(cos23t*j23, -Etau) * ((v->val0[i] * e->tx[i] + v->val1[i] * e->ty[i]));
+    {
+      exact_sol_val(x, y,  ex[0], ex[1]);
     }
+    return ex;
+  };
+
+  virtual void derivatives (double x, double y, Scalar2<std::complex<double> >& dx, Scalar2<std::complex<double> >& dy) const 
+  {
+    std::complex<double> e1dx, e0dy;
+#pragma omp critical (custom)
+    {
+      exact_sol_der(x, y, e1dx, e0dy);
+    }
+    dx[0] = 0;
+    dx[1] = e1dx;
+    dy[0] = e0dy;
+    dy[1] = 0;
+    return;
+  };
+
+  virtual Hermes::Ord ord(Hermes::Ord x, Hermes::Ord y) const 
+  {
+    return Hermes::Ord(10);
+  }
+  
+  virtual MeshFunction<std::complex<double> >* clone() const
+  {
+    return new CustomExactSolution(this->mesh);
+  }
+};
+
+/* Weak forms */
+
+class CustomWeakForm : public Hermes::Hermes2D::WeakForm<std::complex<double> >
+{
+public:
+  CustomWeakForm(double mu_r, double kappa) : Hermes::Hermes2D::WeakForm<std::complex<double> >(1)
+  {
+    std::complex<double> ii = std::complex<double>(0.0, 1.0);
+
+    // Jacobian.
+    add_matrix_form(new WeakFormsHcurl::DefaultJacobianCurlCurl<std::complex<double> >(0, 0, HERMES_ANY, 1.0/mu_r));
+    add_matrix_form(new WeakFormsHcurl::DefaultMatrixFormVol<std::complex<double> >(0, 0, HERMES_ANY, -sqr(kappa)));
+    add_matrix_form_surf(new WeakFormsHcurl::DefaultMatrixFormSurf<std::complex<double> >(0, 0, HERMES_ANY, -kappa*ii));
+
+    // Residual.
+    add_vector_form(new WeakFormsHcurl::DefaultResidualCurlCurl<std::complex<double> >(0, HERMES_ANY, 1.0/mu_r));
+    add_vector_form(new WeakFormsHcurl::DefaultResidualVol<std::complex<double> >(0, HERMES_ANY, -sqr(kappa)));
+    add_vector_form_surf(new WeakFormsHcurl::DefaultResidualSurf<std::complex<double> >(0, HERMES_ANY, -kappa*ii));
+    add_vector_form_surf(new CustomVectorFormSurf());
+  };
+
+  class CustomVectorFormSurf : public VectorFormSurf<std::complex<double> >
+  {
+  public:
+    CustomVectorFormSurf()
+      : VectorFormSurf<std::complex<double> >(0) 
+    {
+    }
+
+    virtual std::complex<double> value(int n, double *wt, Func<std::complex<double> > *u_ext[], 
+      Func<double> *v, Geom<double> *e, Func<std::complex<double> > **ext) const 
+    {
+      std::complex<double> result = 0;
+#pragma omp critical (jv)
+      {
+        for (int i = 0; i < n; i++) {
+          double r = std::sqrt(e->x[i] * e->x[i] + e->y[i] * e->y[i]);
+          double theta = std::atan2(e->y[i], e->x[i]);
+          if (theta < 0) theta += 2.0*M_PI;
+          double j13    = jv(-1.0/3.0, r),    j23    = jv(+2.0/3.0, r);
+          double cost   = std::cos(theta),         sint   = std::sin(theta);
+          double cos23t = std::cos(2.0/3.0*theta), sin23t = std::sin(2.0/3.0*theta);
+
+          double Etau = e->tx[i] * (cos23t*sint*j13 - 2.0/(3.0*r)*j23*(cos23t*sint + sin23t*cost)) +
+            e->ty[i] * (-cos23t*cost*j13 + 2.0/(3.0*r)*j23*(cos23t*cost - sin23t*sint));
+
+          result += wt[i] * std::complex<double>(cos23t*j23, -Etau) * ((v->val0[i] * e->tx[i] + v->val1[i] * e->ty[i]));
+        }
       }
-  return -result;
-}
+      return -result;
+    }
 
-Hermes::Ord CustomWeakForm::CustomVectorFormSurf::ord(int n, double *wt, Func<Hermes::Ord> *u_ext[], Func<Hermes::Ord> *v,
-  Geom<Hermes::Ord> *e, Func<Hermes::Ord> **ext) const 
-{
-  return Hermes::Ord(10);
-}
+    virtual Hermes::Ord ord(int n, double *wt, Func<Hermes::Ord> *u_ext[], Func<Hermes::Ord> *v,
+      Geom<Hermes::Ord> *e, Func<Ord> **ext) const 
+    {
+      return Hermes::Ord(10);
+    }
 
-VectorFormSurf<std::complex<double> >* CustomWeakForm::CustomVectorFormSurf::clone() const
-{
-  return new CustomVectorFormSurf();
-}
-
+    virtual VectorFormSurf<std::complex<double> >* clone() const { return new CustomVectorFormSurf(); }
+  };
+};
