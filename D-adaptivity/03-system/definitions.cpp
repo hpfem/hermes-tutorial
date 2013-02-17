@@ -87,7 +87,7 @@ CustomRightHandSide2::~CustomRightHandSide2()
 }
 
 
-ExactSolutionFitzHughNagumo1::ExactSolutionFitzHughNagumo1(Mesh* mesh)
+ExactSolutionFitzHughNagumo1::ExactSolutionFitzHughNagumo1(const Mesh* mesh)
      : ExactSolutionScalar<double>(mesh) 
 {
   cef1 = new CustomExactFunction1();
@@ -114,10 +114,21 @@ ExactSolutionFitzHughNagumo1::~ExactSolutionFitzHughNagumo1()
   delete cef1;
 }
 
-ExactSolutionFitzHughNagumo2::ExactSolutionFitzHughNagumo2(Mesh* mesh, double K)
-     : ExactSolutionScalar<double>(mesh) 
+MeshFunction<double>* ExactSolutionFitzHughNagumo1::clone() const
+{
+	return new ExactSolutionFitzHughNagumo1(this->mesh);
+}
+
+
+ExactSolutionFitzHughNagumo2::ExactSolutionFitzHughNagumo2(const Mesh* mesh, double K)
+     : ExactSolutionScalar<double>(mesh), K(K)
 {
   cef2 = new CustomExactFunction2(K);
+}
+
+MeshFunction<double>* ExactSolutionFitzHughNagumo2::clone() const
+{
+	return new ExactSolutionFitzHughNagumo2(this->mesh, this->K);
 }
 
 double ExactSolutionFitzHughNagumo2::value(double x, double y) const 

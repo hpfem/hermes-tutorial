@@ -56,10 +56,6 @@ int main(int argc, char* args[])
 
   mesh.refine_by_criterion(criterion, INIT_REF_CRITERION);
 
-  MeshView m;
-  m.show(&mesh);
-
-
   ScalarView view1("Solution - Discontinuous Galerkin FEM", new WinGeom(900, 0, 450, 350));
   ScalarView view2("Solution - Standard continuous FEM", new WinGeom(900, 400, 450, 350));
 
@@ -143,7 +139,6 @@ int main(int argc, char* args[])
     catch(std::exception& e)
     {
       std::cout << e.what();
-      
     }
   }
 

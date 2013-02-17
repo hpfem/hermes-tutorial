@@ -34,7 +34,7 @@ const int INIT_BDY_REF_NUM = 4;
 // Initial polynomial degree.
 const int P_INIT = 2;                              
 // Time step.
-double time_step = 1.5;                           
+double time_step = 0.5;                           
 // Time interval length.
 const double T_FINAL = 5.0;                        
 // Stopping criterion for the Newton's method.
@@ -43,14 +43,14 @@ const double NEWTON_TOL = 1e-5;
 const int NEWTON_MAX_ITER = 100;                   
 // If rel. temporal error is greater than this threshold, decrease time 
 // step size and repeat time step.
-const double TIME_TOL_UPPER = 5.0;                 
+const double TIME_TOL_UPPER = 1.0;                 
 // If rel. temporal error is less than this threshold, increase time step
 // but do not repeat time step (this might need further research).
 const double TIME_TOL_LOWER = 0.5;                 
 // Time step increase ratio (applied when rel. temporal error is too small).
-const double TIME_STEP_INC_RATIO = 1.1;            
+const double TIME_STEP_INC_RATIO = 2.0;            
 // Time step decrease ratio (applied when rel. temporal error is too large).
-const double TIME_STEP_DEC_RATIO = 0.8;            
+const double TIME_STEP_DEC_RATIO = 0.5;            
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;   

@@ -174,7 +174,17 @@ int main(int argc, char* argv[])
                 break;
       }
 
-      ndof_coarse = Space<double>::get_num_dofs(&space);
+      // Important. Since the space was changed, we need to re-assign DOFs.
+      // Try commenting this and see that an exception is thrown.
+      space.assign_dofs();
+      try
+      {
+        ndof_coarse = Space<double>::get_num_dofs(&space);
+      }
+      catch(Hermes::Exceptions::Exception& e)
+      {
+        e.print_msg();
+      }
     }
 
     // Spatial adaptivity loop. Note: sln_time_prev must not be changed 
@@ -186,9 +196,9 @@ int main(int argc, char* argv[])
 
       // Construct globally refined reference mesh and setup reference space.
       Mesh::ReferenceMeshCreator ref_mesh_creator(&mesh);
-    Mesh* ref_mesh = ref_mesh_creator.create_ref_mesh();
-    Space<double>::ReferenceSpaceCreator ref_space_creator(&space, ref_mesh);
-    Space<double>* ref_space = ref_space_creator.create_ref_space();
+      Mesh* ref_mesh = ref_mesh_creator.create_ref_mesh();
+      Space<double>::ReferenceSpaceCreator ref_space_creator(&space, ref_mesh);
+      Space<double>* ref_space = ref_space_creator.create_ref_space();
       int ndof_ref = Space<double>::get_num_dofs(ref_space);
 
       // Perform one Runge-Kutta time step according to the selected Butcher's table.
@@ -236,7 +246,7 @@ int main(int argc, char* argv[])
       
       // Visualize the solution and mesh.
       char title[100];
-      sprintf(title, "Solution<double>, time %g", current_time);
+      sprintf(title, "Solution, time %g", current_time);
       view.set_title(title);
       view.show_mesh(false);
       view.show(&sln_time_new);

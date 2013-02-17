@@ -36,7 +36,14 @@ int main(int argc, char* argv[])
   {
     MeshReaderH2DXML mloader;  
     Hermes::Mixins::Loggable::Static::info("Reading mesh in XML format.");
-    mloader.load("domain.xml", &mesh);
+    try
+    {
+      mloader.load("domain.xml", &mesh);
+    }
+    catch(Hermes::Exceptions::Exception& e)
+    {
+      e.print_msg();
+    }
   }
   else 
   {

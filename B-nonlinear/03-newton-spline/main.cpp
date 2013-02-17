@@ -56,7 +56,8 @@ int main(int argc, char* argv[])
   Hermes::Mixins::Loggable::Static::info("Saving cubic spline into a Pylab file spline.dat.");
   // The interval of definition of the spline will be 
   // extended by "interval_extension" on both sides.
-  double interval_extension = 3.0; 
+  double interval_extension = 3.0;
+  lambda.calculate_coeffs();
   lambda.plot("spline.dat", interval_extension);
 
   // Load the mesh.

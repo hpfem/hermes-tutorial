@@ -73,7 +73,7 @@ public:
 class ExactSolutionFitzHughNagumo1 : public ExactSolutionScalar<double>
 {
 public:
-  ExactSolutionFitzHughNagumo1(Mesh* mesh);
+  ExactSolutionFitzHughNagumo1(const Mesh* mesh);
 
   virtual double value(double x, double y) const;
 
@@ -82,6 +82,8 @@ public:
   virtual Ord ord(Ord x, Ord y) const;
 
   ~ExactSolutionFitzHughNagumo1();
+	
+	virtual MeshFunction<double>* clone() const;
 
   CustomExactFunction1* cef1;
 };
@@ -89,7 +91,7 @@ public:
 class ExactSolutionFitzHughNagumo2 : public ExactSolutionScalar<double>
 {
 public:
-  ExactSolutionFitzHughNagumo2(Mesh* mesh, double K);
+  ExactSolutionFitzHughNagumo2(const Mesh* mesh, double K);
 
   virtual double value(double x, double y) const;
 
@@ -97,9 +99,12 @@ public:
 
   virtual Ord ord(Ord x, Ord y) const;
 
+	virtual MeshFunction<double>* clone() const;
+
   ~ExactSolutionFitzHughNagumo2();
 
   CustomExactFunction2* cef2;
+	double K;
 };
 
 /* Weak forms */
