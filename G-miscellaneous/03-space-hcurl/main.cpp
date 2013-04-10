@@ -23,19 +23,19 @@ int P_INIT = 3;
 int main(int argc, char* argv[])
 {
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("square.mesh", &mesh);
+  mloader.load("square.mesh", mesh);
 
   // Initial mesh refinement.
-  for (int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
+  for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
 
   // Create an Hcurl space with default shapeset.
-  HcurlSpace<double> space(&mesh, P_INIT);
+  SpaceSharedPtr<double> space(new HcurlSpace<double>(mesh, P_INIT));
 
   // Visualize FE basis.
   VectorBaseView<double> bview("VectorBaseView", new WinGeom(0, 0, 700, 600));
-  bview.show(&space);
+  bview.show(space);
 
   // Wait for all views to be closed.
   View::wait();

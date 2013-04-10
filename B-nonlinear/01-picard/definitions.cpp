@@ -16,7 +16,7 @@ Ord CustomNonlinearity::value(Ord u) const
   return Ord(10);
 }
 
-CustomWeakFormPicard::CustomWeakFormPicard(Solution<double>* prev_iter_sln, 
+CustomWeakFormPicard::CustomWeakFormPicard(MeshFunctionSharedPtr<double> prev_iter_sln, 
                                            Hermes1DFunction<double>* lambda, 
                                            Hermes2DFunction<double>* f) 
   : WeakForm<double>(1)

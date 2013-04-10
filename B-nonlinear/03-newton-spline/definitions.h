@@ -14,7 +14,7 @@ using namespace Hermes::Hermes2D::Views;
 class CustomInitialCondition : public ExactSolutionScalar<double>
 {
 public:
-  CustomInitialCondition(const Mesh* mesh) : ExactSolutionScalar<double>(mesh) 
+  CustomInitialCondition(MeshSharedPtr mesh) : ExactSolutionScalar<double>(mesh) 
   {
   };
 

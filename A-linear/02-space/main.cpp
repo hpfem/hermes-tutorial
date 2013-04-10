@@ -47,14 +47,14 @@ Click into the image window and:\n\
 int main(int argc, char* argv[])
 {
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   if (USE_XML_FORMAT == true)
   {
     MeshReaderH2DXML mloader;  
     Hermes::Mixins::Loggable::Static::info("Reading mesh in XML format.");
     try
     {
-      mloader.load("domain.xml", &mesh);
+      mloader.load("domain.xml", mesh);
     }
     catch(Hermes::Exceptions::Exception& e)
     {
@@ -65,26 +65,26 @@ int main(int argc, char* argv[])
   {
     MeshReaderH2D mloader;
     Hermes::Mixins::Loggable::Static::info("Reading mesh in original format.");
-    mloader.load("domain.mesh", &mesh);
+    mloader.load("domain.mesh", mesh);
   }
 
   // The following can be used to view higher-order shape functions
   // on reference domains (disable uniform mesh refinememts for that).
   // Reference square.
-  //mloader.load("ref_square.mesh", &mesh);      
+  //mloader.load("ref_square.mesh", mesh);      
   // Reference triangle.
-  //mloader.load("ref_triangle.mesh", &mesh);    
+  //mloader.load("ref_triangle.mesh", mesh);    
 
   // Refine all elements (optional).
-  mesh.refine_all_elements();
+  mesh->refine_all_elements();
 
   // Create an H1 space with default shapeset and natural BC.
-  H1Space<double> space(&mesh, P_INIT);
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, P_INIT));
 
   // View FE basis functions.
   BaseView<double> bview("Finite Element Space", new WinGeom(0, 0, 440, 350));
   bview.fix_scale_width(50);
-  bview.show(&space, HERMES_EPS_HIGH);
+  bview.show(space, HERMES_EPS_HIGH);
 
   // Practice keyboard and mouse controls.
   printf("%s", text);

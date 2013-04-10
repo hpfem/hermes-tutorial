@@ -52,17 +52,17 @@ const double T_FINAL = 86400;
 int main(int argc, char* argv[])
 {
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("domain.mesh", &mesh);
+  mloader.load("domain.mesh", mesh);
 
   // Perform initial mesh refinements.
-  for(int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
-  mesh.refine_towards_boundary("Boundary air", INIT_REF_NUM_BDY);
-  mesh.refine_towards_boundary("Boundary ground", INIT_REF_NUM_BDY);
+  for(int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
+  mesh->refine_towards_boundary("Boundary air", INIT_REF_NUM_BDY);
+  mesh->refine_towards_boundary("Boundary ground", INIT_REF_NUM_BDY);
 
   // Previous time level solution (initialized by the external temperature).
-  ConstantSolution<double> tsln(&mesh, TEMP_INIT);
+  ConstantSolution<double> tsln(mesh, TEMP_INIT);
 
   // Initialize the weak formulation.
   double current_time = 0;
@@ -74,16 +74,16 @@ int main(int argc, char* argv[])
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
-  int ndof = space.get_num_dofs();
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  int ndof = space->get_num_dofs();
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
  
   // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, &space);
+  DiscreteProblem<double> dp(&wf, space);
 
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp);
-
+  newton.set_jacobian_constant();
   // Initialize views.
   ScalarView Tview("Temperature", new WinGeom(0, 0, 450, 600));
   Tview.set_min_max_range(0,20);
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
     // Perform Newton's iteration.
     try
     {
-      newton.solve_keep_jacobian();
+      newton.solve();
     }
     catch(std::exception& e)
     {
@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
     }
 
     // Translate the resulting coefficient vector into the Solution sln.
-    Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &tsln);
+    Solution<double>::vector_to_solution(newton.get_sln_vector(), space, &tsln);
 
     // Visualize the solution.
     char title[100];

@@ -23,19 +23,19 @@ int P_INIT = 3;
 int main(int argc, char* argv[])
 {
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("square.mesh", &mesh);
+  mloader.load("square.mesh", mesh);
 
   // Initial uniform mesh refinement.
-  for (int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
+  for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
 
   // Create an Hdiv space with default shapeset.
-  HdivSpace<double> space(&mesh, P_INIT);
+  SpaceSharedPtr<double> space(new HdivSpace<double>(mesh, P_INIT));
 
   // Visualise the FE basis.
   VectorBaseView<double> bview("VectorBaseView", new WinGeom(0, 0, 700, 600));
-  bview.show(&space);
+  bview.show(space);
 
   // Wait for all views to be closed.
   View::wait();

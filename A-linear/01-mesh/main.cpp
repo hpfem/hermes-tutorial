@@ -31,14 +31,14 @@ Click into the image window and:\n\
 int main(int argc, char* argv[])
 {
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   if (USE_XML_FORMAT == true)
   {
     MeshReaderH2DXML mloader;  
     Hermes::Mixins::Loggable::Static::info("Reading mesh in XML format.");
     try
     {
-      mloader.load("domain.xml", &mesh);
+      mloader.load("domain.xml", mesh);
     }
     catch(Hermes::Exceptions::Exception& e)
     {
@@ -49,35 +49,35 @@ int main(int argc, char* argv[])
   {
     MeshReaderH2D mloader;
     Hermes::Mixins::Loggable::Static::info("Reading mesh in original format.");
-    mloader.load("domain.mesh", &mesh);
+    mloader.load("domain.mesh", mesh);
   }
 
   // Refine mesh uniformly (optional).
-  mesh.refine_all_elements();          
+  mesh->refine_all_elements();          
 
   // Refine towards a mesh vertex (optional).
   // Four refinements towards vertex no. 3.  
-  mesh.refine_towards_vertex(3, 4);    
+  mesh->refine_towards_vertex(3, 4);    
 
   // Refine towards boundary (optional).
   // Four successive refinements towards boundary with marker "Outer".
-  mesh.refine_towards_boundary("Outer", 4);  
+  mesh->refine_towards_boundary("Outer", 4);  
 
   // Refine individual elements (optional).
   // 0... isotropic refinement.
-  mesh.refine_element_id(86, 0);          
+  mesh->refine_element_id(86, 0);          
   // 0... isotropic refinement.
-  mesh.refine_element_id(112, 0);         
+  mesh->refine_element_id(112, 0);         
   // 2... anisotropic refinement.
-  mesh.refine_element_id(84, 2);          
+  mesh->refine_element_id(84, 2);          
   // 1... anisotropic refinement.
-  mesh.refine_element_id(114, 1);         
+  mesh->refine_element_id(114, 1);         
 
   // Display the mesh.
   // (0, 0) is the upper left corner position, 
   // 350 x 350 is the window size.
   MeshView mview("Hello world!", new WinGeom(0, 0, 350, 350));
-  mview.show(&mesh);
+  mview.show(mesh);
 
   // Practice some keyboard and mouse controls.
   printf("%s", text);

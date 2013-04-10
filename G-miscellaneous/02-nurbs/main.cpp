@@ -36,20 +36,20 @@ const double const_f = 1.0;
 int main(int argc, char* argv[])
 {
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load(mesh_file, &mesh);
+  mloader.load(mesh_file, mesh);
 
   // Perform initial mesh refinements (optional).
-  for (int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
+  for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
 
   // Initialize boundary conditions.
   DefaultEssentialBCConst<double> bc_essential("Bdy", 0.0);
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
-  int ndof = Space<double>::get_num_dofs(&space);
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  int ndof = Space<double>::get_num_dofs(space);
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
   // Initialize the weak formulation.
@@ -57,11 +57,11 @@ int main(int argc, char* argv[])
       new Hermes1DFunction<double>(1.0), new Hermes2DFunction<double>(-const_f));
 
   // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, &space);
+  DiscreteProblem<double> dp(&wf, space);
 
   // Perform Newton's iteration.
-  Hermes::Hermes2D::Solution<double> sln;
-  Hermes::Hermes2D::NewtonSolver<double> newton(&dp);
+  MeshFunctionSharedPtr<double> sln(new Solution<double>);
+  NewtonSolver<double> newton(&dp);
   try
   {
     newton.solve();
@@ -72,11 +72,11 @@ int main(int argc, char* argv[])
     
   }
 
-  Hermes::Hermes2D::Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);
+  Hermes::Hermes2D::Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);
   
   // Visualize the solution.
   Views::ScalarView view("Solution", new Views::WinGeom(0, 0, 800, 350));
-  view.show(&sln);
+  view.show(sln);
 
   // Wait for the view to be closed.
   Views::View::wait();

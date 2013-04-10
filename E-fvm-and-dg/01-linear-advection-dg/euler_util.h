@@ -10,8 +10,8 @@ class DiscontinuityDetector
 {
 public:
   /// Constructor.
-  DiscontinuityDetector(Hermes::vector<const Space<double> *> spaces, 
-                        Hermes::vector<Solution<double> *> solutions);
+  DiscontinuityDetector(Hermes::vector<SpaceSharedPtr<double> > spaces, 
+    Hermes::vector<MeshFunctionSharedPtr<double> > solutions);
 
   /// Destructor.
    ~DiscontinuityDetector();
@@ -21,18 +21,18 @@ public:
 
 protected:
   /// Members.
-  Hermes::vector<const Space<double> *> spaces;
-  Hermes::vector<Solution<double> *> solutions;
+  Hermes::vector<SpaceSharedPtr<double> > spaces;
+  Hermes::vector<MeshFunctionSharedPtr<double> > solutions;
   std::set<int> discontinuous_element_ids;
-  Mesh* mesh;
+  MeshSharedPtr mesh;
 };
 
 class KrivodonovaDiscontinuityDetector : public DiscontinuityDetector
 {
 public:
   /// Constructor.
-  KrivodonovaDiscontinuityDetector(Hermes::vector<const Space<double> *> spaces, 
-                        Hermes::vector<Solution<double> *> solutions);
+  KrivodonovaDiscontinuityDetector(Hermes::vector<SpaceSharedPtr<double> > spaces, 
+                        Hermes::vector<MeshFunctionSharedPtr<double> > solutions);
 
   /// Destructor.
    ~KrivodonovaDiscontinuityDetector();

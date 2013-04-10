@@ -2,16 +2,16 @@
 #include "limits.h"
 #include <limits>
 
-DiscontinuityDetector::DiscontinuityDetector(Hermes::vector<const Space<double>*> spaces, 
-  Hermes::vector<Solution<double>*> solutions) : spaces(spaces), solutions(solutions)
+DiscontinuityDetector::DiscontinuityDetector(Hermes::vector<SpaceSharedPtr<double> > spaces, 
+  Hermes::vector<MeshFunctionSharedPtr<double> > solutions) : spaces(spaces), solutions(solutions)
 {
 };
 
 DiscontinuityDetector::~DiscontinuityDetector()
 {};
 
-KrivodonovaDiscontinuityDetector::KrivodonovaDiscontinuityDetector(Hermes::vector<const Space<double>*> spaces, 
-  Hermes::vector<Solution<double>*> solutions) : DiscontinuityDetector(spaces, solutions)
+KrivodonovaDiscontinuityDetector::KrivodonovaDiscontinuityDetector(Hermes::vector<SpaceSharedPtr<double> > spaces, 
+  Hermes::vector<MeshFunctionSharedPtr<double> > solutions) : DiscontinuityDetector(spaces, solutions)
 {
   // A check that all meshes are the same in the spaces.
   unsigned int mesh0_seq = spaces[0]->get_mesh()->get_seq();
@@ -735,7 +735,7 @@ void FluxLimiter::get_limited_solution(Solution<double>* solution_to_limit)
   solution_to_limit->copy(this->limited_solutions[0]);
 }
 
-void FluxLimiter::limit_according_to_detector(Hermes::vector<Space<double> *> coarse_spaces_to_limit)
+void FluxLimiter::limit_according_to_detector(Hermes::vector<SpaceSharedPtr<double> > coarse_spaces_to_limit)
 {
   std::set<int> discontinuous_elements = this->detector->get_discontinuous_element_ids();
 
@@ -819,7 +819,7 @@ void FluxLimiter::limit_second_orders_according_to_detector(Hermes::vector<Space
       this->detector = new KrivodonovaDiscontinuityDetector(spaces, limited_solutions);
     }
 
-    if(coarse_spaces_to_limit != Hermes::vector<Space<double>*>()) {
+    if(coarse_spaces_to_limit != Hermes::vector<SpaceSharedPtr<double> >()) {
       // Now set the element order to zero.
       Element* e;
 

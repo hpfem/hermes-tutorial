@@ -23,32 +23,32 @@ MatrixSolverType matrix_solver = SOLVER_UMFPACK;
 int main(int argc, char* argv[])
 {
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("square.mesh", &mesh);
+  mloader.load("square.mesh", mesh);
 
   // Perform uniform mesh refinements.
-  for (int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
+  for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
 
   // Create an L2 space with default shapeset.
-  L2Space<double> space(&mesh, P_INIT);
+  SpaceSharedPtr<double> space(new L2Space<double>(mesh, P_INIT));
 
   // View basis functions.
   BaseView<double> bview("BaseView", new WinGeom(0, 0, 600, 500));
-  bview.show(&space);
+  bview.show(space);
   // View::wait(H2DV_WAIT_KEYPRESS);
 
   // Initialize the exact and projected solution.
-  Solution<double> sln;
-  CustomExactSolution sln_exact(&mesh);
+  MeshFunctionSharedPtr<double> sln(new Solution<double>);
+  MeshFunctionSharedPtr<double> sln_exact(new CustomExactSolution(mesh));
 
   // Project the exact function on the FE space.
   OGProjection<double> ogProjection;
-  ogProjection.project_global(&space, &sln_exact, &sln);
+  ogProjection.project_global(space, sln_exact, sln);
 
   // Visualize the projection.
   ScalarView view1("Projection", new WinGeom(610, 0, 600, 500));
-  view1.show(&sln);
+  view1.show(sln);
 
   // Wait for all views to be closed.
   View::wait();

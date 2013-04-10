@@ -48,22 +48,22 @@ const double BDY_C_PARAM = 20.0;
 int main(int argc, char* argv[])
 {
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   if (USE_XML_FORMAT == true)
   {
     MeshReaderH2DXML mloader;  
     Hermes::Mixins::Loggable::Static::info("Reading mesh in XML format.");
-    mloader.load("domain.xml", &mesh);
+    mloader.load("domain.xml", mesh);
   }
   else 
   {
     MeshReaderH2D mloader;
     Hermes::Mixins::Loggable::Static::info("Reading mesh in original format.");
-    mloader.load("domain.mesh", &mesh);
+    mloader.load("domain.mesh", mesh);
   }
 
   // Perform initial mesh refinements (optional).
-  for (int i=0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
+  for (int i=0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
 
   // Initialize the weak formulation.
   CustomWeakFormPoissonNewton wf("Aluminum", new Hermes1DFunction<double>(LAMBDA_AL), 
@@ -77,12 +77,12 @@ int main(int argc, char* argv[])
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
-  int ndof = space.get_num_dofs();
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  int ndof = space->get_num_dofs();
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
   // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, &space);
+  DiscreteProblem<double> dp(&wf, space);
 
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp);
@@ -99,8 +99,8 @@ int main(int argc, char* argv[])
   }
 
   // Translate the resulting coefficient vector into a Solution.
-  Solution<double> sln;
-  Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);
+  MeshFunctionSharedPtr<double> sln(new Solution<double>);
+  Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);
 
   // VTK output.
   if (VTK_VISUALIZATION) 
@@ -108,12 +108,12 @@ int main(int argc, char* argv[])
     // Output solution in VTK format.
     Linearizer lin;
     bool mode_3D = true;
-    lin.save_solution_vtk(&sln, "sln.vtk", "Temperature", mode_3D);
+    lin.save_solution_vtk(sln, "sln.vtk", "Temperature", mode_3D);
     Hermes::Mixins::Loggable::Static::info("Solution in VTK format saved to file %s.", "sln.vtk");
 
     // Output mesh and element orders in VTK format.
     Orderizer ord;
-    ord.save_orders_vtk(&space, "ord.vtk");
+    ord.save_orders_vtk(space, "ord.vtk");
     Hermes::Mixins::Loggable::Static::info("Element orders in VTK format saved to file %s.", "ord.vtk");
   }
 
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
     // tolerance for that. Options are HERMES_EPS_LOW, HERMES_EPS_NORMAL (default), 
     // HERMES_EPS_HIGH and HERMES_EPS_VERYHIGH. The size of the graphics file grows 
     // considerably with more accurate representation, so use it wisely.
-    view.show(&sln, HERMES_EPS_HIGH);
+    view.show(sln, HERMES_EPS_HIGH);
     View::wait();
   }
 

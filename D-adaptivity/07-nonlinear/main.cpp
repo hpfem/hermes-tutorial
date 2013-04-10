@@ -94,33 +94,33 @@ int main(int argc, char* argv[])
   lambda.plot("spline.dat", interval_extension);
 
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("square.mesh", &mesh);
+  mloader.load("square.mesh", mesh);
 
   // Perform initial mesh refinements.
-  for(int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh.refine_all_elements();
-  mesh.refine_towards_boundary("Bdy", INIT_BDY_REF_NUM);
+  for(int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh->refine_all_elements();
+  mesh->refine_towards_boundary("Bdy", INIT_BDY_REF_NUM);
 
   // Initialize boundary conditions.
   CustomEssentialBCNonConst bc_essential("Bdy");
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
 
   // Initialize the weak formulation
   Hermes2DFunction<double> f(-heat_src);
   WeakFormsH1::DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &f);
 
   // Initialize the FE problem.
-  DiscreteProblem<double> dp_coarse(&wf, &space);
+  DiscreteProblem<double> dp_coarse(&wf, space);
 
   // Create a selector which will select optimal candidate.
   H1ProjBasedSelector<double> selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
 
   // Initialize coarse and reference mesh solution.
-  Solution<double> sln, ref_sln;
+  MeshFunctionSharedPtr<double> sln(new Solution<double>), ref_sln(new Solution<double>);
 
   // Time measurement.
   Hermes::Mixins::TimeMeasurable cpu_time;
@@ -137,9 +137,9 @@ int main(int argc, char* argv[])
   // Project the initial condition on the FE space to obtain initial
   // coefficient vector for the Newton's method.
   Hermes::Mixins::Loggable::Static::info("Projecting initial condition to obtain initial vector on the coarse mesh.");
-  double* coeff_vec_coarse = new double[space.get_num_dofs()];
-  InitialSolutionHeatTransfer init_sln(&mesh);
-  OGProjection<double> ogProjection; ogProjection.project_global(&space, &init_sln, coeff_vec_coarse);
+  double* coeff_vec_coarse = new double[space->get_num_dofs()];
+  InitialSolutionHeatTransfer init_sln(mesh);
+  OGProjection<double> ogProjection; ogProjection.project_global(space, &init_sln, coeff_vec_coarse);
 
   // Initialize Newton solver on coarse mesh.
   Hermes::Mixins::Loggable::Static::info("Solving on coarse mesh:");
@@ -159,10 +159,10 @@ int main(int argc, char* argv[])
   }
 
   // Translate the resulting coefficient vector into the Solution<double> sln.
-  Solution<double>::vector_to_solution(newton_coarse.get_sln_vector(), &space, &sln);
+  Solution<double>::vector_to_solution(newton_coarse.get_sln_vector(), space, sln);
 
   // Cleanup after the Newton loop on the coarse mesh.
-  DiscreteProblem<double> dp(&wf, &space);
+  DiscreteProblem<double> dp(&wf, space);
   delete [] coeff_vec_coarse;
   NewtonSolver<double> newton(&dp);
   newton.set_verbose_output(Hermes::Mixins::Loggable::Static::info);
@@ -175,10 +175,10 @@ int main(int argc, char* argv[])
     Hermes::Mixins::Loggable::Static::info("---- Adaptivity step %d:", as);
 
     // Construct globally refined reference mesh and setup reference space.
-    Mesh::ReferenceMeshCreator ref_mesh_creator(&mesh);
-    Mesh* ref_mesh = ref_mesh_creator.create_ref_mesh();
-    Space<double>::ReferenceSpaceCreator ref_space_creator(&space, ref_mesh);
-    Space<double>* ref_space = ref_space_creator.create_ref_space();
+    Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
+    MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
+    Space<double>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
+    SpaceSharedPtr<double> ref_space = ref_space_creator.create_ref_space();
 
     // Initialize discrete problem on the reference mesh.
 
@@ -188,13 +188,13 @@ int main(int argc, char* argv[])
     {
       // In the first step, project the coarse mesh solution.
       Hermes::Mixins::Loggable::Static::info("Projecting coarse mesh solution to obtain initial vector on new fine mesh.");
-      OGProjection<double> ogProjection; ogProjection.project_global(ref_space, &sln, coeff_vec);
+      OGProjection<double> ogProjection; ogProjection.project_global(ref_space, sln, coeff_vec);
     }
     else
     {
       // In all other steps, project the previous fine mesh solution.
       Hermes::Mixins::Loggable::Static::info("Projecting previous fine mesh solution to obtain initial vector on new fine mesh.");
-      OGProjection<double> ogProjection; ogProjection.project_global(ref_space, &ref_sln, coeff_vec);
+      OGProjection<double> ogProjection; ogProjection.project_global(ref_space, ref_sln, coeff_vec);
     }
 
     // Initialize Newton solver on fine mesh.
@@ -212,33 +212,33 @@ int main(int argc, char* argv[])
     }
 
     // Translate the resulting coefficient vector into the Solution<double> ref_sln.
-    Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
+    Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, ref_sln);
 
     // Project the fine mesh solution on the coarse mesh.
     Hermes::Mixins::Loggable::Static::info("Projecting reference solution on new coarse mesh for error calculation.");
-    OGProjection<double> ogProjection; ogProjection.project_global(&space, &ref_sln, &sln);
+    OGProjection<double> ogProjection; ogProjection.project_global(space, ref_sln, sln);
 
     // Calculate element errors and total error estimate.
     Hermes::Mixins::Loggable::Static::info("Calculating error estimate.");
-    Adapt<double>* adaptivity = new Adapt<double>(&space);
-    double err_est_rel = adaptivity->calc_err_est(&sln, &ref_sln) * 100;
+    Adapt<double>* adaptivity = new Adapt<double>(space);
+    double err_est_rel = adaptivity->calc_err_est(sln, ref_sln) * 100;
 
     // Report results.
     Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_fine: %d, err_est_rel: %g%%",
-      Space<double>::get_num_dofs(&space), Space<double>::get_num_dofs(ref_space), err_est_rel);
+      Space<double>::get_num_dofs(space), Space<double>::get_num_dofs(ref_space), err_est_rel);
 
     // Time measurement.
     cpu_time.tick();
 
     // Add entry to DOF and CPU convergence graphs.
-    graph_dof_est.add_values(Space<double>::get_num_dofs(&space), err_est_rel);
+    graph_dof_est.add_values(Space<double>::get_num_dofs(space), err_est_rel);
     graph_dof_est.save("conv_dof_est.dat");
     graph_cpu_est.add_values(cpu_time.accumulated(), err_est_rel);
     graph_cpu_est.save("conv_cpu_est.dat");
 
     // View the coarse mesh solution.
-    sview.show(&sln);
-    oview.show(&space);
+    sview.show(sln);
+    oview.show(space);
 
     // If err_est_rel too large, adapt the mesh.
     if (err_est_rel < ERR_STOP) done = true;
@@ -247,7 +247,7 @@ int main(int argc, char* argv[])
       Hermes::Mixins::Loggable::Static::info("Adapting the coarse mesh.");
       done = adaptivity->adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
 
-      if (Space<double>::get_num_dofs(&space) >= NDOF_STOP)
+      if (Space<double>::get_num_dofs(space) >= NDOF_STOP)
       {
         done = true;
         break;
@@ -267,7 +267,7 @@ int main(int argc, char* argv[])
   // Show the reference solution - the final result.
   sview.set_title("Fine mesh solution");
   sview.show_mesh(false);
-  sview.show(&ref_sln);
+  sview.show(ref_sln);
 
   // Wait for keyboard or mouse input.
   View::wait();

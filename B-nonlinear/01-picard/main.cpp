@@ -53,32 +53,33 @@ double alpha = 4.0;
 int main(int argc, char* argv[])
 {
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("square.mesh", &mesh);
+  mloader.load("square.mesh", mesh);
 
   // Perform initial mesh refinements.
-  for(int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh.refine_all_elements();
-  mesh.refine_towards_boundary("Bdy", INIT_BDY_REF_NUM);
+  for(int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh->refine_all_elements();
+  mesh->refine_towards_boundary("Bdy", INIT_BDY_REF_NUM);
 
   // Initialize boundary conditions.
   CustomEssentialBCNonConst bc_essential("Bdy");
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
-  int ndof = space.get_num_dofs();
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  int ndof = space->get_num_dofs();
 
   // Initialize previous iteration solution for the Picard's method.
-  ConstantSolution<double> sln_prev_iter(&mesh, INIT_COND_CONST);
+  MeshFunctionSharedPtr<double> sln_prev_iter(new ConstantSolution<double>(mesh, INIT_COND_CONST));
 
   // Initialize the weak formulation.
   CustomNonlinearity lambda(alpha);
   Hermes2DFunction<double> src(-heat_src);
-  CustomWeakFormPicard wf(&sln_prev_iter, &lambda, &src);
+  CustomWeakFormPicard wf(sln_prev_iter, &lambda, &src);
 
   // Initialize the FE problem.
-  DiscreteProblemLinear<double> dp(&wf, &space);
+  DiscreteProblem<double> dp(&wf, space);
+  dp.set_linear();
 
   // Initialize the Picard solver.
   PicardSolver<double> picard(&dp);
@@ -91,7 +92,7 @@ int main(int argc, char* argv[])
   picard.set_anderson_beta(PICARD_ANDERSON_BETA);
   try
   {
-    picard.solve(&sln_prev_iter);
+    picard.solve(sln_prev_iter);
   }
   catch(std::exception& e)
   {
@@ -99,15 +100,15 @@ int main(int argc, char* argv[])
   }
 
   // Translate the coefficient vector into a Solution. 
-  Solution<double> sln;
-  Solution<double>::vector_to_solution(picard.get_sln_vector(), &space, &sln);
+  MeshFunctionSharedPtr<double> sln(new Solution<double>);
+  Solution<double>::vector_to_solution(picard.get_sln_vector(), space, sln);
   
   // Visualise the solution and mesh.
   ScalarView s_view("Solution", new WinGeom(0, 0, 440, 350));
   s_view.show_mesh(false);
-  s_view.show(&sln);
+  s_view.show(sln);
   OrderView o_view("Mesh", new WinGeom(450, 0, 420, 350));
-  o_view.show(&space);
+  o_view.show(space);
 
   // Wait for all views to be closed.
   View::wait();

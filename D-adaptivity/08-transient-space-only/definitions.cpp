@@ -67,5 +67,4 @@ MeshFunction<double>* CustomInitialCondition::clone() const
 
 CustomInitialCondition::~CustomInitialCondition()
 {
-  delete mesh;
 }

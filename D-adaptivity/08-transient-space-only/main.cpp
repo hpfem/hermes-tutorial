@@ -114,24 +114,24 @@ int main(int argc, char* argv[])
   if (bt.is_fully_implicit()) Hermes::Mixins::Loggable::Static::info("Using a %d-stage fully implicit R-K method.", bt.get_size());
 
   // Load the mesh.
-  Mesh mesh, basemesh;
+  MeshSharedPtr mesh(new Mesh), basemesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("square.mesh", &basemesh);
+  mloader.load("square.mesh", basemesh);
 
   // Perform initial mesh refinements.
-  for(int i = 0; i < INIT_REF_NUM; i++) basemesh.refine_all_elements(0, true);
-  mesh.copy(&basemesh);
+  for(int i = 0; i < INIT_REF_NUM; i++) basemesh->refine_all_elements(0, true);
+  mesh->copy(basemesh);
   
   // Initialize boundary conditions.
   EssentialBCNonConst bc_essential("Bdy");
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
-  int ndof_coarse = space.get_num_dofs();
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  int ndof_coarse = space->get_num_dofs();
 
   // Previous time level solution (initialized by initial condition).
-  CustomInitialCondition sln_time_prev(&mesh);
+  MeshFunctionSharedPtr<double> sln_time_prev(new CustomInitialCondition(mesh));
 
   // Initialize the weak formulation
   CustomNonlinearity lambda(alpha);
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
   WeakFormsH1::DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &f);
 
   // Next time level solution.
-  Solution<double> sln_time_new(&mesh);
+  MeshFunctionSharedPtr<double> sln_time_new(new Solution<double>(mesh));
 
   // Create a refinement selector.
   H1ProjBasedSelector<double> selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
@@ -148,11 +148,11 @@ int main(int argc, char* argv[])
   char title[100];
   ScalarView view("Initial condition", new WinGeom(0, 0, 440, 350));
   OrderView ordview("Initial mesh", new WinGeom(445, 0, 410, 350));
-  view.show(&sln_time_prev);
-  ordview.show(&space);
+  view.show(sln_time_prev);
+  ordview.show(space);
   
   // Initialize Runge-Kutta time stepping.
-  RungeKutta<double> runge_kutta(&wf, &space, &bt);
+  RungeKutta<double> runge_kutta(&wf, space, &bt);
       
   // Time stepping loop.
   double current_time = 0; int ts = 1;
@@ -163,23 +163,23 @@ int main(int argc, char* argv[])
     {
       Hermes::Mixins::Loggable::Static::info("Global mesh derefinement.");
       switch (UNREF_METHOD) {
-        case 1: mesh.copy(&basemesh);
-                space.set_uniform_order(P_INIT);
+        case 1: mesh->copy(basemesh);
+                space->set_uniform_order(P_INIT);
                 break;
-        case 2: mesh.unrefine_all_elements();
-                space.set_uniform_order(P_INIT);
+        case 2: mesh->unrefine_all_elements();
+                space->set_uniform_order(P_INIT);
                 break;
-        case 3: mesh.unrefine_all_elements();
-                space.adjust_element_order(-1, -1, P_INIT, P_INIT);
+        case 3: mesh->unrefine_all_elements();
+                space->adjust_element_order(-1, -1, P_INIT, P_INIT);
                 break;
       }
 
       // Important. Since the space was changed, we need to re-assign DOFs.
       // Try commenting this and see that an exception is thrown.
-      space.assign_dofs();
+      space->assign_dofs();
       try
       {
-        ndof_coarse = Space<double>::get_num_dofs(&space);
+        ndof_coarse = Space<double>::get_num_dofs(space);
       }
       catch(Hermes::Exceptions::Exception& e)
       {
@@ -195,10 +195,10 @@ int main(int argc, char* argv[])
       Hermes::Mixins::Loggable::Static::info("Time step %d, adaptivity step %d:", ts, as);
 
       // Construct globally refined reference mesh and setup reference space.
-      Mesh::ReferenceMeshCreator ref_mesh_creator(&mesh);
-      Mesh* ref_mesh = ref_mesh_creator.create_ref_mesh();
-      Space<double>::ReferenceSpaceCreator ref_space_creator(&space, ref_mesh);
-      Space<double>* ref_space = ref_space_creator.create_ref_space();
+      Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
+      MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
+      Space<double>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
+      SpaceSharedPtr<double> ref_space = ref_space_creator.create_ref_space();
       int ndof_ref = Space<double>::get_num_dofs(ref_space);
 
       // Perform one Runge-Kutta time step according to the selected Butcher's table.
@@ -208,7 +208,7 @@ int main(int argc, char* argv[])
         runge_kutta.set_verbose_output(true);
         runge_kutta.set_time(current_time);
         runge_kutta.set_time_step(time_step);
-        runge_kutta.rk_time_step_newton(&sln_time_prev, &sln_time_new);
+        runge_kutta.rk_time_step_newton(sln_time_prev, sln_time_new);
       }
       catch(Exceptions::Exception& e)
       {
@@ -217,18 +217,18 @@ int main(int argc, char* argv[])
       }
 
       // Project the fine mesh solution onto the coarse mesh.
-      Solution<double> sln_coarse;
+      MeshFunctionSharedPtr<double> sln_coarse(new Solution<double>);
       Hermes::Mixins::Loggable::Static::info("Projecting fine mesh solution on coarse mesh for error estimation.");
-      OGProjection<double> ogProjection; ogProjection.project_global(&space, &sln_time_new, &sln_coarse); 
+      OGProjection<double> ogProjection; ogProjection.project_global(space, sln_time_new, sln_coarse); 
 
       // Calculate element errors and total error estimate.
       Hermes::Mixins::Loggable::Static::info("Calculating error estimate.");
-      Adapt<double>* adaptivity = new Adapt<double>(&space);
-      double err_est_rel_total = adaptivity->calc_err_est(&sln_coarse, &sln_time_new) * 100;
+      Adapt<double>* adaptivity = new Adapt<double>(space);
+      double err_est_rel_total = adaptivity->calc_err_est(sln_coarse, sln_time_new) * 100;
 
       // Report results.
       Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_ref: %d, err_est_rel: %g%%", 
-           Space<double>::get_num_dofs(&space), Space<double>::get_num_dofs(ref_space), err_est_rel_total);
+           Space<double>::get_num_dofs(space), Space<double>::get_num_dofs(ref_space), err_est_rel_total);
 
       // If err_est too large, adapt the mesh.
       if (err_est_rel_total < ERR_STOP) done = true;
@@ -237,7 +237,7 @@ int main(int argc, char* argv[])
         Hermes::Mixins::Loggable::Static::info("Adapting the coarse mesh.");
         done = adaptivity->adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
 
-        if (Space<double>::get_num_dofs(&space) >= NDOF_STOP) 
+        if (Space<double>::get_num_dofs(space) >= NDOF_STOP) 
           done = true;
         else
           // Increase the counter of performed adaptivity steps.
@@ -249,21 +249,17 @@ int main(int argc, char* argv[])
       sprintf(title, "Solution, time %g", current_time);
       view.set_title(title);
       view.show_mesh(false);
-      view.show(&sln_time_new);
+      view.show(sln_time_new);
       sprintf(title, "Mesh, time %g", current_time);
       ordview.set_title(title);
-      ordview.show(&space);
+      ordview.show(space);
 
       // Clean up.
       delete adaptivity;
-      if(!done) {
-        delete ref_space;
-        delete sln_time_new.get_mesh();
-      }
     }
     while (done == false);
 
-    sln_time_prev.copy(&sln_time_new);
+    sln_time_prev->copy(sln_time_new);
 
     // Increase current time and counter of time steps.
     current_time += time_step;

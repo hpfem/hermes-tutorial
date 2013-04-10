@@ -34,37 +34,37 @@ int main(int argc, char* argv[])
   cpu_time.tick();
 
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   if (USE_XML_FORMAT == true)
   {
     MeshReaderH2DXML mloader;  
     Hermes::Mixins::Loggable::Static::info("Reading mesh in XML format.");
-    mloader.load("domain.xml", &mesh);
+    mloader.load("domain.xml", mesh);
   }
   else 
   {
     MeshReaderH2D mloader;
     Hermes::Mixins::Loggable::Static::info("Reading mesh in original format.");
-    mloader.load("domain.mesh", &mesh);
+    mloader.load("domain.mesh", mesh);
   }
 
   // Perform initial mesh refinements.
-  for (int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
+  for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
   
   // Initialize boundary conditions
   CustomEssentialBCNonConst bc_essential("Horizontal");
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
-  int ndof = space.get_num_dofs();
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  int ndof = space->get_num_dofs();
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
   // Initialize the weak formulation.
   CustomWeakFormGeneral wf("Horizontal");
 
   // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, &space);
+  DiscreteProblem<double> dp(&wf, space);
 
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp);
@@ -81,17 +81,17 @@ int main(int argc, char* argv[])
   }
 
   // Translate the resulting coefficient vector into a Solution.
-  Solution<double> sln;
-  Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);
+  MeshFunctionSharedPtr<double> sln(new Solution<double>);
+  Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);
 
   // Time measurement.
   cpu_time.tick();
 
   // View the solution and mesh.
   ScalarView sview("Solution", new WinGeom(0, 0, 440, 350));
-  sview.show(&sln);
+  sview.show(sln);
   OrderView oview("Polynomial orders", new WinGeom(450, 0, 405, 350));
-  oview.show(&space);
+  oview.show(space);
 
   // Print timing information.
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());

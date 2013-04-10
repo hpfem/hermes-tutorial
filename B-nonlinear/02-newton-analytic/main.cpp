@@ -40,21 +40,21 @@ double alpha = 4.0;
 int main(int argc, char* argv[])
 {
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("square.mesh", &mesh);
+  mloader.load("square.mesh", mesh);
 
   // Perform initial mesh refinements.
-  for(int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh.refine_all_elements();
-  mesh.refine_towards_boundary("Bdy", INIT_BDY_REF_NUM);
+  for(int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh->refine_all_elements();
+  mesh->refine_towards_boundary("Bdy", INIT_BDY_REF_NUM);
 
   // Initialize boundary conditions.
   CustomEssentialBCNonConst bc_essential("Bdy");
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
-  int ndof = space.get_num_dofs();
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  int ndof = space->get_num_dofs();
   Hermes::Mixins::Loggable::Static::info("ndof: %d", ndof);
 
   // Initialize the weak formulation
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
   DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &src);
 
   // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, &space);
+  DiscreteProblem<double> dp(&wf, space);
 
   // Project the initial condition on the FE space to obtain initial 
   // coefficient vector for the Newton's method.
@@ -71,8 +71,8 @@ int main(int argc, char* argv[])
   // coeff_vec to be a vector of ndof zeros (no projection is needed).
   Hermes::Mixins::Loggable::Static::info("Projecting to obtain initial vector for the Newton's method.");
   double* coeff_vec = new double[ndof];
-  CustomInitialCondition init_sln(&mesh);
-  OGProjection<double> ogProjection; ogProjection.project_global(&space, &init_sln, coeff_vec); 
+  CustomInitialCondition init_sln(mesh);
+  OGProjection<double> ogProjection; ogProjection.project_global(space, &init_sln, coeff_vec); 
 
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp);
@@ -91,8 +91,8 @@ int main(int argc, char* argv[])
   }
 
   // Translate the resulting coefficient vector into a Solution.
-  Solution<double> sln;
-  Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);
+  MeshFunctionSharedPtr<double> sln(new Solution<double>);
+  Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);
 
   // Get info about time spent during assembling in its respective parts.
   //dp.get_all_profiling_output(std::cout);
@@ -103,9 +103,9 @@ int main(int argc, char* argv[])
   // Visualise the solution and mesh.
   ScalarView s_view("Solution", new WinGeom(0, 0, 440, 350));
   s_view.show_mesh(false);
-  s_view.show(&sln);
+  s_view.show(sln);
   OrderView o_view("Mesh", new WinGeom(450, 0, 400, 350));
-  o_view.show(&space);
+  o_view.show(space);
 
   // Wait for all views to be closed.
   View::wait();

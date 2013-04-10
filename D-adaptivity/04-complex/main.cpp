@@ -82,12 +82,12 @@ int main(int argc, char* argv[])
   cpu_time.tick();
 
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("domain.mesh", &mesh);
+  mloader.load("domain.mesh", mesh);
 
   // Perform initial mesh refinements.
-  for (int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
+  for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
 
   // Initialize boundary conditions.
   Hermes::Hermes2D::DefaultEssentialBCConst<std::complex<double> > 
@@ -95,8 +95,8 @@ int main(int argc, char* argv[])
   EssentialBCs<std::complex<double> > bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<std::complex<double> > space(&mesh, &bcs, P_INIT);
-  int ndof = space.get_num_dofs();
+  SpaceSharedPtr<std::complex<double> > space(new  H1Space<std::complex<double> >(mesh, &bcs, P_INIT));
+  int ndof = space->get_num_dofs();
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
   // Initialize the weak formulation.
@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
     "Wire", MU_0, std::complex<double>(J_EXT, 0.0), OMEGA);
 
   // Initialize coarse and reference mesh solution.
-  Solution<std::complex<double> > sln, ref_sln;
+  MeshFunctionSharedPtr<std::complex<double> > sln(new Solution<std::complex<double> >), ref_sln(new Solution<std::complex<double> >);
 
   // Initialize refinement selector.
   H1ProjBasedSelector<std::complex<double> > 
@@ -125,10 +125,10 @@ int main(int argc, char* argv[])
     Hermes::Mixins::Loggable::Static::info("---- Adaptivity step %d:", as);
 
     // Construct globally refined reference mesh and setup reference space.
-    Mesh::ReferenceMeshCreator ref_mesh_creator(&mesh);
-    Mesh* ref_mesh = ref_mesh_creator.create_ref_mesh();
-    Space<std::complex<double> >::ReferenceSpaceCreator ref_space_creator(&space, ref_mesh);
-    Space<std::complex<double> >* ref_space = ref_space_creator.create_ref_space();
+    Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
+    MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
+    Space<std::complex<double> >::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
+    SpaceSharedPtr<std::complex<double> > ref_space = ref_space_creator.create_ref_space();
     int ndof_ref = ref_space->get_num_dofs();
 
     // Initialize reference problem.
@@ -149,35 +149,35 @@ int main(int argc, char* argv[])
       std::cout << e.what();
       
     }
-    Hermes::Hermes2D::Solution<std::complex<double> >::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
+    Hermes::Hermes2D::Solution<std::complex<double> >::vector_to_solution(newton.get_sln_vector(), ref_space, ref_sln);
 
     // Time measurement.
     cpu_time.tick();
 
     // Project the fine mesh solution onto the coarse mesh.
     Hermes::Mixins::Loggable::Static::info("Projecting reference solution on coarse mesh.");
-    OGProjection<std::complex<double> > ogProjection; ogProjection.project_global(&space, &ref_sln, &sln);
+    OGProjection<std::complex<double> > ogProjection; ogProjection.project_global(space, ref_sln, sln);
 
     // View the coarse mesh solution and polynomial orders.
-    RealFilter real_filter(&sln);
-    sview.show(&real_filter);
+    MeshFunctionSharedPtr<double> real_filter(new RealFilter(sln));
+    sview.show(real_filter);
 
-    oview.show(&space);
+    oview.show(space);
 
     // Calculate element errors and total error estimate.
     Hermes::Mixins::Loggable::Static::info("Calculating error estimate.");
-    Adapt<std::complex<double> >* adaptivity = new Adapt<std::complex<double> >(&space);
-    double err_est_rel = adaptivity->calc_err_est(&sln, &ref_sln) * 100;
+    Adapt<std::complex<double> >* adaptivity = new Adapt<std::complex<double> >(space);
+    double err_est_rel = adaptivity->calc_err_est(sln, ref_sln) * 100;
 
     // Report results.
     Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_fine: %d, err_est_rel: %g%%",
-      space.get_num_dofs(), ref_space->get_num_dofs(), err_est_rel);
+      space->get_num_dofs(), ref_space->get_num_dofs(), err_est_rel);
 
     // Time measurement.
     cpu_time.tick();
 
     // Add entry to DOF and CPU convergence graphs.
-    graph_dof.add_values(space.get_num_dofs(), err_est_rel);
+    graph_dof.add_values(space->get_num_dofs(), err_est_rel);
     graph_dof.save("conv_dof_est.dat");
     graph_cpu.add_values(cpu_time.accumulated(), err_est_rel);
     graph_cpu.save("conv_cpu_est.dat");
@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
       Hermes::Mixins::Loggable::Static::info("Adapting coarse mesh.");
       done = adaptivity->adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
     }
-    if (space.get_num_dofs() >= NDOF_STOP) done = true;
+    if (space->get_num_dofs() >= NDOF_STOP) done = true;
 
     // Clean up.
     delete adaptivity;
@@ -203,7 +203,7 @@ int main(int argc, char* argv[])
   // Show the reference solution - the final result.
   sview.set_title("Fine mesh solution");
 
-  RealFilter real_filter(&ref_sln);
+  RealFilter real_filter(ref_sln);
   sview.show(&real_filter);
 
   // Wait for all views to be closed.

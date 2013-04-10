@@ -86,26 +86,26 @@ int main(int argc, char* argv[])
   if (bt.is_fully_implicit()) Hermes::Mixins::Loggable::Static::info("Using a %d-stage fully implicit R-K method.", bt.get_size());
 
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("square.mesh", &mesh);
+  mloader.load("square.mesh", mesh);
 
   // Initial mesh refinements.
-  for(int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh.refine_all_elements();
-  mesh.refine_towards_boundary("Bdy", INIT_BDY_REF_NUM);
+  for(int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh->refine_all_elements();
+  mesh->refine_towards_boundary("Bdy", INIT_BDY_REF_NUM);
 
   // Initialize boundary conditions.
   EssentialBCNonConst bc_essential("Bdy");
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
-  int ndof = space.get_num_dofs();
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  int ndof = space->get_num_dofs();
 
   // Convert initial condition into a Solution.
-  CustomInitialCondition sln_time_prev(&mesh);
-  Solution<double> sln_time_new(&mesh);
-  ZeroSolution<double> time_error_fn(&mesh);
+  MeshFunctionSharedPtr<double>  sln_time_prev(new CustomInitialCondition(mesh));
+  MeshFunctionSharedPtr<double>  sln_time_new(new Solution<double>(mesh));
+  MeshFunctionSharedPtr<double>  time_error_fn(new ZeroSolution<double>(mesh));
 
   // Initialize the weak formulation
   CustomNonlinearity lambda(alpha);
@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
   ScalarView eview("Temporal error", new WinGeom(500, 0, 500, 400));
   eview.fix_scale_width(50);
 
-  RungeKutta<double> runge_kutta(&wf, &space, &bt);
+  RungeKutta<double> runge_kutta(&wf, space, &bt);
 
   // Graph for time step history.
   SimpleGraph time_step_graph;
@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
       runge_kutta.set_time_step(time_step);
       runge_kutta.set_newton_max_iter(NEWTON_MAX_ITER);
       runge_kutta.set_newton_tol(NEWTON_TOL);
-      runge_kutta.rk_time_step_newton(&sln_time_prev, &sln_time_new, &time_error_fn);
+      runge_kutta.rk_time_step_newton(sln_time_prev, sln_time_new, time_error_fn);
     }
     catch(Exceptions::Exception& e)
     {
@@ -148,21 +148,21 @@ int main(int argc, char* argv[])
     char title[100];
     sprintf(title, "Temporal error, t = %g", current_time);
     eview.set_title(title);
-    AbsFilter abs_tef(&time_error_fn);
+    AbsFilter abs_tef(time_error_fn);
     eview.show(&abs_tef);
     
     // Show the new time level solution.
     sprintf(title, "Solution (higher-order), t = %g", current_time);
     sview_high.set_title(title);
-    sview_high.show(&sln_time_new);
+    sview_high.show(sln_time_new);
 
     // Calculate relative time stepping error and decide whether the 
     // time step can be accepted. If not, then the time step size is 
     // reduced and the entire time step repeated. If yes, then another
     // check is run, and if the relative error is very low, time step 
     // is increased.
-    double rel_err_time = Global<double>::calc_norm(&time_error_fn, HERMES_H1_NORM) / 
-                          Global<double>::calc_norm(&sln_time_new, HERMES_H1_NORM) * 100;
+    double rel_err_time = Global<double>::calc_norm(time_error_fn.get(), HERMES_H1_NORM) / 
+                          Global<double>::calc_norm(sln_time_new.get(), HERMES_H1_NORM) * 100;
     Hermes::Mixins::Loggable::Static::info("rel_err_time = %g%%", rel_err_time);
     if (rel_err_time > TIME_TOL_UPPER) {
       Hermes::Mixins::Loggable::Static::info("rel_err_time above upper limit %g%% -> decreasing time step from %g to %g and repeating time step.", 
@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
     time_step_graph.save("time_step_history.dat");
 
     // Copy solution for next time step.
-    sln_time_prev.copy(&sln_time_new);
+    sln_time_prev->copy(sln_time_new);
 
     // Update time.
     current_time += time_step;

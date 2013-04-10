@@ -28,7 +28,7 @@ public:
 class CustomWeakFormPicard : public WeakForm<double>
 {
 public:
-  CustomWeakFormPicard(Solution<double>* prev_iter_sln, Hermes1DFunction<double>* lambda, Hermes2DFunction<double>* f);
+  CustomWeakFormPicard(MeshFunctionSharedPtr<double> prev_iter_sln, Hermes1DFunction<double>* lambda, Hermes2DFunction<double>* f);
 
 private:
   class CustomJacobian : public MatrixFormVol<double>

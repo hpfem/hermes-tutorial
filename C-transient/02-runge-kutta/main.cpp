@@ -90,18 +90,18 @@ int main(int argc, char* argv[])
   if (bt.is_fully_implicit()) Hermes::Mixins::Loggable::Static::info("Using a %d-stage fully implicit R-K method.", bt.get_size());
 
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("domain.mesh", &mesh);
+  mloader.load("domain.mesh", mesh);
 
   // Perform initial mesh refinements.
-  for(int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
-  mesh.refine_towards_boundary("Boundary_air", INIT_REF_NUM_BDY);
-  mesh.refine_towards_boundary("Boundary_ground", INIT_REF_NUM_BDY);
+  for(int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
+  mesh->refine_towards_boundary("Boundary_air", INIT_REF_NUM_BDY);
+  mesh->refine_towards_boundary("Boundary_ground", INIT_REF_NUM_BDY);
 
   // Previous and next time level solutions.
-  ConstantSolution<double> sln_time_prev(&mesh, TEMP_INIT);
-  Solution<double> sln_time_new(&mesh);
+  MeshFunctionSharedPtr<double> sln_time_prev(new ConstantSolution<double>(mesh, TEMP_INIT));
+  MeshFunctionSharedPtr<double> sln_time_new(new Solution<double>(mesh));
 
   // Initialize the weak formulation.
   double current_time = 0;
@@ -114,8 +114,8 @@ int main(int argc, char* argv[])
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
-  int ndof = space.get_num_dofs();
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  int ndof = space->get_num_dofs();
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
   // Initialize views.
@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
   Tview.fix_scale_width(30);
 
   // Initialize Runge-Kutta time stepping.
-  RungeKutta<double> runge_kutta(&wf, &space, &bt);
+  RungeKutta<double> runge_kutta(&wf, space, &bt);
 
   // Time stepping loop:
   int ts = 1;
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
       runge_kutta.set_time_step(time_step);
       runge_kutta.set_newton_max_iter(NEWTON_MAX_ITER);
       runge_kutta.set_newton_tol(NEWTON_TOL);
-      runge_kutta.rk_time_step_newton(&sln_time_prev, &sln_time_new);
+      runge_kutta.rk_time_step_newton(sln_time_prev, sln_time_new);
     }
     catch(Exceptions::Exception& e)
     {
@@ -150,10 +150,10 @@ int main(int argc, char* argv[])
     char title[100];
     sprintf(title, "Time %3.2f s", current_time);
     Tview.set_title(title);
-    Tview.show(&sln_time_new);
+    Tview.show(sln_time_new);
 
     // Copy solution for the new time step.
-    sln_time_prev.copy(&sln_time_new);
+    sln_time_prev->copy(sln_time_new);
 
     // Increase current time and time step counter.
     current_time += time_step;

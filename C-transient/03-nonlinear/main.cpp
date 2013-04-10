@@ -72,25 +72,25 @@ int main(int argc, char* argv[])
   if (bt.is_fully_implicit()) Hermes::Mixins::Loggable::Static::info("Using a %d-stage fully implicit R-K method.", bt.get_size());
 
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("square.mesh", &mesh);
+  mloader.load("square.mesh", mesh);
 
   // Initial mesh refinements.
-  for(int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh.refine_all_elements();
-  mesh.refine_towards_boundary("Bdy", INIT_BDY_REF_NUM);
+  for(int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh->refine_all_elements();
+  mesh->refine_towards_boundary("Bdy", INIT_BDY_REF_NUM);
 
   // Initialize boundary conditions.
   EssentialBCNonConst bc_essential("Bdy");
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
-  int ndof = space.get_num_dofs();
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  int ndof = space->get_num_dofs();
   Hermes::Mixins::Loggable::Static::info("ndof = %d.", ndof);
 
   // Previous time level solution (initialized by the initial condition).
-  CustomInitialCondition sln_time_prev(&mesh);
+  MeshFunctionSharedPtr<double>  sln_time_prev(new CustomInitialCondition(mesh));
 
   // Initialize the weak formulation
   CustomNonlinearity lambda(alpha);
@@ -98,15 +98,15 @@ int main(int argc, char* argv[])
   DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &f);
 
   // Next time level solution.
-  Solution<double> sln_time_new(&mesh);
+  MeshFunctionSharedPtr<double> sln_time_new(new Solution<double>(mesh));
 
   // Initialize Runge-Kutta time stepping.
-  RungeKutta<double> runge_kutta(&wf, &space, &bt);
+  RungeKutta<double> runge_kutta(&wf, space, &bt);
 
   // Initialize views.
   ScalarView sview("Solution", new WinGeom(0, 0, 500, 400));
   OrderView oview("Mesh", new WinGeom(510, 0, 460, 400));
-  oview.show(&space);
+  oview.show(space);
 
   // Time stepping loop:
   double current_time = 0; int ts = 1;
@@ -119,10 +119,10 @@ int main(int argc, char* argv[])
     bool block_diagonal_jacobian = false;
     double damping_coeff = 1.0;
     double max_allowed_residual_norm = 1e10;
-    Hermes::vector<Solution<double>*> slns_time_prev;
-    slns_time_prev.push_back(&sln_time_prev);
-    Hermes::vector<Solution<double>*> slns_time_new;
-    slns_time_new.push_back(&sln_time_new);
+    Hermes::vector<MeshFunctionSharedPtr<double> > slns_time_prev;
+    slns_time_prev.push_back(sln_time_prev);
+    Hermes::vector<MeshFunctionSharedPtr<double> > slns_time_new;
+    slns_time_new.push_back(sln_time_new);
     try
     {
       runge_kutta.set_verbose_output(true);
@@ -146,11 +146,11 @@ int main(int argc, char* argv[])
     char title[100];
     sprintf(title, "Solution, t = %g", current_time);
     sview.set_title(title);
-    sview.show(&sln_time_new, HERMES_EPS_HIGH);
-    oview.show(&space);
+    sview.show(sln_time_new, HERMES_EPS_HIGH);
+    oview.show(space);
 
     // Copy solution for the new time step.
-    sln_time_prev.copy(&sln_time_new);
+    sln_time_prev->copy(sln_time_new);
 
     // Increase counter of time steps.
     ts++;

@@ -8,7 +8,7 @@ using namespace Hermes::Hermes2D;
 class InitialSolutionHeatTransfer : public ExactSolutionScalar<double>
 {
 public:
-  InitialSolutionHeatTransfer(Mesh* mesh) : ExactSolutionScalar<double>(mesh) {};
+  InitialSolutionHeatTransfer(MeshSharedPtr mesh) : ExactSolutionScalar<double>(mesh) {};
   ~InitialSolutionHeatTransfer();
 
   virtual double value (double x, double y) const;

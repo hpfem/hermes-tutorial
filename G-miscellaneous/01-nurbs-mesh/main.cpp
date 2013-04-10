@@ -17,16 +17,16 @@ const char* mesh_file = "domain-4.mesh";
 int main(int argc, char* argv[])
 {
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load(mesh_file, &mesh);
+  mloader.load(mesh_file, mesh);
 
   // Perform initial mesh refinements (optional).
-  for (int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
+  for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
 
   // Show the mesh.
   Views::MeshView mview("Nurbs", new Views::WinGeom(0, 0, 350, 350));
-  mview.show(&mesh);
+  mview.show(mesh);
 	
   // Wait for the view to be closed.
   Views::View::wait();
