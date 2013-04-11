@@ -119,8 +119,7 @@ MeshFunction<double>* ExactSolutionFitzHughNagumo1::clone() const
 	return new ExactSolutionFitzHughNagumo1(this->mesh);
 }
 
-
-ExactSolutionFitzHughNagumo2::ExactSolutionFitzHughNagumo2(Mesh mesh, double K)
+ExactSolutionFitzHughNagumo2::ExactSolutionFitzHughNagumo2(MeshSharedPtr mesh, double K)
      : ExactSolutionScalar<double>(mesh), K(K)
 {
   cef2 = new CustomExactFunction2(K);

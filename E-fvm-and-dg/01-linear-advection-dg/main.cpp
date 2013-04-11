@@ -62,21 +62,22 @@ int main(int argc, char* args[])
   if(WANT_DG)
   {
     // Create an L2 space.
-    L2Space<double> space_l2(mesh, P_INIT);
+    SpaceSharedPtr<double> space_l2(new L2Space<double>(mesh, P_INIT));
 
     // Initialize the solution.
-    Solution<double> sln_l2;
+    MeshFunctionSharedPtr<double> sln_l2(new Solution<double>);
 
     // Initialize the weak formulation.
     CustomWeakForm wf_l2(BDY_BOTTOM_LEFT);
 
     // Initialize the FE problem.
-    DiscreteProblemLinear<double> dp_l2(&wf_l2, space_l2);
+    DiscreteProblem<double> dp_l2(&wf_l2, space_l2);
+    dp_l2.set_linear();
 
     // Initialize linear solver.
     Hermes::Hermes2D::LinearSolver<double> linear_solver(&dp_l2);
 
-    Hermes::Mixins::Loggable::Static::info("Assembling Discontinuous Galerkin (nelem: %d, ndof: %d).", mesh->get_num_active_elements(), space_l2.get_num_dofs());
+    Hermes::Mixins::Loggable::Static::info("Assembling Discontinuous Galerkin (nelem: %d, ndof: %d).", mesh->get_num_active_elements(), space_l2->get_num_dofs());
 
     // Solve the linear system. If successful, obtain the solution.
     Hermes::Mixins::Loggable::Static::info("Solving Discontinuous Galerkin.");
@@ -110,18 +111,19 @@ int main(int argc, char* args[])
   if(WANT_FEM)
   {
     // Create an H1 space.
-    H1Space<double> space_h1(mesh, P_INIT);
+    SpaceSharedPtr<double> space_h1(new H1Space<double>(mesh, P_INIT));
 
     // Initialize the solution.
-    Solution<double> sln_h1;
+    MeshFunctionSharedPtr<double> sln_h1(new Solution<double>);
 
     // Initialize the weak formulation.
     CustomWeakForm wf_h1(BDY_BOTTOM_LEFT, false);
 
     // Initialize the FE problem.
-    DiscreteProblemLinear<double> dp_h1(&wf_h1, space_h1);
+    DiscreteProblem<double> dp_h1(&wf_h1, space_h1);
+    dp_h1.set_linear();
 
-    Hermes::Mixins::Loggable::Static::info("Assembling Continuous FEM (nelem: %d, ndof: %d).", mesh->get_num_active_elements(), space_h1.get_num_dofs());
+    Hermes::Mixins::Loggable::Static::info("Assembling Continuous FEM (nelem: %d, ndof: %d).", mesh->get_num_active_elements(), space_h1->get_num_dofs());
 
     // Initialize linear solver.
     Hermes::Hermes2D::LinearSolver<double> linear_solver(&dp_h1);

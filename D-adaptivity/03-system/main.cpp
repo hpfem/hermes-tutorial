@@ -176,10 +176,7 @@ int main(int argc, char* argv[])
     
     DiscreteProblem<double> dp(&wf, ref_spaces_const);
     NewtonSolver<double> newton(&dp);
-    newton.set_newton_tol(1e-1);
-    //dp.set_spaces(ref_spaces_const);
-
-    //newton.set_verbose_output(false);
+    newton.set_tolerance(1e-1);
 
     // Time measurement.
     cpu_time.tick();

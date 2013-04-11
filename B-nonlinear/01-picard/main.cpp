@@ -86,8 +86,8 @@ int main(int argc, char* argv[])
   picard.use_Anderson_acceleration(true);
 
   // Perform the Picard's iteration (Anderson acceleration on by default).
-  picard.set_picard_tol(PICARD_TOL);
-  picard.set_picard_max_iter(PICARD_MAX_ITER);
+  picard.set_tolerance(PICARD_TOL);
+  picard.set_max_allowed_iterations(PICARD_MAX_ITER);
   picard.set_num_last_vector_used(PICARD_NUM_LAST_ITER_USED);
   picard.set_anderson_beta(PICARD_ANDERSON_BETA);
   try

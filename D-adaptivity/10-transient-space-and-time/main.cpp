@@ -347,7 +347,7 @@ int main(int argc, char* argv[])
     ordview.show(space);
 
     // Copy last reference solution into sln_time_prev.
-    sln_time_prev.copy(ref_sln);
+    sln_time_prev->copy(ref_sln);
 
     // Increase current time and counter of time steps.
     current_time += time_step;
