@@ -62,12 +62,12 @@ int main(int argc, char* argv[])
   mesh->refine_towards_boundary("Boundary ground", INIT_REF_NUM_BDY);
 
   // Previous time level solution (initialized by the external temperature).
-  ConstantSolution<double> tsln(mesh, TEMP_INIT);
+  MeshFunctionSharedPtr<double> tsln(new ConstantSolution<double>(mesh, TEMP_INIT));
 
   // Initialize the weak formulation.
   double current_time = 0;
   CustomWeakFormHeatRK1 wf("Boundary air", ALPHA, LAMBDA, HEATCAP, RHO, time_step, 
-                           &current_time, TEMP_INIT, T_FINAL, &tsln);
+                           &current_time, TEMP_INIT, T_FINAL, tsln);
   
   // Initialize boundary conditions.
   DefaultEssentialBCConst<double> bc_essential("Boundary ground", TEMP_INIT);
@@ -107,13 +107,13 @@ int main(int argc, char* argv[])
     }
 
     // Translate the resulting coefficient vector into the Solution sln.
-    Solution<double>::vector_to_solution(newton.get_sln_vector(), space, &tsln);
+    Solution<double>::vector_to_solution(newton.get_sln_vector(), space, tsln);
 
     // Visualize the solution.
     char title[100];
     sprintf(title, "Time %3.2f s", current_time);
     Tview.set_title(title);
-    Tview.show(&tsln);
+    Tview.show(tsln);
 
     // Increase current time and time step counter.
     current_time += time_step;

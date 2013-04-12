@@ -138,8 +138,8 @@ int main(int argc, char* argv[])
   // coefficient vector for the Newton's method.
   Hermes::Mixins::Loggable::Static::info("Projecting initial condition to obtain initial vector on the coarse mesh.");
   double* coeff_vec_coarse = new double[space->get_num_dofs()];
-  InitialSolutionHeatTransfer init_sln(mesh);
-  OGProjection<double> ogProjection; ogProjection.project_global(space, &init_sln, coeff_vec_coarse);
+  MeshFunctionSharedPtr<double>  init_sln(new InitialSolutionHeatTransfer(mesh));
+  OGProjection<double> ogProjection; ogProjection.project_global(space, init_sln, coeff_vec_coarse);
 
   // Initialize Newton solver on coarse mesh.
   Hermes::Mixins::Loggable::Static::info("Solving on coarse mesh:");
@@ -155,7 +155,6 @@ int main(int argc, char* argv[])
   catch(std::exception& e)
   {
     std::cout << e.what();
-    
   }
 
   // Translate the resulting coefficient vector into the Solution<double> sln.
@@ -167,7 +166,6 @@ int main(int argc, char* argv[])
   NewtonSolver<double> newton(&dp);
   newton.set_verbose_output(Hermes::Mixins::Loggable::Static::info);
 
-    
   // Adaptivity loop.
   int as = 1; bool done = false;
   do

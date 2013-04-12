@@ -164,11 +164,11 @@ int main(int argc, char* argv[])
     // View the coarse mesh solution and polynomial orders.
     if(HERMES_VISUALIZATION)
     {
-      RealFilter real_filter(sln);
-      v_view.show(&real_filter);
+      MeshFunctionSharedPtr<double> real_filter(new RealFilter(sln));
+      v_view.show(real_filter);
       o_view.show(space);
-      lin.save_solution_vtk(&real_filter, "sln.vtk", "a");
-      ord.save_mesh_vtk(space, "mesh->vtk");
+      lin.save_solution_vtk(real_filter, "sln.vtk", "a");
+      ord.save_mesh_vtk(space, "mesh.vtk");
       lin.free();
     }
 
@@ -211,8 +211,8 @@ int main(int argc, char* argv[])
   if(HERMES_VISUALIZATION)
   {
     v_view.set_title("Fine mesh solution (magnitude)");
-    RealFilter real_filter(ref_sln);
-    v_view.show(&real_filter);
+    MeshFunctionSharedPtr<double> real_filter(new RealFilter(ref_sln));
+    v_view.show(real_filter);
 
     // Wait for all views to be closed.
     Views::View::wait();

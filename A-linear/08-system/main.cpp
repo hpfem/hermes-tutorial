@@ -105,9 +105,9 @@ int main(int argc, char* argv[])
   double lambda = (E * nu) / ((1 + nu) * (1 - 2*nu));  
   // Second Lame constant.
   double mu = E / (2*(1 + nu));                        
-  VonMisesFilter stress(Hermes::vector<MeshFunctionSharedPtr<double> >(u1_sln, u2_sln), lambda, mu);
+  MeshFunctionSharedPtr<double> stress(new VonMisesFilter(Hermes::vector<MeshFunctionSharedPtr<double> >(u1_sln, u2_sln), lambda, mu));
   view.show_mesh(false);
-  view.show(&stress, HERMES_EPS_HIGH, H2D_FN_VAL_0, u1_sln, u2_sln, 1.5e5);
+  view.show(stress, HERMES_EPS_HIGH, H2D_FN_VAL_0, u1_sln, u2_sln, 1.5e5);
 
   // Wait for the view to be closed.
   View::wait();

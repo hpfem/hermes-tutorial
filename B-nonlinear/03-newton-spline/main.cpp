@@ -91,8 +91,8 @@ int main(int argc, char* argv[])
   // coeff_vec to be a vector of ndof zeros (no projection is needed).
   Hermes::Mixins::Loggable::Static::info("Projecting to obtain initial vector for the Newton's method.");
   double* coeff_vec = new double[ndof];
-  CustomInitialCondition init_sln(mesh);
-  OGProjection<double> ogProjection; ogProjection.project_global(space, &init_sln, coeff_vec); 
+  MeshFunctionSharedPtr<double> init_sln(new CustomInitialCondition(mesh));
+  OGProjection<double> ogProjection; ogProjection.project_global(space, init_sln, coeff_vec); 
 
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp);

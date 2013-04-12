@@ -38,7 +38,7 @@ const bool HERMES_VISUALIZATION = true;
 // Set to "true" to enable VTK output.
 const bool VTK_VISUALIZATION = false;             
 // Initial polynomial degree of mesh elements.
-const int P_INIT = 10;                             
+const int P_INIT = 1;                             
 // This is a quantitative parameter of the adapt(...) function and
 // it has different meanings for various adaptive strategies.
 const double THRESHOLD = 0.8;                     

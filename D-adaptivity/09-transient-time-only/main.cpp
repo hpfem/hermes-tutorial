@@ -148,8 +148,8 @@ int main(int argc, char* argv[])
     char title[100];
     sprintf(title, "Temporal error, t = %g", current_time);
     eview.set_title(title);
-    AbsFilter abs_tef(time_error_fn);
-    eview.show(&abs_tef);
+    MeshFunctionSharedPtr<double> abs_tef(new AbsFilter(time_error_fn));
+    eview.show(abs_tef);
     
     // Show the new time level solution.
     sprintf(title, "Solution (higher-order), t = %g", current_time);
