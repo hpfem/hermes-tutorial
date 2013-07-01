@@ -178,16 +178,16 @@ void KrivodonovaDiscontinuityDetector::calculate_jumps(Element* e, int edge_i, d
     Func<double>* density_vel_y_neighbor = init_fn(solutions[2], eo);
     Func<double>* energy_neighbor = init_fn(solutions[3], eo);
 
-    DiscontinuousFunc<double> density_discontinuous(density, density_neighbor, true);
+		DiscontinuousFunc<double> density_discontinuous(density, density_neighbor, true);
     DiscontinuousFunc<double> density_vel_x_discontinuous(density_vel_x, density_vel_x_neighbor, true);
     DiscontinuousFunc<double> density_vel_y_discontinuous(density_vel_y, density_vel_y_neighbor, true);
     DiscontinuousFunc<double> energy_discontinuous(energy, energy_neighbor, true);
 
     for(int point_i = 0; point_i < np; point_i++) {
-      result[0] += jwt[point_i] * std::abs(density_discontinuous.get_val_central(point_i) - density_discontinuous.get_val_neighbor(point_i)); 
-      result[1] += jwt[point_i] * std::abs(density_vel_x_discontinuous.get_val_central(point_i) - density_vel_x_discontinuous.get_val_neighbor(point_i));
-      result[2] += jwt[point_i] * std::abs(density_vel_y_discontinuous.get_val_central(point_i) - density_vel_y_discontinuous.get_val_neighbor(point_i));
-      result[3] += jwt[point_i] * std::abs(energy_discontinuous.get_val_central(point_i) - energy_discontinuous.get_val_neighbor(point_i));
+      result[0] += jwt[point_i] * std::abs(density_discontinuous.val_neighbor[point_i] - density_discontinuous.val_neighbor[point_i]); 
+      result[1] += jwt[point_i] * std::abs(density_vel_x_discontinuous.val[point_i] - density_vel_x_discontinuous.val_neighbor[point_i]);
+      result[2] += jwt[point_i] * std::abs(density_vel_y_discontinuous.val[point_i] - density_vel_y_discontinuous.val_neighbor[point_i]);
+      result[3] += jwt[point_i] * std::abs(energy_discontinuous.val[point_i] - energy_discontinuous.val_neighbor[point_i]);
     }
 
     geom->free();
