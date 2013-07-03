@@ -31,8 +31,21 @@ project(hermes_tutorial)
 	# Allow to override the default values in CMake.vars:
 	include(CMake.vars OPTIONAL)
 
-  # --- DEPENDENCIES
-  #
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+			# Disable all warnings and turn on only important ones:
+			set(CMAKE_CXX_FLAGS "-w ${CMAKE_CXX_FLAGS}")
+			set(CMAKE_CXX_FLAGS "-Wuninitialized -Wvla -Wsign-compare ${CMAKE_CXX_FLAGS}")
+
+			set(RELEASE_FLAGS "-DNDEBUG -O3")
+			set(DEBUG_FLAGS   "-g")
+	endif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+
+	# Enabling multiprocessor build on MSVC
+	if(MSVC)
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP") 
+	endif(MSVC)
+	
+    include_directories("${PTHREAD_ROOT}/include")
 	find_package(PTHREAD REQUIRED)
 
 	if(WITH_TRILINOS)
