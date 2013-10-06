@@ -7,7 +7,7 @@ add_subdirectory(06-bc-newton)
 add_subdirectory(07-general)
 add_subdirectory(08-system)
 add_subdirectory(09-axisym)
-
+add_subdirectory(0X-ln-elast)
 
 
 
