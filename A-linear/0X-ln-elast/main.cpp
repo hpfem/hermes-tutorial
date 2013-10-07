@@ -37,38 +37,40 @@ const double f1  = 8e4;
 int main(int argc, char* argv[])
 {
   // Load the mesh.
-  Mesh mesh, mesh1;
+  MeshSharedPtr mesh(new Mesh), mesh1(new Mesh);
   if (USE_XML_FORMAT == true)
   {
     MeshReaderH2DXML mloader;
     Hermes::Mixins::Loggable::Static::info("Reading mesh in XML format.");
-    mloader.load("square.xml", &mesh);
+    mloader.load("square.xml", mesh);
   }
   else
   {
     MeshReaderH2D mloader;
     Hermes::Mixins::Loggable::Static::info("Reading mesh in original format.");
-    mloader.load("square.mesh", &mesh);
+    mloader.load("square.mesh", mesh);
   }
 
   // Perform uniform mesh refinement.
   int refinement_type = 0;
-  for (int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements(refinement_type);
+  for (int i = 0; i < INIT_REF_NUM; i++)
+    mesh->refine_all_elements(refinement_type);
 
    // Show mesh.
    MeshView mv("Mesh", new WinGeom(0, 0, 580, 400));
-   mv.show(&mesh);
+   mv.show(mesh);
 
    // Exact lambda
-   ExactSolutionLambda exact_lambda(&mesh,E,nu);
+   MeshFunctionSharedPtr<double> exact_lambda(new ExactSolutionLambda(mesh,E,nu));
    ScalarView viewLam("lambda [Pa]", new WinGeom(0, 460, 530, 350));
    viewLam.show_mesh(false);
-   viewLam.show(&exact_lambda);
+   viewLam.show(exact_lambda);
+
    // Exact lambda
-   ExactSolutionMu exact_mu(&mesh,E,nu);
+   MeshFunctionSharedPtr<double> exact_mu(new ExactSolutionMu(mesh,E,nu));
    ScalarView viewMu("mu [Pa]", new WinGeom(550, 460, 530, 350));
    viewMu.show_mesh(false);
-   viewMu.show(&exact_mu);
+   viewMu.show(exact_mu);
 
    // Initialize boundary conditions.
    DefaultEssentialBCConst<double> disp_bot_top_x(Hermes::vector<std::string>("Bottom","Top"), 0.0);
@@ -78,29 +80,24 @@ int main(int argc, char* argv[])
    EssentialBCs<double> bcs_y(Hermes::vector<EssentialBoundaryCondition<double> *>(&disp_bot_y, &disp_top_y));
 
    // Create x- and y- displacement space using the default H1 shapeset.
-   H1Space<double> u1_space(&mesh, &bcs_x, P_INIT);
-   H1Space<double> u2_space(&mesh, &bcs_y, P_INIT);
-   int ndof = Space<double>::get_num_dofs(Hermes::vector<const Space<double> *>(&u1_space, &u2_space));
+   SpaceSharedPtr<double> u1_space(new H1Space<double>(mesh, &bcs_x, P_INIT));
+   SpaceSharedPtr<double> u2_space(new H1Space<double>(mesh, &bcs_y, P_INIT));
+   Hermes::vector<SpaceSharedPtr<double> > spaces(u1_space, u2_space);
+   int ndof = Space<double>::get_num_dofs(spaces);
    Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
    // Initialize the weak formulation.
    CustomWeakFormLinearElasticity wf(E, nu, &lambdaFun, &muFun, rho*g1, "Top", f0, f1);
 
-   // Initialize the FE problem.
-   DiscreteProblem<double> dp(&wf, Hermes::vector<const Space<double> *>(&u1_space, &u2_space));
-
    // Initialize Newton solver.
-   NewtonSolver<double> newton(&dp);
+   NewtonSolver<double> newton(&wf, spaces);
    newton.set_verbose_output(true);
 
    // Perform Newton's iteration.
    try
    {
-     // NULL = start from zero initial vector, 1e-7 = tolerance.
-//     newton.solve(NULL, 1e-7);
 	   newton.solve();
    }
-//   catch(Hermes::Exceptions::Exception e)
    catch(std::exception& e)
    {
      std::cout << e.what();
@@ -108,34 +105,38 @@ int main(int argc, char* argv[])
    }
 
    // Translate the resulting coefficient vector into the Solution sln.
-   Solution<double> u1_sln, u2_sln;
-   Solution<double>::vector_to_solutions(newton.get_sln_vector(), Hermes::vector<const Space<double> *>(&u1_space, &u2_space),
-       Hermes::vector<Solution<double> *>(&u1_sln, &u2_sln));
+   MeshFunctionSharedPtr<double> u1_sln(new Solution<double>), u2_sln(new Solution<double>);
+   Hermes::vector<MeshFunctionSharedPtr<double> > solutions(u1_sln, u2_sln);
+
+   Solution<double>::vector_to_solutions(newton.get_sln_vector(), spaces, solutions);
 
    // Visualize the solution.
    ScalarView view("Von Mises stress [Pa]", new WinGeom(590, 0, 700, 400));
    // First Lame constant.
+
    double lambda = (E * nu) / ((1 + nu) * (1 - 2*nu));
    // Second Lame constant.
    double mu = E / (2*(1 + nu));
-   VonMisesFilter stress(Hermes::vector<MeshFunction<double> *>(&u1_sln, &u2_sln), lambda, mu);
+
+   MeshFunctionSharedPtr<double> stress(new VonMisesFilter(solutions, lambda, mu));
+   MeshFunctionSharedPtr<double> S11(new CustomFilterS11(solutions, &muFun, &lambdaFun));
+   MeshFunctionSharedPtr<double> S12(new CustomFilterS12(solutions, mu));
+   MeshFunctionSharedPtr<double> S22(new CustomFilterS22(solutions, mu, lambda));
+
    view.show_mesh(false);
-   view.show(&stress, HERMES_EPS_HIGH, H2D_FN_VAL_0, &u1_sln, &u2_sln, 1.0);
+   view.show(stress, HERMES_EPS_HIGH, H2D_FN_VAL_0, u1_sln, u2_sln, 1.0);
 
    ScalarView viewS11("S11 [Pa]", new WinGeom(0, 260, 530, 350));
-   CustomFilterS11 S11(Hermes::vector<Solution<double> *>(&u1_sln, &u2_sln), mu, lambda);
    viewS11.show_mesh(false);
-   viewS11.show(&S11, HERMES_EPS_HIGH, H2D_FN_VAL_0, &u1_sln, &u2_sln, 1.0);
+   viewS11.show(S11, HERMES_EPS_HIGH, H2D_FN_VAL_0, u1_sln, u2_sln, 1.0);
 
    ScalarView viewS12("S12 [Pa]", new WinGeom(540, 260, 530, 350));
-   CustomFilterS12 S12(Hermes::vector<Solution<double> *>(&u1_sln, &u2_sln), mu);
    viewS12.show_mesh(false);
-   viewS12.show(&S12, HERMES_EPS_HIGH, H2D_FN_VAL_0, &u1_sln, &u2_sln, 1.0);
+   viewS12.show(S12, HERMES_EPS_HIGH, H2D_FN_VAL_0, u1_sln, u2_sln, 1.0);
 
    ScalarView viewS22("S22 [Pa]", new WinGeom(1080, 260, 530, 350));
-   CustomFilterS22 S22(Hermes::vector<Solution<double> *>(&u1_sln, &u2_sln), mu, lambda);
    viewS22.show_mesh(false);
-   viewS22.show(&S22, HERMES_EPS_HIGH, H2D_FN_VAL_0, &u1_sln, &u2_sln, 1.0);
+   viewS22.show(S22, HERMES_EPS_HIGH, H2D_FN_VAL_0, u1_sln, u2_sln, 1.0);
 
    // Wait for the view to be closed.
    View::wait();

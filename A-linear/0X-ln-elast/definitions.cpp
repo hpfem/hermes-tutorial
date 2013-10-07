@@ -282,7 +282,7 @@ CustomMu::~CustomMu()
 }
 
 // Exact solution lambda
-ExactSolutionLambda::ExactSolutionLambda(const Mesh* mesh, double E, double nu)
+ExactSolutionLambda::ExactSolutionLambda(MeshSharedPtr mesh, double E, double nu)
      : ExactSolutionScalar<double>(mesh), E(E), nu(nu)
 {
   cefLam = new CustomExactFunctionLambda(E, nu);
@@ -296,7 +296,7 @@ void ExactSolutionLambda::derivatives(double x, double y, double& dx, double& dy
   dx = cefLam->dx(x,y);
   dy = -cefLam->dx(y,y);
 }
-Ord ExactSolutionLambda::ord(Ord x, Ord y) const
+Ord ExactSolutionLambda::ord(double x, double y) const
 {
   return Ord(10);
 }
@@ -310,7 +310,7 @@ MeshFunction<double>* ExactSolutionLambda::clone() const
 }
 
 // Exact solution mu
-ExactSolutionMu::ExactSolutionMu(const Mesh* mesh, double E, double nu)
+ExactSolutionMu::ExactSolutionMu(MeshSharedPtr mesh, double E, double nu)
      : ExactSolutionScalar<double>(mesh), E(E), nu(nu)
 {
   cefMu = new CustomExactFunctionMu(E, nu);
@@ -324,7 +324,7 @@ void ExactSolutionMu::derivatives(double x, double y, double& dx, double& dy) co
   dx = cefMu->dx(x,y);
   dy = -cefMu->dx(y,y);
 }
-Ord ExactSolutionMu::ord(Ord x, Ord y) const
+Ord ExactSolutionMu::ord(double x, double y) const
 {
   return Ord(10);
 }
@@ -339,19 +339,19 @@ MeshFunction<double>* ExactSolutionMu::clone() const
 
 
 // Custom filter S11
-void CustomFilterS11::filter_fn(int n, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
+void CustomFilterS11::filter_fn(int n, double* x, double* y, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
                       double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)
   {
-	out[i] = 2.0 * mu * dx.at(0)[i] + lambda * (dx.at(0)[i] + dy.at(1)[i]);
+    out[i] = 2.0 * this->mu->value(x[i], y[i]) * dx.at(0)[i] + this->lambda->value(x[i], y[i]) * (dx.at(0)[i] + dy.at(1)[i]);
 	outdx[i] = 0.0;
 	outdy[i] = 0.0;
   }
 }
 
 // Custom filter S12
-void CustomFilterS12::filter_fn(int n, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
+void CustomFilterS12::filter_fn(int n, double* x, double* y, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
                       double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)
@@ -363,7 +363,7 @@ void CustomFilterS12::filter_fn(int n, Hermes::vector<double*> values, Hermes::v
 }
 
 // Custom filter S22
-void CustomFilterS22::filter_fn(int n, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
+void CustomFilterS22::filter_fn(int n, double* x, double* y, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
                       double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)

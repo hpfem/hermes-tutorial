@@ -166,10 +166,10 @@ protected :
 class ExactSolutionLambda : public ExactSolutionScalar<double>
 {
 public:
-  ExactSolutionLambda(const Mesh* mesh, double E, double nu);
+  ExactSolutionLambda(MeshSharedPtr mesh, double E, double nu);
   virtual double value(double x, double y) const;
   virtual void derivatives(double x, double y, double& dx, double& dy) const;
-  virtual Ord ord(Ord x, Ord y) const;
+  virtual Ord ord(double x, double y) const;
   ~ExactSolutionLambda();
   virtual MeshFunction<double>* clone() const;
   CustomExactFunctionLambda* cefLam;
@@ -181,10 +181,10 @@ protected:
 class ExactSolutionMu : public ExactSolutionScalar<double>
 {
 public:
-  ExactSolutionMu(const Mesh* mesh, double E, double nu);
+  ExactSolutionMu(MeshSharedPtr mesh, double E, double nu);
   virtual double value(double x, double y) const;
   virtual void derivatives(double x, double y, double& dx, double& dy) const;
-  virtual Ord ord(Ord x, Ord y) const;
+  virtual Ord ord(double x, double y) const;
   ~ExactSolutionMu();
   virtual MeshFunction<double>* clone() const;
   CustomExactFunctionMu* cefMu;
@@ -197,46 +197,40 @@ protected:
 class CustomFilterS11 : public Hermes::Hermes2D::DXDYFilter<double>
 {
 public:
-  CustomFilterS11(Hermes::vector<Solution<double>*> solutions, double mu, double lambda) : Hermes::Hermes2D::DXDYFilter<double>(solutions), mu(mu), lambda(lambda)
+  CustomFilterS11(Hermes::vector<MeshFunctionSharedPtr<double> > solutions, CustomMu* mu, CustomLambda* lambda) : Hermes::Hermes2D::DXDYFilter<double>(solutions), mu(mu), lambda(lambda)
 {
 }
 virtual MeshFunction<double>* clone() const
 {
-  Hermes::vector<Solution<double>*> slns;
-  Hermes::vector<int> items;
+  Hermes::vector<MeshFunctionSharedPtr<double> > slns;
   for(int i = 0; i < this->num; i++)
-  {
-    slns.push_back(dynamic_cast<Solution<double>*>(this->sln[i]->clone()));
-  }
+    slns.push_back(this->sln[i]->clone());
   CustomFilterS11* filter = new CustomFilterS11(slns, mu, lambda);
   return filter;
 }
 private:
-virtual void filter_fn(int n, Hermes::vector<double *> values, Hermes::vector<double *> dx, Hermes::vector<double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
-double mu;
-double lambda;
+virtual void filter_fn(int n, double* x, double* y, Hermes::vector<double *> values, Hermes::vector<double *> dx, Hermes::vector<double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
+CustomMu* mu;
+CustomLambda* lambda;
 };
 
 // Custom filter S12
 class CustomFilterS12 : public Hermes::Hermes2D::DXDYFilter<double>
 {
 public:
-  CustomFilterS12(Hermes::vector<Solution<double>*> solutions, double mu) : Hermes::Hermes2D::DXDYFilter<double>(solutions), mu(mu)
+  CustomFilterS12(Hermes::vector<MeshFunctionSharedPtr<double> > solutions, double mu) : Hermes::Hermes2D::DXDYFilter<double>(solutions), mu(mu)
 {
 }
 virtual MeshFunction<double>* clone() const
 {
-  Hermes::vector<Solution<double>*> slns;
-  Hermes::vector<int> items;
+  Hermes::vector<MeshFunctionSharedPtr<double> > slns;
   for(int i = 0; i < this->num; i++)
-  {
-    slns.push_back(dynamic_cast<Solution<double>*>(this->sln[i]->clone()));
-  }
+    slns.push_back(this->sln[i]->clone());
   CustomFilterS12* filter = new CustomFilterS12(slns, mu);
   return filter;
 }
 private:
-virtual void filter_fn(int n, Hermes::vector<double *> values, Hermes::vector<double *> dx, Hermes::vector<double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
+virtual void filter_fn(int n, double* x, double* y, Hermes::vector<double *> values, Hermes::vector<double *> dx, Hermes::vector<double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
 double mu;
 };
 
@@ -244,22 +238,19 @@ double mu;
 class CustomFilterS22 : public Hermes::Hermes2D::DXDYFilter<double>
 {
 public:
-  CustomFilterS22(Hermes::vector<Solution<double>*> solutions, double mu, double lambda) : Hermes::Hermes2D::DXDYFilter<double>(solutions), mu(mu), lambda(lambda)
+  CustomFilterS22(Hermes::vector<MeshFunctionSharedPtr<double> > solutions, double mu, double lambda) : Hermes::Hermes2D::DXDYFilter<double>(solutions), mu(mu), lambda(lambda)
 {
 }
 virtual MeshFunction<double>* clone() const
 {
-  Hermes::vector<Solution<double>*> slns;
-  Hermes::vector<int> items;
+  Hermes::vector<MeshFunctionSharedPtr<double> > slns;
   for(int i = 0; i < this->num; i++)
-  {
-    slns.push_back(dynamic_cast<Solution<double>*>(this->sln[i]->clone()));
-  }
+    slns.push_back(this->sln[i]->clone());
   CustomFilterS22* filter = new CustomFilterS22(slns, mu, lambda);
   return filter;
 }
 private:
-virtual void filter_fn(int n, Hermes::vector<double *> values, Hermes::vector<double *> dx, Hermes::vector<double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
+virtual void filter_fn(int n, double* x, double* y, Hermes::vector<double *> values, Hermes::vector<double *> dx, Hermes::vector<double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
 double mu;
 double lambda;
 };
