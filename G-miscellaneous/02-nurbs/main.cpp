@@ -1,4 +1,3 @@
-#define HERMES_REPORT_ALL
 #include "hermes2d.h"
 
 using namespace Hermes;
@@ -25,10 +24,7 @@ const char* mesh_file = "domain-2.mesh";
 // Uniform polynomial degree of mesh elements.
 const int P_INIT = 3;                             
 // Number of initial uniform mesh refinements.
-const int INIT_REF_NUM = 2;                       
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
+const int INIT_REF_NUM = 2;
 
 // Problem parameters.
 const double const_f = 1.0;  

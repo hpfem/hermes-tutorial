@@ -1,5 +1,3 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
 
 //  This example solves a general second-order linear equation with non-constant
@@ -22,10 +20,7 @@ const bool USE_XML_FORMAT = true;
 // Initial polynomial degree of all mesh elements.
 const int P_INIT = 3;                             
 // Number of initial uniform refinements.
-const int INIT_REF_NUM = 3;                       
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
+const int INIT_REF_NUM = 3;
 
 int main(int argc, char* argv[])
 {

@@ -1,5 +1,3 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
 
 using namespace RefinementSelectors;
@@ -50,10 +48,7 @@ const double TIME_TOL_LOWER = 0.5;
 // Time step increase ratio (applied when rel. temporal error is too small).
 const double TIME_STEP_INC_RATIO = 2.0;            
 // Time step decrease ratio (applied when rel. temporal error is too large).
-const double TIME_STEP_DEC_RATIO = 0.5;            
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;   
+const double TIME_STEP_DEC_RATIO = 0.5;  
 
 // Choose one of the following time-integration methods, or define your own Butcher's table. The last number 
 // in the name of each method is its order. The one before last, if present, is the number of stages.

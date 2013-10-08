@@ -11,7 +11,7 @@ void CustomInitialCondition::derivatives(double x, double y, double& dx, double&
   dy = (x+10) / 100.;
 }
 
-Ord CustomInitialCondition::ord(Ord x, Ord y) const 
+Ord CustomInitialCondition::ord(double x, double y) const 
 {
   return x*y;
 }

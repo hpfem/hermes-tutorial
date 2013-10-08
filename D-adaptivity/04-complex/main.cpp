@@ -1,8 +1,8 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
 
 using namespace Hermes::Hermes2D::RefinementSelectors;
+
+typedef std::complex<double> complex;
 
 //  This problem describes the distribution of the vector potential in
 //  a 2D domain comprising a wire carrying electrical current, air, and
@@ -22,50 +22,23 @@ using namespace Hermes::Hermes2D::RefinementSelectors;
 const int INIT_REF_NUM = 0;                       
 // Initial polynomial degree of mesh elements.
 const int P_INIT = 1;                             
-// This is a quantitative parameter of the adapt(...) function and
-// it has different meanings for various adaptive strategies.
-const double THRESHOLD = 0.3;                     
-// Adaptive strategy:
-// STRATEGY = 0 ... refine elements until sqrt(THRESHOLD) times total
-//   error is processed. If more elements have similar errors, refine
-//   all to keep the mesh symmetric.
-// STRATEGY = 1 ... refine all elements whose error is larger
-//   than THRESHOLD times maximum element error.
-// STRATEGY = 2 ... refine all elements whose error is larger
-//   than THRESHOLD.
-// More adaptive strategies can be created in adapt_ortho_h1.cpp.
-const int STRATEGY = 0;                           
+// Parameter influencing the candidate selection.
+
+const double THRESHOLD = 0.3;                           
 // Predefined list of element refinement candidates. Possible values are
 // H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO,
 // H2D_HP_ANISO_H, H2D_HP_ANISO_P, H2D_HP_ANISO.
 const CandList CAND_LIST = H2D_HP_ANISO;          
-// Maximum allowed level of hanging nodes:
-// MESH_REGULARITY = -1 ... arbitrary level hangning nodes (default),
-// MESH_REGULARITY = 1 ... at most one-level hanging nodes,
-// MESH_REGULARITY = 2 ... at most two-level hanging nodes, etc.
-// Note that regular meshes are not supported, this is due to
-// their notoriously bad performance.
-const int MESH_REGULARITY = -1;                   
-// This parameter influences the selection of
-// candidates in hp-adaptivity. Default value is 1.0. 
-const double CONV_EXP = 1.0;                      
 // Stopping criterion for adaptivity.
 const double ERR_STOP = 1.0;                      
-// Adaptivity process stops when the number of degrees of freedom grows
-// over this limit. This is to prevent h-adaptivity to go on forever.
-const int NDOF_STOP = 60000;                      
-// Name of the iterative method employed by AztecOO (ignored
-// by the other solvers).
-// Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
-const char* iterative_method = "gmres";           
-// Name of the preconditioner employed by AztecOO (ignored by
-// the other solvers).
-// Possibilities: none, jacobi, neumann, least-squares, or a
-//  preconditioner from IFPACK (see solver/aztecoo.h)
-const char* preconditioner = "least-squares";     
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
+// Error calculation & adaptivity.
+DefaultErrorCalculator<double, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
+// Stopping criterion for an adaptivity step.
+AdaptStoppingCriterionSingleElement<complex> stoppingCriterion(THRESHOLD);
+// Adaptivity processor class.
+Adapt<complex> adaptivity(&errorCalculator, &stoppingCriterion);
+// Selector.
+H1ProjBasedSelector<complex> selector(CAND_LIST);
 
 // Problem parameters.
 const double MU_0 = 4.0*M_PI*1e-7;
@@ -108,7 +81,7 @@ int main(int argc, char* argv[])
 
   // Initialize refinement selector.
   H1ProjBasedSelector<std::complex<double> > 
-      selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
+      selector(CAND_LIST, H2DRS_DEFAULT_ORDER);
 
   // Initialize views.
   Views::ScalarView sview("Solution", new Views::WinGeom(0, 0, 600, 350));
@@ -187,7 +160,7 @@ int main(int argc, char* argv[])
     else
     {
       Hermes::Mixins::Loggable::Static::info("Adapting coarse mesh.");
-      done = adaptivity->adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
+      done = adaptivity.adapt(&selector);
     }
     if (space->get_num_dofs() >= NDOF_STOP) done = true;
 

@@ -13,7 +13,7 @@ void InitialSolutionHeatTransfer::derivatives (double x, double y, double& dx, d
   dy = (x + 10) / 10.;
 }
 
-Ord InitialSolutionHeatTransfer::ord(Ord x, Ord y) const 
+Ord InitialSolutionHeatTransfer::ord(double x, double y) const 
 {
   return (x + 10) * (y + 10) / 100. + 2.;
 }

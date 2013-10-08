@@ -6,7 +6,6 @@ using namespace Hermes::Hermes2D::WeakFormsH1;
 using namespace Hermes::Hermes2D::WeakFormsElasticity;
 using namespace Hermes::Hermes2D::Views;
 
-
 class CustomWeakFormLinearElasticity : public WeakForm<double>
 {
 public:

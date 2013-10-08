@@ -1,8 +1,4 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
-//#include "function/function.h"
-#include <fstream>
 
 // Read original or XML mesh file.
 const bool USE_XML_FORMAT = true;
@@ -10,10 +6,6 @@ const bool USE_XML_FORMAT = true;
 const int P_INIT = 1;
 // Number of initial uniform mesh refinements.
 const int INIT_REF_NUM = 5;
-//
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;
 
 // Problem parameters.
 // Young modulus (soft tissue).

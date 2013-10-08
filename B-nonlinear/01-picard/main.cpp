@@ -1,7 +1,4 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
-#include "function/function.h"
 
 using namespace RefinementSelectors;
 
@@ -29,10 +26,7 @@ const int INIT_GLOB_REF_NUM = 3;
 // Number of initial refinements towards boundary.
 const int INIT_BDY_REF_NUM = 5;                   
 // Value for custom constant initial condition.
-const double INIT_COND_CONST = 3.0;               
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
+const double INIT_COND_CONST = 3.0;
 
 // Picard's method.
 // Number of last iterations used. 
@@ -86,7 +80,7 @@ int main(int argc, char* argv[])
   picard.use_Anderson_acceleration(true);
 
   // Perform the Picard's iteration (Anderson acceleration on by default).
-  picard.set_tolerance(PICARD_TOL);
+  picard.set_tolerance(PICARD_TOL, Hermes::Solvers::SolutionChangeAbsolute);
   picard.set_max_allowed_iterations(PICARD_MAX_ITER);
   picard.set_num_last_vector_used(PICARD_NUM_LAST_ITER_USED);
   picard.set_anderson_beta(PICARD_ANDERSON_BETA);

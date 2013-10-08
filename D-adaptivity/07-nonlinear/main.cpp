@@ -1,5 +1,3 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
 
 using namespace RefinementSelectors;
@@ -23,54 +21,34 @@ const int P_INIT = 1;
 const int INIT_GLOB_REF_NUM = 1;                  
 // Number of initial refinements towards boundary.
 const int INIT_BDY_REF_NUM = 3;                   
-// This is a quantitative parameter of the adapt(...) function and
-// it has different meanings for various adaptive strategies.
-const double THRESHOLD = 0.2;                     
-// Adaptive strategy:
-// STRATEGY = 0 ... refine elements until sqrt(THRESHOLD) times total
-//   error is processed. If more elements have similar errors, refine
-//   all to keep the mesh symmetric.
-// STRATEGY = 1 ... refine all elements whose error is larger
-//   than THRESHOLD times maximum element error.
-// STRATEGY = 2 ... refine all elements whose error is larger
-//   than THRESHOLD.
-// More adaptive strategies can be created in adapt_ortho_h1.cpp.
-const int STRATEGY = 1;                           
+// Parameter influencing the candidate selection.
+const double THRESHOLD = 0.2;
 // Predefined list of element refinement candidates. Possible values are
 // H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO,
 // H2D_HP_ANISO_H, H2D_HP_ANISO_P, H2D_HP_ANISO.
-const CandList CAND_LIST = H2D_HP_ANISO;          
-// Maximum allowed level of hanging nodes:
-// MESH_REGULARITY = -1 ... arbitrary level hangning nodes (default),
-// MESH_REGULARITY = 1 ... at most one-level hanging nodes,
-// MESH_REGULARITY = 2 ... at most two-level hanging nodes, etc.
-// Note that regular meshes are not supported, this is due to
-// their notoriously bad performance.
-const int MESH_REGULARITY = -1;                   
-// This parameter influences the selection of
-// candidates in hp-adaptivity. Default value is 1.0. 
-const double CONV_EXP = 1.0;                      
+const CandList CAND_LIST = H2D_HP_ANISO;
 // Stopping criterion for adaptivity.
-const double ERR_STOP = 1.0;                      
-// Adaptivity process stops when the number of degrees of freedom grows
-// over this limit. This is to prevent h-adaptivity to go on forever.
-const int NDOF_STOP = 60000;                      
+const double ERR_STOP = 1.0;
 // Stopping criterion for the Newton's method on coarse mesh.
 const double NEWTON_TOL_COARSE = 1e-4;            
 // Stopping criterion for the Newton's method on fine mesh.
 const double NEWTON_TOL_FINE = 1e-8;              
 // Maximum allowed number of Newton iterations.
-const int NEWTON_MAX_ITER = 100;                  
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
+const int NEWTON_MAX_ITER = 100;
+// Error calculation & adaptivity.
+DefaultErrorCalculator<double, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
+// Stopping criterion for an adaptivity step.
+AdaptStoppingCriterionSingleElement<double> stoppingCriterion(THRESHOLD);
+// Adaptivity processor class.
+Adapt<double> adaptivity(&errorCalculator, &stoppingCriterion);
+// Selector.
+H1ProjBasedSelector<double> selector(CAND_LIST);
 
 // Problem parameters.
 double heat_src = 1.0;
 
 int main(int argc, char* argv[])
 {
-
   // Define nonlinear thermal conductivity lambda(u) via a cubic spline.
   // Step 1: Fill the x values and use lambda_macro(u) = 1 + u^4 for the y values.
   #define lambda_macro(x) (1 + std::pow(x, 4))
@@ -113,11 +91,8 @@ int main(int argc, char* argv[])
   Hermes2DFunction<double> f(-heat_src);
   WeakFormsH1::DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &f);
 
-  // Initialize the FE problem.
-  DiscreteProblem<double> dp_coarse(&wf, space);
-
   // Create a selector which will select optimal candidate.
-  H1ProjBasedSelector<double> selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
+  H1ProjBasedSelector<double> selector(CAND_LIST, H2DRS_DEFAULT_ORDER);
 
   // Initialize coarse and reference mesh solution.
   MeshFunctionSharedPtr<double> sln(new Solution<double>), ref_sln(new Solution<double>);
@@ -139,11 +114,11 @@ int main(int argc, char* argv[])
   Hermes::Mixins::Loggable::Static::info("Projecting initial condition to obtain initial vector on the coarse mesh.");
   double* coeff_vec_coarse = new double[space->get_num_dofs()];
   MeshFunctionSharedPtr<double>  init_sln(new InitialSolutionHeatTransfer(mesh));
-  OGProjection<double> ogProjection; ogProjection.project_global(space, init_sln, coeff_vec_coarse);
+  OGProjection<double>::project_global(space, init_sln, coeff_vec_coarse);
 
   // Initialize Newton solver on coarse mesh.
   Hermes::Mixins::Loggable::Static::info("Solving on coarse mesh:");
-  NewtonSolver<double> newton_coarse(&dp_coarse);
+  NewtonSolver<double> newton_coarse(&wf, space);
   newton_coarse.set_verbose_output(Hermes::Mixins::Loggable::Static::info);
 
   // Perform initial Newton's iteration on coarse mesh, to obtain 
@@ -186,13 +161,13 @@ int main(int argc, char* argv[])
     {
       // In the first step, project the coarse mesh solution.
       Hermes::Mixins::Loggable::Static::info("Projecting coarse mesh solution to obtain initial vector on new fine mesh.");
-      OGProjection<double> ogProjection; ogProjection.project_global(ref_space, sln, coeff_vec);
+      OGProjection<double>::project_global(ref_space, sln, coeff_vec);
     }
     else
     {
       // In all other steps, project the previous fine mesh solution.
       Hermes::Mixins::Loggable::Static::info("Projecting previous fine mesh solution to obtain initial vector on new fine mesh.");
-      OGProjection<double> ogProjection; ogProjection.project_global(ref_space, ref_sln, coeff_vec);
+      OGProjection<double>::project_global(ref_space, ref_sln, coeff_vec);
     }
 
     // Initialize Newton solver on fine mesh.
@@ -214,12 +189,12 @@ int main(int argc, char* argv[])
 
     // Project the fine mesh solution on the coarse mesh.
     Hermes::Mixins::Loggable::Static::info("Projecting reference solution on new coarse mesh for error calculation.");
-    OGProjection<double> ogProjection; ogProjection.project_global(space, ref_sln, sln);
+    OGProjection<double>::project_global(space, ref_sln, sln);
 
     // Calculate element errors and total error estimate.
     Hermes::Mixins::Loggable::Static::info("Calculating error estimate.");
-    Adapt<double>* adaptivity = new Adapt<double>(space);
-    double err_est_rel = adaptivity->calc_err_est(sln, ref_sln) * 100;
+    errorCalculator.calculate_errors(sln, ref_sln);
+    double err_est_rel = errorCalculator.get_total_error_squared() * 100;
 
     // Report results.
     Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_fine: %d, err_est_rel: %g%%",
@@ -239,22 +214,16 @@ int main(int argc, char* argv[])
     oview.show(space);
 
     // If err_est_rel too large, adapt the mesh.
-    if (err_est_rel < ERR_STOP) done = true;
+    if (err_est_rel < ERR_STOP)
+      done = true;
     else
     {
       Hermes::Mixins::Loggable::Static::info("Adapting the coarse mesh.");
-      done = adaptivity->adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
-
-      if (Space<double>::get_num_dofs(space) >= NDOF_STOP)
-      {
-        done = true;
-        break;
-      }
+      done = adaptivity.adapt(&selector);
     }
 
     // Clean up.
     delete [] coeff_vec;
-    delete adaptivity;
 
     as++;
   }

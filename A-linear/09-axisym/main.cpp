@@ -1,4 +1,3 @@
-#define HERMES_REPORT_ALL
 #include "definitions.h"
 
 // This example shows how to solve exisymmetric problems. The domain of interest
@@ -25,10 +24,7 @@ const bool VTK_VISUALIZATION = false;
 // Uniform polynomial degree of all mesh elements.
 const int P_INIT = 4;                             
 // Number of initial uniform mesh refinements.
-const int INIT_REF_NUM = 2;                       
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
+const int INIT_REF_NUM = 2;
 
 // Problem parameters.
 // Prescribed temperature on Gamma_bottom.

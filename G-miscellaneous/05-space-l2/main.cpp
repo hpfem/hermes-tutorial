@@ -1,5 +1,3 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
 
 using namespace Hermes::Hermes2D::Views;
@@ -15,10 +13,7 @@ using namespace Hermes::Hermes2D::Views;
 // Number of initial uniform mesh refinements.
 const int INIT_REF_NUM = 4;                       
 // Polynomial degree of mesh elements.
-const int P_INIT = 1;                            
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
+const int P_INIT = 1;
 
 int main(int argc, char* argv[])
 {

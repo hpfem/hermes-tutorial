@@ -1,5 +1,3 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
 
 using namespace RefinementSelectors;
@@ -45,10 +43,7 @@ const double time_step = 3e+2;
  // Stopping criterion for the Newton's method.
 const double NEWTON_TOL = 1e-5;                  
 // Maximum allowed number of Newton iterations.
-const int NEWTON_MAX_ITER = 100;                  
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
+const int NEWTON_MAX_ITER = 100;  
 
 // Choose one of the following time-integration methods, or define your own Butcher's table. The last number 
 // in the name of each method is its order. The one before last, if present, is the number of stages.

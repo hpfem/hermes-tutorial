@@ -1,5 +1,3 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
 
 // This example explains how to create multiple spaces over a mesh and use them
@@ -20,10 +18,7 @@
 // Read original or XML mesh file.
 const bool USE_XML_FORMAT = true;                          
 // Initial polynomial degree of all elements.
-const int P_INIT = 6;                                      
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;           
+const int P_INIT = 6;
 
 // Problem parameters.
 // Young modulus (steel).

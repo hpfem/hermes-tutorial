@@ -53,7 +53,7 @@ double CustomInitialCondition::value (double x, double y) const
   return (x + 10) * (y + 10) / 100.;
 }
 
-Ord CustomInitialCondition::ord(Ord x, Ord y) const 
+Ord CustomInitialCondition::ord(double x, double y) const 
 {
   return (x + 10) * (y + 10) / 100.;
 }

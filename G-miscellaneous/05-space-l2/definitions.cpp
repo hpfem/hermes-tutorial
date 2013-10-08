@@ -11,7 +11,7 @@ void CustomExactSolution::derivatives (double x, double y, double& dx, double& d
   dy = 0; // Not needed for L2 projections.
 }
 
-Ord CustomExactSolution::ord(Ord x, Ord y) const 
+Ord CustomExactSolution::ord(double x, double y) const 
 {
   return - Hermes::pow(x, 4) * Hermes::pow(y, 5);
 }

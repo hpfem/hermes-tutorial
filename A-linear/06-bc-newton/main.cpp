@@ -1,4 +1,3 @@
-#define HERMES_REPORT_ALL
 #include "definitions.h"
 
 // This example shows how to use Newton (Robin) boundary conditions.
@@ -25,10 +24,7 @@ const bool VTK_VISUALIZATION = false;
 // Uniform polynomial degree of mesh elements.
 const int P_INIT = 5;                             
 // Number of initial uniform mesh refinements.
-const int INIT_REF_NUM = 0;                       
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
+const int INIT_REF_NUM = 0;
 
 // Problem parameters.
 // Thermal cond. of Al for temperatures around 20 deg Celsius.

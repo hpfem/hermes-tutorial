@@ -1,7 +1,4 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
-#include "function/function.h"
 
 using namespace RefinementSelectors;
 
@@ -28,10 +25,7 @@ const int NEWTON_MAX_ITER = 100;
 // Number of initial uniform mesh refinements.
 const int INIT_GLOB_REF_NUM = 3;                  
 // Number of initial refinements towards boundary.
-const int INIT_BDY_REF_NUM = 4;                   
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
+const int INIT_BDY_REF_NUM = 4;
 
 // Problem parameters.
 double heat_src = 1.0;
@@ -72,7 +66,7 @@ int main(int argc, char* argv[])
   Hermes::Mixins::Loggable::Static::info("Projecting to obtain initial vector for the Newton's method.");
   double* coeff_vec = new double[ndof];
   MeshFunctionSharedPtr<double> init_sln(new CustomInitialCondition(mesh));
-  OGProjection<double> ogProjection; ogProjection.project_global(space, init_sln, coeff_vec); 
+  OGProjection<double>::project_global(space, init_sln, coeff_vec); 
 
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp);

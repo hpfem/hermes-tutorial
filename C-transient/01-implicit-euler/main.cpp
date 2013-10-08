@@ -1,5 +1,3 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
 
 using namespace RefinementSelectors;
@@ -30,10 +28,7 @@ const int INIT_REF_NUM = 1;
 // Number of initial uniform mesh refinements towards the boundary.
 const int INIT_REF_NUM_BDY = 3;                   
 // Time step in seconds.
-const double time_step = 300.0;                   
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
+const double time_step = 300.0;
 
 // Problem parameters.
 // Temperature of the ground (also initial temperature).

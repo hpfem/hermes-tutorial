@@ -1,4 +1,3 @@
-#define HERMES_REPORT_ALL
 #include "definitions.h"
 
 //  This example solves a linear advection equation using Dicontinuous Galerkin (DG) method and standard continuous Finite Element Method. Shows the comparison.
@@ -24,9 +23,6 @@ const bool DG_SHOCK_CAPTURING = true;
 // What parts to use.
 const bool WANT_DG = true;
 const bool WANT_FEM = true;
-// Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver_type = SOLVER_UMFPACK;
 
 // Boundary markers.
 const std::string BDY_BOTTOM_LEFT = "1";
