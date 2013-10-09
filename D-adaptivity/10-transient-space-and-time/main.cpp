@@ -218,8 +218,8 @@ int main(int argc, char* argv[])
       {
         runge_kutta.set_time(current_time);
         runge_kutta.set_time_step(time_step);
-        runge_kutta.set_newton_max_iter(NEWTON_MAX_ITER);
-        runge_kutta.set_newton_tol(NEWTON_TOL_FINE);
+        runge_kutta.set_max_allowed_iterations(NEWTON_MAX_ITER);
+        runge_kutta.set_tolerance(NEWTON_TOL_FINE);
         runge_kutta.rk_time_step_newton(sln_time_prev, ref_sln, time_error_fn);
       }
       catch(Exceptions::Exception& e)
@@ -243,8 +243,9 @@ int main(int argc, char* argv[])
         AbsFilter abs_tef(time_error_fn);
         time_error_view.show(&abs_tef, HERMES_EPS_HIGH);
 
-        rel_err_time = Global<double>::calc_norm(time_error_fn.get(), HERMES_H1_NORM) / 
-                       Global<double>::calc_norm(ref_sln.get(), HERMES_H1_NORM) * 100;
+        DefaultErrorCalculator<double, HERMES_HCURL_NORM> errorCalculatorTime(RelativeErrorToGlobalNorm, 1);
+        errorCalculatorTime.calculate_errors(time_error_fn, ref_sln);
+        rel_err_time = errorCalculatorTime.get_total_error_squared() * 100;
         if (ADAPTIVE_TIME_STEP_ON == false) Hermes::Mixins::Loggable::Static::info("rel_err_time: %g%%", rel_err_time);
       }
 
@@ -291,12 +292,12 @@ int main(int argc, char* argv[])
 
       // Calculate element errors and spatial error estimate.
       Hermes::Mixins::Loggable::Static::info("Calculating spatial error estimate.");
-      Adapt<double>* adaptivity = new Adapt<double>(space);
-      double err_rel_space = adaptivity->calc_err_est(sln, ref_sln) * 100;
+      errorCalculator.calculate_errors(sln, ref_sln);
+      double err_rel_space = errorCalculator.get_total_error_squared() * 100;
 
       // Report results.
       Hermes::Mixins::Loggable::Static::info("ndof: %d, ref_ndof: %d, err_rel_space: %g%%", 
-           Space<double>::get_num_dofs(space), Space<double>::get_num_dofs(ref_space), err_rel_space);
+        Space<double>::get_num_dofs(space), Space<double>::get_num_dofs(ref_space), err_rel_space);
 
       // If err_est too large, adapt the mesh.
       if (err_rel_space < SPACE_ERR_TOL) done = true;

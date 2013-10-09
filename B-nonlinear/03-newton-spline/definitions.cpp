@@ -13,7 +13,7 @@ void CustomInitialCondition::derivatives(double x, double y, double& dx, double&
 
 Ord CustomInitialCondition::ord(double x, double y) const 
 {
-  return x*y;
+  return Hermes::Ord(x*y);
 }
 
 MeshFunction<double>* CustomInitialCondition::clone() const

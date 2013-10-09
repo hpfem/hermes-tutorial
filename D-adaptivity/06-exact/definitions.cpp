@@ -13,7 +13,7 @@ void ExactSolutionCustom::derivatives (double x, double y, double& dx, double& d
 
 Ord ExactSolutionCustom::ord(double x, double y) const 
 {
-  return pow(x*x + y*y, 0.25);
+  return Hermes::Ord(std::pow(x*x + y*y, 0.25));
 }
 
 MeshFunction<double>* ExactSolutionCustom::clone() const

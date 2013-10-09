@@ -56,7 +56,7 @@ double CustomInitialCondition::value (double x, double y) const
 
 Ord CustomInitialCondition::ord(double x, double y) const 
   {
-    return (x+10)*(y+10)/100.;
+    return Hermes::Ord((x+10)*(y+10)/100.);
   }
  
 MeshFunction<double>* CustomInitialCondition::clone() const

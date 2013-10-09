@@ -24,29 +24,29 @@ using namespace Views;
 //  The following parameters can be changed:
 
 // Number of initial uniform mesh refinements.
-const int INIT_REF_NUM = 2;                       
+const int INIT_REF_NUM = 2;
 // Initial polynomial degree of all mesh elements.
-const int P_INIT = 2;                             
+const int P_INIT = 2;
 // Time step. 
-double time_step = 0.05;                           
+double time_step = 0.05;
 // Time interval length.
-const double T_FINAL = 2.0;                       
+const double T_FINAL = 2.0;
 
 // Adaptivity
 // Every UNREF_FREQth time step the mesh is derefined.
-const int UNREF_FREQ = 1;                         
+const int UNREF_FREQ = 1;
 // 1... mesh reset to basemesh and poly degrees to P_INIT.   
 // 2... one ref. layer shaved off, poly degrees reset to P_INIT.
 // 3... one ref. layer shaved off, poly degrees decreased by one. 
-const int UNREF_METHOD = 3;                       
+const int UNREF_METHOD = 3;
 // Parameter influencing the candidate selection.
-const double THRESHOLD = 0.3;                        
+const double THRESHOLD = 0.3;
 // Predefined list of element refinement candidates. Possible values are
 // H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO,
 // H2D_HP_ANISO_H, H2D_HP_ANISO_P, H2D_HP_ANISO.
-const CandList CAND_LIST = H2D_HP_ANISO;                      
+const CandList CAND_LIST = H2D_HP_ANISO;
 // Stopping criterion for adaptivity.
-const double ERR_STOP = 1.0; 
+const double ERR_STOP = 1.0;
 // Error calculation & adaptivity.
 DefaultErrorCalculator<double, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
 // Stopping criterion for an adaptivity step.
@@ -58,9 +58,9 @@ H1ProjBasedSelector<double> selector(CAND_LIST);
 
 // Newton's method
 // Stopping criterion for Newton on fine mesh.
-const double NEWTON_TOL = 1e-5;                   
+const double NEWTON_TOL = 1e-5;
 // Maximum allowed number of Newton iterations.
-const int NEWTON_MAX_ITER = 20;                   
+const int NEWTON_MAX_ITER = 20;
 
 // Choose one of the following time-integration methods, or define your own Butcher's table. The last number
 // in the name of each method is its order. The one before last, if present, is the number of stages.
@@ -81,7 +81,7 @@ ButcherTableType butcher_table_type = Implicit_RK_1;
 
 // Problem parameters.
 // Parameter for nonlinear thermal conductivity.
-const double alpha = 4.0;                         
+const double alpha = 4.0;
 const double heat_src = 1.0;
 
 int main(int argc, char* argv[])
@@ -98,9 +98,9 @@ int main(int argc, char* argv[])
   mloader.load("square.mesh", basemesh);
 
   // Perform initial mesh refinements.
-  for(int i = 0; i < INIT_REF_NUM; i++) basemesh->refine_all_elements(0, true);
+  for (int i = 0; i < INIT_REF_NUM; i++) basemesh->refine_all_elements(0, true);
   mesh->copy(basemesh);
-  
+
   // Initialize boundary conditions.
   EssentialBCNonConst bc_essential("Bdy");
   EssentialBCs<double> bcs(&bc_essential);
@@ -129,28 +129,28 @@ int main(int argc, char* argv[])
   OrderView ordview("Initial mesh", new WinGeom(445, 0, 410, 350));
   view.show(sln_time_prev);
   ordview.show(space);
-  
+
   // Initialize Runge-Kutta time stepping.
   RungeKutta<double> runge_kutta(&wf, space, &bt);
-      
+
   // Time stepping loop.
   double current_time = 0; int ts = 1;
-  do 
+  do
   {
     // Periodic global derefinement.
-    if (ts > 1 && ts % UNREF_FREQ == 0) 
+    if (ts > 1 && ts % UNREF_FREQ == 0)
     {
       Hermes::Mixins::Loggable::Static::info("Global mesh derefinement.");
       switch (UNREF_METHOD) {
-        case 1: mesh->copy(basemesh);
-                space->set_uniform_order(P_INIT);
-                break;
-        case 2: mesh->unrefine_all_elements();
-                space->set_uniform_order(P_INIT);
-                break;
-        case 3: mesh->unrefine_all_elements();
-                space->adjust_element_order(-1, -1, P_INIT, P_INIT);
-                break;
+      case 1: mesh->copy(basemesh);
+        space->set_uniform_order(P_INIT);
+        break;
+      case 2: mesh->unrefine_all_elements();
+        space->set_uniform_order(P_INIT);
+        break;
+      case 3: mesh->unrefine_all_elements();
+        space->adjust_element_order(-1, -1, P_INIT, P_INIT);
+        break;
       }
 
       // Important. Since the space was changed, we need to re-assign DOFs.
@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
       {
         ndof_coarse = Space<double>::get_num_dofs(space);
       }
-      catch(Hermes::Exceptions::Exception& e)
+      catch (Hermes::Exceptions::Exception& e)
       {
         e.print_msg();
       }
@@ -189,40 +189,37 @@ int main(int argc, char* argv[])
         runge_kutta.set_time_step(time_step);
         runge_kutta.rk_time_step_newton(sln_time_prev, sln_time_new);
       }
-      catch(Exceptions::Exception& e)
+      catch (Exceptions::Exception& e)
       {
         std::cout << e.what();
-        
+
       }
 
       // Project the fine mesh solution onto the coarse mesh.
       MeshFunctionSharedPtr<double> sln_coarse(new Solution<double>);
       Hermes::Mixins::Loggable::Static::info("Projecting fine mesh solution on coarse mesh for error estimation.");
-      OGProjection<double>::project_global(space, sln_time_new, sln_coarse); 
+      OGProjection<double>::project_global(space, sln_time_new, sln_coarse);
 
       // Calculate element errors and total error estimate.
       Hermes::Mixins::Loggable::Static::info("Calculating error estimate.");
-      Adapt<double>* adaptivity = new Adapt<double>(space);
-      double err_est_rel_total = adaptivity->calc_err_est(sln_coarse, sln_time_new) * 100;
+      errorCalculator.calculate_errors(sln_coarse, sln_time_new);
+      double err_est_rel_total = errorCalculator.get_total_error_squared() * 100;
 
       // Report results.
-      Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_ref: %d, err_est_rel: %g%%", 
-           Space<double>::get_num_dofs(space), Space<double>::get_num_dofs(ref_space), err_est_rel_total);
+      Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_ref: %d, err_est_rel: %g%%",
+        Space<double>::get_num_dofs(space), Space<double>::get_num_dofs(ref_space), err_est_rel_total);
 
       // If err_est too large, adapt the mesh.
       if (err_est_rel_total < ERR_STOP) done = true;
-      else 
+      else
       {
         Hermes::Mixins::Loggable::Static::info("Adapting the coarse mesh.");
         done = adaptivity.adapt(&selector);
 
-        if (Space<double>::get_num_dofs(space) >= NDOF_STOP) 
-          done = true;
-        else
-          // Increase the counter of performed adaptivity steps.
-          as++;
+        // Increase the counter of performed adaptivity steps.
+        as++;
       }
-      
+
       // Visualize the solution and mesh.
       char title[100];
       sprintf(title, "Solution, time %g", current_time);
@@ -232,19 +229,14 @@ int main(int argc, char* argv[])
       sprintf(title, "Mesh, time %g", current_time);
       ordview.set_title(title);
       ordview.show(space);
-
-      // Clean up.
-      delete adaptivity;
-    }
-    while (done == false);
+    } while (done == false);
 
     sln_time_prev->copy(sln_time_new);
 
     // Increase current time and counter of time steps.
     current_time += time_step;
     ts++;
-  }
-  while (current_time < T_FINAL);
+  } while (current_time < T_FINAL);
 
   // Wait for all views to be closed.
   View::wait();

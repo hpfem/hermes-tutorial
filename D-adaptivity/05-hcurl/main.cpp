@@ -45,7 +45,7 @@ const CandList CAND_LIST = H2D_HP_ANISO;
 // reference mesh and coarse mesh solution in percent).
 const double ERR_STOP = 1.0;
 // Error calculation & adaptivity.
-DefaultErrorCalculator<double, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
+DefaultErrorCalculator<complex, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
 // Stopping criterion for an adaptivity step.
 AdaptStoppingCriterionSingleElement<complex> stoppingCriterion(THRESHOLD);
 // Adaptivity processor class.
@@ -154,16 +154,11 @@ int main(int argc, char* argv[])
     }
 
     // Calculate element errors and total error estimate.
-    Adapt<std::complex<double> >* adaptivity = new Adapt<std::complex<double> >(space);
-    adaptivity->set_verbose_output(true);
-
-    double err_est_rel = adaptivity->calc_err_est(sln, ref_sln) * 100;
-
-    Hermes::Mixins::Loggable::Static::info("\nError estimate: %f%%.\n", err_est_rel);
-
+    errorCalculator.calculate_errors(sln, sln_exact, false);
+    double err_exact_rel = errorCalculator.get_total_error_squared() * 100;
     // Calculate exact error.
-    bool solutions_for_adapt = false;
-    double err_exact_rel = adaptivity->calc_err_exact(sln, sln_exact, solutions_for_adapt) * 100;
+    errorCalculator.calculate_errors(sln, ref_sln);
+    double err_est_rel = errorCalculator.get_total_error_squared() * 100;
 
     // Add entry to DOF and CPU convergence graphs.
     graph_dof_est.add_values(space->get_num_dofs(), err_est_rel);
@@ -180,11 +175,9 @@ int main(int argc, char* argv[])
       // Increase the counter of performed adaptivity steps.
       if(done == false)  as++;
     }
-    if(space->get_num_dofs() >= NDOF_STOP) done = true;
 
     // Clean up.
     delete [] coeff_vec;
-    delete adaptivity;
   }
   while (done == false);
 

@@ -32,7 +32,7 @@ const CandList CAND_LIST = H2D_HP_ANISO;
 // Stopping criterion for adaptivity.
 const double ERR_STOP = 1.0;                      
 // Error calculation & adaptivity.
-DefaultErrorCalculator<double, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
+DefaultErrorCalculator<complex, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
 // Stopping criterion for an adaptivity step.
 AdaptStoppingCriterionSingleElement<complex> stoppingCriterion(THRESHOLD);
 // Adaptivity processor class.
@@ -139,8 +139,8 @@ int main(int argc, char* argv[])
 
     // Calculate element errors and total error estimate.
     Hermes::Mixins::Loggable::Static::info("Calculating error estimate.");
-    Adapt<std::complex<double> >* adaptivity = new Adapt<std::complex<double> >(space);
-    double err_est_rel = adaptivity->calc_err_est(sln, ref_sln) * 100;
+    errorCalculator.calculate_errors(sln, ref_sln);
+    double err_est_rel = errorCalculator.get_total_error_squared() * 100;
 
     // Report results.
     Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_fine: %d, err_est_rel: %g%%",
@@ -162,10 +162,7 @@ int main(int argc, char* argv[])
       Hermes::Mixins::Loggable::Static::info("Adapting coarse mesh.");
       done = adaptivity.adapt(&selector);
     }
-    if (space->get_num_dofs() >= NDOF_STOP) done = true;
 
-    // Clean up.
-    delete adaptivity;
     // Increase counter.
     as++;
   }

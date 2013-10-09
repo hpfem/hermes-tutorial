@@ -130,8 +130,8 @@ int main(int argc, char* argv[])
       runge_kutta.set_verbose_output(true);
       runge_kutta.set_time(current_time);
       runge_kutta.set_time_step(time_step);
-      runge_kutta.set_newton_max_iter(NEWTON_MAX_ITER);
-      runge_kutta.set_newton_tol(NEWTON_TOL);
+      runge_kutta.set_max_allowed_iterations(NEWTON_MAX_ITER);
+      runge_kutta.set_tolerance(NEWTON_TOL);
       runge_kutta.rk_time_step_newton(sln_time_prev, sln_time_new, time_error_fn);
     }
     catch(Exceptions::Exception& e)
@@ -151,13 +151,11 @@ int main(int argc, char* argv[])
     sview_high.set_title(title);
     sview_high.show(sln_time_new);
 
-    // Calculate relative time stepping error and decide whether the 
-    // time step can be accepted. If not, then the time step size is 
-    // reduced and the entire time step repeated. If yes, then another
-    // check is run, and if the relative error is very low, time step 
-    // is increased.
-    double rel_err_time = Global<double>::calc_norm(time_error_fn.get(), HERMES_H1_NORM) / 
-                          Global<double>::calc_norm(sln_time_new.get(), HERMES_H1_NORM) * 100;
+    DefaultErrorCalculator<double, HERMES_HCURL_NORM> errorCalculatorTime(RelativeErrorToGlobalNorm, 1);
+    errorCalculatorTime.calculate_errors(time_error_fn, sln_time_new);
+    double rel_err_time = errorCalculatorTime.get_total_error_squared() * 100;
+
+
     Hermes::Mixins::Loggable::Static::info("rel_err_time = %g%%", rel_err_time);
     if (rel_err_time > TIME_TOL_UPPER) {
       Hermes::Mixins::Loggable::Static::info("rel_err_time above upper limit %g%% -> decreasing time step from %g to %g and repeating time step.", 

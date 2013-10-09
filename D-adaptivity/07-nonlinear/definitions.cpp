@@ -15,14 +15,12 @@ void InitialSolutionHeatTransfer::derivatives (double x, double y, double& dx, d
 
 Ord InitialSolutionHeatTransfer::ord(double x, double y) const 
 {
-  return (x + 10) * (y + 10) / 100. + 2.;
+  return Hermes::Ord((x + 10) * (y + 10) / 100. + 2.);
 }
 
 MeshFunction<double>* InitialSolutionHeatTransfer::clone() const
 {
-  Mesh* new_mesh = new Mesh();
-  new_mesh->copy(this->mesh);
-  return new InitialSolutionHeatTransfer(new_mesh);
+  return new InitialSolutionHeatTransfer(*this);
 }
 
 InitialSolutionHeatTransfer::~InitialSolutionHeatTransfer()

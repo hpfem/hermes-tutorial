@@ -13,6 +13,6 @@ void CustomExactSolution::derivatives (double x, double y, double& dx, double& d
 
 Ord CustomExactSolution::ord(double x, double y) const 
 {
-  return - Hermes::pow(x, 4) * Hermes::pow(y, 5);
+  return Hermes::Ord(Hermes::pow(x, 4) * Hermes::pow(y, 5));
 }
 
