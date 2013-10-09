@@ -1,203 +1,203 @@
-project(hermes-tutorialMeshSharedPtr mesh
-cmake_minimum_required(VERSION 2.8MeshSharedPtr mesh
+project(hermes-tutorial)
+cmake_minimum_required(VERSION 2.8)
 
-set(CMAKE_MODULE_PATH ${CMAKE_HOME_DIRECTORY}/cmakeMeshSharedPtr mesh
-include(CommonTargetPropertiesMeshSharedPtr mesh
+set(CMAKE_MODULE_PATH ${CMAKE_HOME_DIRECTORY}/cmake)
+include(CommonTargetProperties)
 
 # For Win64
-if(${CMAKE_CL_64}MeshSharedPtr mesh
-  set(WIN64 YESMeshSharedPtr mesh
-else(${CMAKE_CL_64}MeshSharedPtr mesh
-  set(WIN64 NOMeshSharedPtr mesh
-endif(${CMAKE_CL_64}MeshSharedPtr mesh
+if(${CMAKE_CL_64})
+  set(WIN64 YES)
+else(${CMAKE_CL_64})
+  set(WIN64 NO)
+endif(${CMAKE_CL_64})
 
 # This has to be the same as in the library's CMake.
 # Default "yes"
-set(H2D_WITH_GLUT YESMeshSharedPtr mesh
-set(WITH_TC_MALLOC YESMeshSharedPtr mesh
-set(WITH_PARALUTION YESMeshSharedPtr mesh
-set(WITH_UMFPACK YESMeshSharedPtr mesh
-set(WITH_OPENMP YESMeshSharedPtr mesh
+set(H2D_WITH_GLUT YES)
+set(WITH_TC_MALLOC YES)
+set(WITH_PARALUTION YES)
+set(WITH_UMFPACK YES)
+set(WITH_OPENMP YES)
 # Default "no"
-set(WITH_EXODUSII NOMeshSharedPtr mesh
-set(WITH_MUMPS NOMeshSharedPtr mesh
-set(WITH_MATIO NOMeshSharedPtr mesh
-set(WITH_BSON NOMeshSharedPtr mesh
-set(WITH_SUPERLU NOMeshSharedPtr mesh
+set(WITH_EXODUSII NO)
+set(WITH_MUMPS NO)
+set(WITH_MATIO NO)
+set(WITH_BSON NO)
+set(WITH_SUPERLU NO)
 
 # Where to look for the static libraries.
-set(HERMES_DIRECTORY /usr/local/libMeshSharedPtr mesh
-set(HERMES_INCLUDE_PATH /usr/local/includeMeshSharedPtr mesh
-set(DEP_INCLUDE_PATHS /usr/local/includeMeshSharedPtr mesh
+set(HERMES_DIRECTORY /usr/local/lib)
+set(HERMES_INCLUDE_PATH /usr/local/include)
+set(DEP_INCLUDE_PATHS /usr/local/include)
 
 # Allow to override the default values in CMake.vars:
-include(CMake.vars OPTIONALMeshSharedPtr mesh
+include(CMake.vars OPTIONAL)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"MeshSharedPtr mesh
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		# Disable all warnings and turn on only important ones:
-		set(CMAKE_CXX_FLAGS "-w ${CMAKE_CXX_FLAGS} -std=c++11"MeshSharedPtr mesh
-		set(CMAKE_CXX_FLAGS "-Wuninitialized -Wvla -Wsign-compare ${CMAKE_CXX_FLAGS}"MeshSharedPtr mesh
+		set(CMAKE_CXX_FLAGS "-w ${CMAKE_CXX_FLAGS} -std=c++11")
+		set(CMAKE_CXX_FLAGS "-Wuninitialized -Wvla -Wsign-compare ${CMAKE_CXX_FLAGS}")
 
-		set(RELEASE_FLAGS "-DNDEBUG -O3"MeshSharedPtr mesh
-		set(DEBUG_FLAGS   "-g"MeshSharedPtr mesh
-endif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU"MeshSharedPtr mesh
+		set(RELEASE_FLAGS "-DNDEBUG -O3")
+		set(DEBUG_FLAGS   "-g")
+endif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
 # Enabling multiprocessor build on MSVC
-if(MSVCMeshSharedPtr mesh
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP"MeshSharedPtr mesh
-  if(WITH_OPENMPMeshSharedPtr mesh
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp"MeshSharedPtr mesh
-  endif(WITH_OPENMPMeshSharedPtr mesh
-endif(MSVCMeshSharedPtr mesh
+if(MSVC)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+  if(WITH_OPENMP)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
+  endif(WITH_OPENMP)
+endif(MSVC)
 
 # This overrides CXX flags for MSVC
-if(MSVCMeshSharedPtr mesh
-  if(WIN64MeshSharedPtr mesh
-    set(MSVC_DEFINES "/DWIN64 /D_WINDOWS /Dfinite=_finite /wd4275 /wd4251"MeshSharedPtr mesh
-  else(WIN64MeshSharedPtr mesh
-    set(MSVC_DEFINES "/DWIN32 /D_WINDOWS /Dfinite=_finite /wd4275 /wd4251"MeshSharedPtr mesh
-  endif(WIN64MeshSharedPtr mesh
-  set(CMAKE_CXX_FLAGS_DEBUG          "/D_DEBUG /Od /Ob2 /MDd /Zi ${MSVC_DEFINES}"MeshSharedPtr mesh
-  set(HERMES_DEBUG_FLAGS "${CMAKE_CXX_FLAGS_DEBUG}"MeshSharedPtr mesh
-  set(CMAKE_CXX_FLAGS_MINSIZEREL_INIT     "/O2 /Ob2 /MD ${MSVC_DEFINES}"MeshSharedPtr mesh
-  set(CMAKE_CXX_FLAGS_RELEASE        "/DNDEBUG /O2 /Ob2 /MD ${MSVC_DEFINES}"MeshSharedPtr mesh
-  set(HERMES_RELEASE_FLAGS "${CMAKE_CXX_FLAGS_RELEASE}"MeshSharedPtr mesh
-  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO_INIT "/DNDEBUG /O2 /Ob2 /MD /Zi ${MSVC_DEFINES}"MeshSharedPtr mesh
+if(MSVC)
+  if(WIN64)
+    set(MSVC_DEFINES "/DWIN64 /D_WINDOWS /Dfinite=_finite /wd4275 /wd4251")
+  else(WIN64)
+    set(MSVC_DEFINES "/DWIN32 /D_WINDOWS /Dfinite=_finite /wd4275 /wd4251")
+  endif(WIN64)
+  set(CMAKE_CXX_FLAGS_DEBUG          "/D_DEBUG /Od /Ob2 /MDd /Zi ${MSVC_DEFINES}")
+  set(HERMES_DEBUG_FLAGS "${CMAKE_CXX_FLAGS_DEBUG}")
+  set(CMAKE_CXX_FLAGS_MINSIZEREL_INIT     "/O2 /Ob2 /MD ${MSVC_DEFINES}")
+  set(CMAKE_CXX_FLAGS_RELEASE        "/DNDEBUG /O2 /Ob2 /MD ${MSVC_DEFINES}")
+  set(HERMES_RELEASE_FLAGS "${CMAKE_CXX_FLAGS_RELEASE}")
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO_INIT "/DNDEBUG /O2 /Ob2 /MD /Zi ${MSVC_DEFINES}")
   
-  set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO"MeshSharedPtr mesh
-  set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO"MeshSharedPtr mesh
-  set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /SAFESEH:NO"MeshSharedPtr mesh
-endif(MSVCMeshSharedPtr mesh
+  set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
+  set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
+  set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /SAFESEH:NO")
+endif(MSVC)
 
-include_directories("${PTHREAD_ROOT}/include"MeshSharedPtr mesh
+include_directories("${PTHREAD_ROOT}/include")
 
-if(${WITH_UMFPACK}MeshSharedPtr mesh
-  find_package(UMFPACK REQUIREDMeshSharedPtr mesh
-  include_directories(${UMFPACK_INCLUDE_DIRS}MeshSharedPtr mesh
-endif(MeshSharedPtr mesh
+if(${WITH_UMFPACK})
+  find_package(UMFPACK REQUIRED)
+  include_directories(${UMFPACK_INCLUDE_DIRS})
+endif()
 
-find_package(PTHREAD REQUIREDMeshSharedPtr mesh
+find_package(PTHREAD REQUIRED)
 
-if(${WITH_TC_MALLOC}MeshSharedPtr mesh
-  find_package(TCMALLOC REQUIREDMeshSharedPtr mesh
-  include_directories(${TCMALLOC_INCLUDE_DIR}MeshSharedPtr mesh
-endif(MeshSharedPtr mesh
+if(${WITH_TC_MALLOC})
+  find_package(TCMALLOC REQUIRED)
+  include_directories(${TCMALLOC_INCLUDE_DIR})
+endif()
 
-if(${WITH_PARALUTION}MeshSharedPtr mesh
-  find_package(PARALUTION REQUIREDMeshSharedPtr mesh
-  include_directories(${PARALUTION_INCLUDE_DIR}MeshSharedPtr mesh
-endif(MeshSharedPtr mesh
+if(${WITH_PARALUTION})
+  find_package(PARALUTION REQUIRED)
+  include_directories(${PARALUTION_INCLUDE_DIR})
+endif()
 
-if(${WITH_MATIO}MeshSharedPtr mesh
-  find_package(MATIO REQUIREDMeshSharedPtr mesh
-  include_directories(${MATIO_INCLUDE_DIR}MeshSharedPtr mesh
-endif(MeshSharedPtr mesh
+if(${WITH_MATIO})
+  find_package(MATIO REQUIRED)
+  include_directories(${MATIO_INCLUDE_DIR})
+endif()
 
-if(MSVCMeshSharedPtr mesh
-  if(WITH_PETSC OR WITH_TRILINOS OR WITH_SUPERLUMeshSharedPtr mesh
-      find_package(CLAPACK REQUIREDMeshSharedPtr mesh
-      include_directories(${CLAPACK_INCLUDE_DIRS}MeshSharedPtr mesh
-  endif(WITH_PETSC OR WITH_TRILINOS OR WITH_SUPERLUMeshSharedPtr mesh
-  if(WITH_MUMPSMeshSharedPtr mesh
-    find_package(WINBLAS REQUIREDMeshSharedPtr mesh
-  endif(WITH_MUMPSMeshSharedPtr mesh
-else(MSVCMeshSharedPtr mesh
-  if(WITH_UMFPACK OR WITH_PETSC OR WITH_MUMPS OR WITH_TRILINOS OR WITH_SUPERLUMeshSharedPtr mesh
-    if (NOT LAPACK_FOUNDMeshSharedPtr mesh
-        enable_language(FortranMeshSharedPtr mesh
-        find_package(LAPACK REQUIREDMeshSharedPtr mesh
+if(MSVC)
+  if(WITH_PETSC OR WITH_TRILINOS OR WITH_SUPERLU)
+      find_package(CLAPACK REQUIRED)
+      include_directories(${CLAPACK_INCLUDE_DIRS})
+  endif(WITH_PETSC OR WITH_TRILINOS OR WITH_SUPERLU)
+  if(WITH_MUMPS)
+    find_package(WINBLAS REQUIRED)
+  endif(WITH_MUMPS)
+else(MSVC)
+  if(WITH_UMFPACK OR WITH_PETSC OR WITH_MUMPS OR WITH_TRILINOS OR WITH_SUPERLU)
+    if (NOT LAPACK_FOUND)
+        enable_language(Fortran)
+        find_package(LAPACK REQUIRED)
         set(LAPACK_LIBRARIES  ${LAPACK_LIBRARIES}
-                CACHE STRING  "Path to LAPACK/BLAS libraries."MeshSharedPtr mesh
+                CACHE STRING  "Path to LAPACK/BLAS libraries.")
         set(LAPACK_FOUND      YES
-                CACHE STRING  "Have LAPACK/BLAS libraries been found?"MeshSharedPtr mesh
-    endif (NOT LAPACK_FOUNDMeshSharedPtr mesh
-    add_definitions(-DWITH_BLASMeshSharedPtr mesh  
-  endif(WITH_UMFPACK OR WITH_PETSC OR WITH_MUMPS OR WITH_TRILINOS OR WITH_SUPERLUMeshSharedPtr mesh
-endif(MSVCMeshSharedPtr mesh
+                CACHE STRING  "Have LAPACK/BLAS libraries been found?")
+    endif (NOT LAPACK_FOUND)
+    add_definitions(-DWITH_BLAS)  
+  endif(WITH_UMFPACK OR WITH_PETSC OR WITH_MUMPS OR WITH_TRILINOS OR WITH_SUPERLU)
+endif(MSVC)
 
-if(WITH_MUMPSMeshSharedPtr mesh
-  find_package(MUMPS REQUIREDMeshSharedPtr mesh
-  if(WITH_MPIMeshSharedPtr mesh
-    find_package(SCALAPACK REQUIREDMeshSharedPtr mesh # parallel version of MUMPS needs ScaLapack+BLACS
-  endif(WITH_MPIMeshSharedPtr mesh
-  include_directories(${MUMPS_INCLUDE_DIR}MeshSharedPtr mesh
-  set(MUMPS_LIBRARIES ${MUMPS_CPLX_LIBRARIES}MeshSharedPtr mesh
-  LIST(APPEND MUMPS_LIBRARIES ${MUMPS_REAL_LIBRARIES}MeshSharedPtr mesh
-endif(WITH_MUMPSMeshSharedPtr mesh
+if(WITH_MUMPS)
+  find_package(MUMPS REQUIRED)
+  if(WITH_MPI)
+    find_package(SCALAPACK REQUIRED) # parallel version of MUMPS needs ScaLapack+BLACS
+  endif(WITH_MPI)
+  include_directories(${MUMPS_INCLUDE_DIR})
+  set(MUMPS_LIBRARIES ${MUMPS_CPLX_LIBRARIES})
+  LIST(APPEND MUMPS_LIBRARIES ${MUMPS_REAL_LIBRARIES})
+endif(WITH_MUMPS)
 
-if(${WITH_BSON}MeshSharedPtr mesh
-  find_package(BSON REQUIREDMeshSharedPtr mesh
-  include_directories(${BSON_INCLUDE_DIR}MeshSharedPtr mesh
-endif(MeshSharedPtr mesh
+if(${WITH_BSON})
+  find_package(BSON REQUIRED)
+  include_directories(${BSON_INCLUDE_DIR})
+endif()
       
-if(WITH_SUPERLUMeshSharedPtr mesh
-  find_package(SUPERLU REQUIREDMeshSharedPtr mesh
-  include_directories(${SUPERLU_INCLUDE_DIR}MeshSharedPtr mesh
-  if(SUPERLU_MTMeshSharedPtr mesh
-    add_definitions(-DSLU_MTMeshSharedPtr mesh
-  endif(SUPERLU_MTMeshSharedPtr mesh
-endif(WITH_SUPERLUMeshSharedPtr mesh
-set(HERMES2D_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes2dMeshSharedPtr mesh
-set(HERMES_COMMON_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes_commonMeshSharedPtr mesh
+if(WITH_SUPERLU)
+  find_package(SUPERLU REQUIRED)
+  include_directories(${SUPERLU_INCLUDE_DIR})
+  if(SUPERLU_MT)
+    add_definitions(-DSLU_MT)
+  endif(SUPERLU_MT)
+endif(WITH_SUPERLU)
+set(HERMES2D_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes2d)
+set(HERMES_COMMON_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes_common)
 
-find_package(HERMES_COMMON REQUIREDMeshSharedPtr mesh
+find_package(HERMES_COMMON REQUIRED)
 
-include_directories(${HERMES_COMMON_INCLUDE_PATH}MeshSharedPtr mesh
-include_directories(${HERMES2D_INCLUDE_PATH}MeshSharedPtr mesh
-include_directories(${DEP_INCLUDE_PATHS}MeshSharedPtr mesh
+include_directories(${HERMES_COMMON_INCLUDE_PATH})
+include_directories(${HERMES2D_INCLUDE_PATH})
+include_directories(${DEP_INCLUDE_PATHS})
 
 # Linear problems.
-add_subdirectory(A-linearMeshSharedPtr mesh
+add_subdirectory(A-linear)
 
 # Nonlinear problems.
-add_subdirectory(B-nonlinearMeshSharedPtr mesh
+add_subdirectory(B-nonlinear)
 
 # Time-dependent problems.
-add_subdirectory(C-transientMeshSharedPtr mesh
+add_subdirectory(C-transient)
 
 # Adaptivity.
-add_subdirectory(D-adaptivityMeshSharedPtr mesh
+add_subdirectory(D-adaptivity)
 
 # FVM and DG.
-add_subdirectory(E-fvm-and-dgMeshSharedPtr mesh
+add_subdirectory(E-fvm-and-dg)
 
 # Using Trilinos.
-if(WITH_TRILINOSMeshSharedPtr mesh
-	add_subdirectory(F-trilinosMeshSharedPtr mesh
-endif(WITH_TRILINOSMeshSharedPtr mesh
+if(WITH_TRILINOS)
+	add_subdirectory(F-trilinos)
+endif(WITH_TRILINOS)
 
 # Miscellaneous techniques.
-add_subdirectory(G-miscellaneousMeshSharedPtr mesh
+add_subdirectory(G-miscellaneous)
 
 #------------------------------------------------------------------------------
 # Report.
 #~~~~~~~~
-message("\nHermes-tutorial Configuration results"MeshSharedPtr mesh
-message("---------------------"MeshSharedPtr mesh
-if(WIN32MeshSharedPtr mesh
-  message("Build for Win64: ${WIN64}"MeshSharedPtr mesh
-endif(WIN32MeshSharedPtr mesh
+message("\nHermes-tutorial Configuration results")
+message("---------------------")
+if(WIN32)
+  message("Build for Win64: ${WIN64}")
+endif(WIN32)
 
-message("\n-------Features-------"MeshSharedPtr mesh
-message("Build with OpenMP: ${WITH_OPENMP}"MeshSharedPtr mesh
-message("Build with TCMalloc: ${WITH_TC_MALLOC}"MeshSharedPtr mesh
-message("Build with BSON: ${WITH_BSON}"MeshSharedPtr mesh
-message("Build with MATIO: ${WITH_MATIO}"MeshSharedPtr mesh
-if(${WITH_MATIO}MeshSharedPtr mesh
-  message(" MATIO with HDF5: ${MATIO_WITH_HDF5}"MeshSharedPtr mesh
-endif(MeshSharedPtr mesh
-if(${WITH_MPI}MeshSharedPtr mesh
-  message("Build with MPI: ${WITH_MPI}"MeshSharedPtr mesh
-endif(MeshSharedPtr mesh
-message("Build with EXODUSII: ${WITH_EXODUSII}"MeshSharedPtr mesh
+message("\n-------Features-------")
+message("Build with OpenMP: ${WITH_OPENMP}")
+message("Build with TCMalloc: ${WITH_TC_MALLOC}")
+message("Build with BSON: ${WITH_BSON}")
+message("Build with MATIO: ${WITH_MATIO}")
+if(${WITH_MATIO})
+  message(" MATIO with HDF5: ${MATIO_WITH_HDF5}")
+endif()
+if(${WITH_MPI})
+  message("Build with MPI: ${WITH_MPI}")
+endif()
+message("Build with EXODUSII: ${WITH_EXODUSII}")
 
-message("\n-------Solvers-------"MeshSharedPtr mesh
-message("Build with UMFPACK: ${WITH_UMFPACK}"MeshSharedPtr mesh
-message("Build with PARALUTION: ${WITH_PARALUTION}"MeshSharedPtr mesh
-message("Build with PETSC: !TO_DO!"MeshSharedPtr mesh
-message("Build with MUMPS: ${WITH_MUMPS}"MeshSharedPtr mesh
-message("Build with SUPERLU${MT}: ${WITH_SUPERLU}"MeshSharedPtr mesh
-message("Build with TRILINOS: !TO_DO!"MeshSharedPtr mesh
+message("\n-------Solvers-------")
+message("Build with UMFPACK: ${WITH_UMFPACK}")
+message("Build with PARALUTION: ${WITH_PARALUTION}")
+message("Build with PETSC: !TO_DO!")
+message("Build with MUMPS: ${WITH_MUMPS}")
+message("Build with SUPERLU${MT}: ${WITH_SUPERLU}")
+message("Build with TRILINOS: !TO_DO!")
 
-message("---------------------"MeshSharedPtr mesh
-message("\n"MeshSharedPtr mesh
+message("---------------------")
+message("\n")
