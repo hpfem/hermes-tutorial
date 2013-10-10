@@ -17,7 +17,7 @@ KrivodonovaDiscontinuityDetector::KrivodonovaDiscontinuityDetector(Hermes::vecto
   unsigned int mesh0_seq = spaces[0]->get_mesh()->get_seq();
   for(unsigned int i = 0; i < spaces.size(); i++)
     if(spaces[i]->get_mesh()->get_seq() != mesh0_seq)
-      throw Hermes::Exceptions::Exception("So far DiscontinuityDetector works only for single mesh.");
+      throw Hermes::Exceptions::Exception("So far DiscontinuityDetector works only for single mesh->");
   mesh = spaces[0]->get_mesh();
 };
 
@@ -278,7 +278,7 @@ KuzminDiscontinuityDetector::KuzminDiscontinuityDetector(Hermes::vector<SpaceSha
   unsigned int mesh0_seq = spaces[0]->get_mesh()->get_seq();
   for(unsigned int i = 0; i < spaces.size(); i++)
     if(spaces[i]->get_mesh()->get_seq() != mesh0_seq)
-      throw Hermes::Exceptions::Exception("So far DiscontinuityDetector works only for single mesh.");
+      throw Hermes::Exceptions::Exception("So far DiscontinuityDetector works only for single mesh->");
   mesh = spaces[0]->get_mesh();
 };
 

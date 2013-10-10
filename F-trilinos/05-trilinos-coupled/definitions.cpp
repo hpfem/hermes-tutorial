@@ -1,8 +1,10 @@
 #include "definitions.h"
 
-CustomWeakForm::CustomWeakForm(double Le, double alpha, double beta, double kappa, double x1, double tau, bool JFNK, int PRECOND, Hermes::Hermes2D::Filter<double>* omega, Hermes::Hermes2D::Filter<double>* omega_dt, Hermes::Hermes2D::Filter<double>* omega_dc, Solution<double>* t_prev_time_1, Solution<double>* c_prev_time_1, Solution<double>* t_prev_time_2, Solution<double>* c_prev_time_2) : WeakForm<double>(2, JFNK ? true : false), Le(Le), alpha(alpha), beta(beta), kappa(kappa), x1(x1)
+CustomWeakForm::CustomWeakForm(double Le, double alpha, double beta, double kappa, double x1, double tau, bool JFNK, int PRECOND, 
+  Hermes::Hermes2D::MeshFunctionSharedPtr<double>  omega, Hermes::Hermes2D::MeshFunctionSharedPtr<double>  omega_dt, Hermes::Hermes2D::MeshFunctionSharedPtr<double>  omega_dc,
+  MeshFunctionSharedPtr<double>  t_prev_time_1, MeshFunctionSharedPtr<double>  c_prev_time_1, MeshFunctionSharedPtr<double>  t_prev_time_2, MeshFunctionSharedPtr<double>  c_prev_time_2) : WeakForm<double>(2, JFNK ? true : false), Le(Le), alpha(alpha), beta(beta), kappa(kappa), x1(x1)
 {
-  this->set_ext(Hermes::vector<MeshFunction<double>*>(omega_dt, omega_dc, t_prev_time_1, t_prev_time_2, c_prev_time_1, c_prev_time_2, omega));
+  this->set_ext(Hermes::vector<MeshFunctionSharedPtr<double> >(omega_dt, omega_dc, t_prev_time_1, t_prev_time_2, c_prev_time_1, c_prev_time_2, omega));
 
   if (!JFNK || (JFNK && PRECOND == 1))
   {
@@ -256,7 +258,7 @@ Ord CustomWeakForm::PreconditionerForm_1::ord(int n, double *wt, Func<Ord>* u_ex
   return vj->val[0] * vi->val[0] +  vj->dx[0] * vi->dx[0] + vj->dy[0] * vi->dy[0];
 }
 
-void CustomFilter::filter_fn(int n, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
+void CustomFilter::filter_fn(int n, double* x, double* y, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
                       double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)
@@ -272,7 +274,7 @@ void CustomFilter::filter_fn(int n, Hermes::vector<double*> values, Hermes::vect
   }
 }
 
-void CustomFilterDt::filter_fn(int n, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
+void CustomFilterDt::filter_fn(int n, double* x, double* y, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
                         double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)
@@ -288,7 +290,7 @@ void CustomFilterDt::filter_fn(int n, Hermes::vector<double*> values, Hermes::ve
   }
 }
 
-void CustomFilterDc::filter_fn(int n, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
+void CustomFilterDc::filter_fn(int n, double* x, double* y, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
                         double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)

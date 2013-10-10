@@ -1,6 +1,7 @@
 #include "definitions.h"
 
 using namespace RefinementSelectors;
+using namespace Preconditioners;
 
 // This example is a matrix-free version of example 01-intro. It employs the 
 // Trilinos NOX package (Trilinos needs to be installed and enabled in CMake.vars). 
@@ -99,7 +100,7 @@ int main(int argc, char* argv[])
   MeshFunctionSharedPtr<double> sln(new Solution<double>), ref_sln(new Solution<double>);
 
   // Initialize refinement selector.
-  H1ProjBasedSelector<double> selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
+  H1ProjBasedSelector<double> selector(CAND_LIST);
 
   // Initialize views.
   Views::ScalarView sview("Solution", new Views::WinGeom(0, 0, 410, 600));
@@ -123,19 +124,16 @@ int main(int argc, char* argv[])
     // Time measurement.
     cpu_time.tick();
 
-    // Backup fine mesh space if it already exists.
-    if (ref_space_new != NULL) 
-    {
-      if (ref_space_prev != NULL) delete ref_space_prev;
-      ref_space_prev = ref_space_new;
-    }
-
     // Construct (new) fine mesh and setup (new) fine mesh space.
-    ref_space_new = Space<double>::construct_refined_space(space);
-    int ndof_ref = ref_space_new->get_num_dofs();
+    Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
+    MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
+    Space<double>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
+    SpaceSharedPtr<double> ref_space = ref_space_creator.create_ref_space();
+    int ndof_ref = ref_space->get_num_dofs();
+
 
     // Initialize (new) fine mesh problem.
-    DiscreteProblem<double> dp(&wf, ref_space_new);
+    DiscreteProblemNOX<double> dp(&wf, ref_space);
     
     // Allocate initial coefficient vector for the Newton's method
     // on the (new) fine mesh.
@@ -232,13 +230,13 @@ int main(int argc, char* argv[])
 
     // Report results.
     Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_fine: %d, err_est_rel: %g%%",
-      space.get_num_dofs(), ref_space_new->get_num_dofs(), err_est_rel);
+      space->get_num_dofs(), ref_space->get_num_dofs(), err_est_rel);
 
     // Add entry to DOF and CPU convergence graphs.
     cpu_time.tick();    
     graph_cpu.add_values(cpu_time.accumulated(), err_est_rel);
     graph_cpu.save("conv_cpu_est.dat");
-    graph_dof.add_values(space.get_num_dofs(), err_est_rel);
+    graph_dof.add_values(space->get_num_dofs(), err_est_rel);
     graph_dof.save("conv_dof_est.dat");
     
     // Skip the time spent to save the convergence graphs.

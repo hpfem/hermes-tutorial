@@ -1,8 +1,7 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
 
 using namespace Hermes;
+using namespace Hermes::Preconditioners;
 using namespace Hermes::Hermes2D;
 using namespace Hermes::Hermes2D::Views;
 using namespace Hermes::Hermes2D::RefinementSelectors;
@@ -69,37 +68,37 @@ int max_iters = 100;
 int main(int argc, char* argv[])
 {
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("square.mesh", &mesh);
+  mloader.load("square.mesh", mesh);
 
   // Perform initial mesh refinemets.
-  for (int i=0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
+  for (int i=0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
 
   // Initialize boundary conditions.
   DefaultEssentialBCConst<double> bc("Bdy_bottom", TEMP_INIT);
   EssentialBCs<double> bcs(&bc);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
-  int ndof = Space<double>::get_num_dofs(&space);
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  int ndof = Space<double>::get_num_dofs(space);
   Hermes::Mixins::Loggable::Static::info("ndof: %d", ndof);
 
   // Define constant initial condition. 
-  ConstantSolution<double> t_prev_time(&mesh, TEMP_INIT);
+  ConstantSolution<double> t_prev_time(mesh, TEMP_INIT);
 
   // Initialize the weak formulation.
   CustomWeakForm wf(Hermes::vector<std::string>("Bdy_right", "Bdy_top", "Bdy_left"), 
                     HEATCAP, RHO, TAU, LAMBDA, ALPHA, TEMP_EXT, &t_prev_time, TRILINOS_JFNK);
 
   // Initialize the finite element problem.
-  DiscreteProblem<double> dp(&wf, &space);
+  DiscreteProblemNOX<double> dp(&wf, space);
 
   // Project the function "t_prev_time" on the FE space 
   // in order to obtain initial vector for NOX. 
-  Hermes::Mixins::Loggable::Static::info("Projecting initial solution on the FE mesh.");
+  Hermes::Mixins::Loggable::Static::info("Projecting initial solution on the FE mesh->");
   double* coeff_vec = new double[ndof];
-  OGProjection<double> ogProjection; ogProjection.project_global(&space, &t_prev_time, coeff_vec);
+  OGProjection<double>::project_global(space, &t_prev_time, coeff_vec);
 
   // Initialize the NOX solver.
   Hermes::Mixins::Loggable::Static::info("Initializing NOX.");
@@ -144,7 +143,7 @@ int main(int argc, char* argv[])
       
     }
 
-    Solution<double>::vector_to_solution(solver_nox.get_sln_vector(), &space, &t_prev_time);
+    Solution<double>::vector_to_solution(solver_nox.get_sln_vector(), space, &t_prev_time);
 
     // Show the new solution.
     Tview.show(&t_prev_time);

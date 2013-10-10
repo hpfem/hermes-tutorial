@@ -125,6 +125,11 @@ if(WITH_MUMPS)
   LIST(APPEND MUMPS_LIBRARIES ${MUMPS_REAL_LIBRARIES})
 endif(WITH_MUMPS)
 
+if(WITH_TRILINOS)
+  find_package(TRILINOS REQUIRED)
+  include_directories(${TRILINOS_INCLUDE_DIR})
+endif(WITH_TRILINOS)
+    
 if(${WITH_BSON})
   find_package(BSON REQUIRED)
   include_directories(${BSON_INCLUDE_DIR})

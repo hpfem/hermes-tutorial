@@ -3,6 +3,7 @@
 using namespace Hermes;
 using namespace Hermes::Hermes2D;
 using namespace Hermes::Hermes2D::Views;
+using namespace Hermes::Preconditioners;
 
 class CustomRightHandSide: public Hermes2DFunction<double>
 {
@@ -40,14 +41,13 @@ public:
 class CustomExactSolution : public ExactSolutionScalar<double>
 {
 public:
-  CustomExactSolution(Mesh* mesh)
-             : ExactSolutionScalar<double>(mesh) {};
+  CustomExactSolution(MeshSharedPtr mesh) : ExactSolutionScalar<double>(mesh) {};
 
   double value(double x, double y) const;
 
   virtual void derivatives (double x, double y, double& dx, double& dy) const;
 
-  virtual Ord ord(Ord x, Ord y) const;
+  virtual Ord ord(double x, double y) const;
   
   MeshFunction<double>* clone() const;
 };

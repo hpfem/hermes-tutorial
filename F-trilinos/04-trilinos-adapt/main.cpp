@@ -1,6 +1,7 @@
 #include "definitions.h"
 
 using namespace Hermes;
+using namespace Hermes::Preconditioners;
 using namespace Hermes::Hermes2D;
 using namespace Hermes::Hermes2D::Views;
 using namespace Hermes::Hermes2D::RefinementSelectors;
@@ -88,7 +89,7 @@ int main(int argc, char* argv[])
   mloader.load("square.mesh", mesh);     // quadrilaterals
 
   // Perform initial mesh refinements.
-  for (int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
+  for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
   
   // Define exact solution.
   MeshFunctionSharedPtr<double> exact(new CustomExactSolution(mesh, slope));
@@ -100,14 +101,14 @@ int main(int argc, char* argv[])
   WeakFormsH1::DefaultWeakFormPoisson<double> wf(HERMES_ANY, new Hermes1DFunction<double>(1.0), &f);
   
   // Initialize boundary conditions
-  DefaultEssentialBCNonConst<double> bc_essential("Bdy", &exact);
+  DefaultEssentialBCNonConst<double> bc_essential("Bdy", exact);
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
   
   // Initialize refinement selector.
-  H1ProjBasedSelector<double> selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
+  H1ProjBasedSelector<double> selector(CAND_LIST);
 
   // Initialize views.
   ScalarView sview("Solution", new WinGeom(0, 0, 440, 350));
@@ -118,6 +119,9 @@ int main(int argc, char* argv[])
 
   // DOF and CPU convergence graphs.
   SimpleGraph graph_dof, graph_cpu, graph_dof_exact, graph_cpu_exact;
+
+  MeshFunctionSharedPtr<double> sln(new Solution<double>);
+  MeshFunctionSharedPtr<double> ref_sln(new Solution<double>);
 
   // Time measurement.
   Hermes::Mixins::TimeMeasurable cpu_time;
@@ -130,12 +134,15 @@ int main(int argc, char* argv[])
     Hermes::Mixins::Loggable::Static::info("---- Adaptivity step %d:", as);
 
     // Construct globally refined reference mesh and setup reference space.
-    Space<double>* ref_space = Space<double>::construct_refined_space(space);
+    Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
+    MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
+    Space<double>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
+    SpaceSharedPtr<double> ref_space = ref_space_creator.create_ref_space();
     int ndof_ref = Space<double>::get_num_dofs(ref_space);
 
     // Initialize reference problem.
     Hermes::Mixins::Loggable::Static::info("Solving on reference mesh.");
-    DiscreteProblem<double> dp(&wf, ref_space);
+    DiscreteProblemNOX<double> dp(&wf, ref_space);
 
     // Time measurement.
     cpu_time.tick();
@@ -167,8 +174,6 @@ int main(int argc, char* argv[])
     // Time measurement.
     cpu_time.tick();
 
-    Solution<double> sln, ref_sln;
-
     Hermes::Mixins::Loggable::Static::info("Assembling by DiscreteProblem, solving by NOX.");
     try
     {
@@ -177,7 +182,6 @@ int main(int argc, char* argv[])
     catch(std::exception& e)
     {
       std::cout << e.what();
-      
     }
 
     Solution<double>::vector_to_solution(solver.get_sln_vector(), ref_space, ref_sln);
@@ -196,13 +200,12 @@ int main(int argc, char* argv[])
 
     // Calculate element errors and total error estimate.
     Hermes::Mixins::Loggable::Static::info("Calculating error estimate and exact error.");
-    Adapt<double>* adaptivity = new Adapt<double>(space);
-    double err_est_rel = adaptivity->calc_err_est(sln, ref_sln) * 100;
-
+    errorCalculator.calculate_errors(sln, exact, false);
+    double err_exact_rel = errorCalculator.get_total_error_squared() * 100;
     // Calculate exact error.
-    //Solution<double>* exact = new Solution(mesh, &exact);
-    bool solutions_for_adapt = false;
-    double err_exact_rel = adaptivity->calc_err_exact(sln, &exact, solutions_for_adapt) * 100;
+    errorCalculator.calculate_errors(sln, ref_sln);
+    double err_est_rel = errorCalculator.get_total_error_squared() * 100;
+
 
     // Report results.
     Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_fine: %d",
@@ -232,7 +235,6 @@ int main(int argc, char* argv[])
       // Increase the counter of adaptivity steps.
       if (done == false)  as++;
     }
-    if (Space<double>::get_num_dofs(space) >= NDOF_STOP) done = true;
 
     // Clean up.
     delete [] coeff_vec;

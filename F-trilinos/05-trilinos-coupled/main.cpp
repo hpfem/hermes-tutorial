@@ -1,5 +1,3 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
 
 //  The purpose of this example is to show how to use Trilinos for nonlinear time-dependent coupled PDE systems.
@@ -69,12 +67,12 @@ int main(int argc, char* argv[])
   cpu_time.tick();
 
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("domain.mesh", &mesh);
+  mloader.load("domain.mesh", mesh);
 
   // Perform initial mesh refinemets.
-  for (int i=0; i < INIT_REF_NUM; i++)  mesh.refine_all_elements();
+  for (int i=0; i < INIT_REF_NUM; i++)  mesh->refine_all_elements();
 
   // Initialize boundary conditions.
   DefaultEssentialBCConst<double> left_t("Left", 1.0);
@@ -84,44 +82,44 @@ int main(int argc, char* argv[])
   EssentialBCs<double> bcs_c(&left_c);
 
   // Create H1 spaces with default shapesets.
-  H1Space<double>* t_space = new H1Space<double>(&mesh, &bcs_t, P_INIT);
-  H1Space<double>* c_space = new H1Space<double>(&mesh, &bcs_c, P_INIT);
-  int ndof = Space<double>::get_num_dofs(Hermes::vector<const Space<double>*>(t_space, c_space));
+  SpaceSharedPtr<double> t_space(new H1Space<double>(mesh, &bcs_t, P_INIT));
+  SpaceSharedPtr<double> c_space(new H1Space<double>(mesh, &bcs_c, P_INIT));
+  int ndof = Space<double>::get_num_dofs(Hermes::vector<SpaceSharedPtr<double> >(t_space, c_space));
   Hermes::Mixins::Loggable::Static::info("ndof = %d.", ndof);
 
   // Define initial conditions.
-  InitialSolutionTemperature t_prev_time_1(&mesh, x1);
-  InitialSolutionConcentration c_prev_time_1(&mesh, x1, Le);
-  InitialSolutionTemperature t_prev_time_2(&mesh, x1);
-  InitialSolutionConcentration c_prev_time_2(&mesh, x1, Le);
-  Solution<double> t_prev_newton;
-  Solution<double> c_prev_newton;
+  MeshFunctionSharedPtr<double> t_prev_time_1(new InitialSolutionTemperature(mesh, x1));
+  MeshFunctionSharedPtr<double> c_prev_time_1(new InitialSolutionConcentration(mesh, x1, Le));
+  MeshFunctionSharedPtr<double> t_prev_time_2(new InitialSolutionTemperature(mesh, x1));
+  MeshFunctionSharedPtr<double> c_prev_time_2(new InitialSolutionConcentration(mesh, x1, Le));
+  MeshFunctionSharedPtr<double> t_prev_newton(new Solution<double>);
+  MeshFunctionSharedPtr<double> c_prev_newton(new Solution<double>);
 
   // Filters for the reaction rate omega and its derivatives.
-  CustomFilter omega(Hermes::vector<Solution<double>*>(&t_prev_time_1, &c_prev_time_1), Le, alpha, beta, kappa, x1, TAU);
-  CustomFilterDt omega_dt(Hermes::vector<Solution<double>*>(&t_prev_time_1, &c_prev_time_1), Le, alpha, beta, kappa, x1, TAU);
-  CustomFilterDc omega_dc(Hermes::vector<Solution<double>*>(&t_prev_time_1, &c_prev_time_1), Le, alpha, beta, kappa, x1, TAU);
+  MeshFunctionSharedPtr<double> omega(new CustomFilter(Hermes::vector<MeshFunctionSharedPtr<double> >(t_prev_time_1, c_prev_time_1), Le, alpha, beta, kappa, x1, TAU));
+  MeshFunctionSharedPtr<double> omega_dt(new CustomFilterDt(Hermes::vector<MeshFunctionSharedPtr<double> >(t_prev_time_1, c_prev_time_1), Le, alpha, beta, kappa, x1, TAU));
+  MeshFunctionSharedPtr<double> omega_dc(new CustomFilterDc(Hermes::vector<MeshFunctionSharedPtr<double> >(t_prev_time_1, c_prev_time_1), Le, alpha, beta, kappa, x1, TAU));
 
   // Initialize visualization.
   ScalarView rview("Reaction rate", new WinGeom(0, 0, 800, 230));
 
   // Initialize weak formulation.
-  CustomWeakForm wf(Le, alpha, beta, kappa, x1, TAU, TRILINOS_JFNK, PRECOND, &omega, &omega_dt, 
-                    &omega_dc, &t_prev_time_1, &c_prev_time_1, &t_prev_time_2, &c_prev_time_2);
+  CustomWeakForm wf(Le, alpha, beta, kappa, x1, TAU, TRILINOS_JFNK, PRECOND, omega, omega_dt, 
+                    omega_dc, t_prev_time_1, c_prev_time_1, t_prev_time_2, c_prev_time_2);
 
   // Project the functions "t_prev_time_1" and "c_prev_time_1" on the FE space 
   // in order to obtain initial vector for NOX. 
   Hermes::Mixins::Loggable::Static::info("Projecting initial solutions on the FE meshes.");
   double* coeff_vec = new double[ndof];
-  OGProjection<double> ogProjection; ogProjection.project_global(Hermes::vector<const Space<double> *>(t_space, c_space), 
-                                       Hermes::vector<MeshFunction<double>*>(&t_prev_time_1, &c_prev_time_1),
+  OGProjection<double>::project_global(Hermes::vector<SpaceSharedPtr<double> >(t_space, c_space), 
+                                       Hermes::vector<MeshFunctionSharedPtr<double> >(t_prev_time_1, c_prev_time_1),
                                        coeff_vec);
 
   // Measure the projection time.
   double proj_time = cpu_time.tick().last();
 
   // Initialize finite element problem.
-  DiscreteProblem<double> dp(&wf, Hermes::vector<const Space<double>*>(t_space, c_space));
+  DiscreteProblemNOX<double> dp(&wf, Hermes::vector<SpaceSharedPtr<double> >(t_space, c_space));
 
   // Initialize NOX solver and preconditioner.
   NewtonSolverNOX<double> solver(&dp);
@@ -156,8 +154,7 @@ int main(int argc, char* argv[])
       
     }
 
-    Solution<double>::vector_to_solutions(solver.get_sln_vector(), Hermes::vector<const Space<double> *>(t_space, c_space), 
-              Hermes::vector<Solution<double> *>(&t_prev_newton, &c_prev_newton));
+    Solution<double>::vector_to_solutions(solver.get_sln_vector(), Hermes::vector<SpaceSharedPtr<double> >(t_space, c_space),  Hermes::vector<MeshFunctionSharedPtr<double> >(t_prev_newton, c_prev_newton));
 
     cpu_time.tick();
     Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)",
@@ -177,16 +174,16 @@ int main(int argc, char* argv[])
     // Saving solutions for the next time step.
     if(ts > 1)
     {
-      t_prev_time_2.copy(&t_prev_time_1);
-      c_prev_time_2.copy(&c_prev_time_1);
+      t_prev_time_2->copy(t_prev_time_1);
+      c_prev_time_2->copy(c_prev_time_1);
     }
 
-    t_prev_time_1.copy(&t_prev_newton);
-    c_prev_time_1.copy(&c_prev_newton);
+    t_prev_time_1->copy(t_prev_newton);
+    c_prev_time_1->copy(c_prev_newton);
       
     // Visualization.
     rview.set_min_max_range(0.0,2.0);
-    rview.show(&omega);
+    rview.show(omega);
     cpu_time.tick();
 
     Hermes::Mixins::Loggable::Static::info("Total running time for time level %d: %g s.", ts, cpu_time.tick().last());
