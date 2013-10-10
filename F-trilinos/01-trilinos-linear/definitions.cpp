@@ -13,7 +13,7 @@ void CustomExactSolution::derivatives (double x, double y, double& dx, double& d
 
 Ord CustomExactSolution::ord(double x, double y) const 
 {
-  return x*x + y*y;
+  return Ord(x*x + y*y);
 }
 
 
