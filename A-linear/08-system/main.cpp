@@ -65,14 +65,15 @@ int main(int argc, char* argv[])
   // Create x- and y- displacement space using the default H1 shapeset.
   SpaceSharedPtr<double> u1_space(new H1Space<double>(mesh, &bcs, P_INIT));
   SpaceSharedPtr<double> u2_space(new H1Space<double>(mesh, &bcs, P_INIT));
-  int ndof = Space<double>::get_num_dofs(Hermes::vector<SpaceSharedPtr<double> >(u1_space, u2_space));
+  Hermes::vector<SpaceSharedPtr<double> > spaces(u1_space, u2_space);
+  int ndof = Space<double>::get_num_dofs(spaces);
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
   // Initialize the weak formulation.
   CustomWeakFormLinearElasticity wf(E, nu, rho*g1, "Top", f0, f1);
 
   // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, Hermes::vector<SpaceSharedPtr<double> >(u1_space, u2_space));
+  DiscreteProblem<double> dp(&wf, spaces);
 
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp);
@@ -91,8 +92,7 @@ int main(int argc, char* argv[])
 
   // Translate the resulting coefficient vector into the Solution sln.
   MeshFunctionSharedPtr<double> u1_sln(new Solution<double>), u2_sln(new Solution<double>);
-  Solution<double>::vector_to_solutions(newton.get_sln_vector(), Hermes::vector<SpaceSharedPtr<double> >(u1_space, u2_space), 
-      Hermes::vector<MeshFunctionSharedPtr<double> >(u1_sln, u2_sln));
+  Solution<double>::vector_to_solutions(newton.get_sln_vector(), spaces, Hermes::vector<MeshFunctionSharedPtr<double> >(u1_sln, u2_sln));
   
   // Visualize the solution.
   ScalarView view("Von Mises stress [Pa]", new WinGeom(590, 0, 700, 400));
