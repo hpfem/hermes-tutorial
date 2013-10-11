@@ -79,6 +79,9 @@ int main(int argc, char* argv[])
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
 
+  // Set the space to adaptivity.
+  adaptivity.set_space(space);
+
   // Initialize coarse and fine mesh solution.
   MeshFunctionSharedPtr<double> sln(new Solution<double>), ref_sln(new Solution<double>);
 
@@ -122,7 +125,6 @@ int main(int argc, char* argv[])
     
     newton.set_space(ref_space);
 
-
     // Perform Newton's iteration.
     try
     {
@@ -150,7 +152,7 @@ int main(int argc, char* argv[])
       Views::Linearizer lin;
       char* title = new char[100];
       sprintf(title, "sln-%d.vtk", as);
-      lin.save_solution_vtk(sln, title, "Potential", false);
+      lin.save_solution_vtk(ref_sln, title, "Potential", false);
       Hermes::Mixins::Loggable::Static::info("Solution in VTK format saved to file %s.", title);
 
       // Output mesh and element orders in VTK format.

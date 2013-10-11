@@ -17,7 +17,7 @@ const double THRESHOLD = 0.2;
 // H2D_HP_ANISO_P, H2D_HP_ANISO. 
 const CandList CAND_LIST = H2D_HP_ANISO;  
 // Stopping criterion for adaptivity.
-const double ERR_STOP = 1.0;
+const double ERR_STOP = 1e-2;
 // Error calculation & adaptivity.
 DefaultErrorCalculator<double, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
 // Stopping criterion for an adaptivity step.
@@ -40,14 +40,17 @@ int main(int argc, char* argv[])
   
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, P_INIT));
+  
+  // Set the space to adaptivity.
+  adaptivity.set_space(space);
 
   // Initialize the weak formulation.
   WeakForm<double> wf_dummy;
 
   // Initialize coarse and reference mesh solution.
   MeshFunctionSharedPtr<double> sln(new Solution<double>);
-  ExactSolutionCustom* ref_sln = NULL;
-
+  MeshFunctionSharedPtr<double> ref_sln(new ExactSolutionCustom(mesh));
+   
   // Initialize refinement selector.
   H1ProjBasedSelector<double> selector(CAND_LIST, H2DRS_DEFAULT_ORDER);
 
@@ -74,8 +77,6 @@ int main(int argc, char* argv[])
 
     // Assign the function f() to the fine mesh.
     Hermes::Mixins::Loggable::Static::info("Assigning f() to the fine mesh.");
-    if(ref_sln != NULL) delete ref_sln;
-    MeshFunctionSharedPtr<double> ref_sln(new ExactSolutionCustom(ref_space->get_mesh()));
 
     // Time measurement.
     cpu_time.tick();

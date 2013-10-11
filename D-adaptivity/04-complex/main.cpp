@@ -71,6 +71,9 @@ int main(int argc, char* argv[])
   SpaceSharedPtr< ::complex> space(new  H1Space< ::complex>(mesh, &bcs, P_INIT));
   int ndof = space->get_num_dofs();
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
+  
+  // Set the space to adaptivity.
+  adaptivity.set_space(space);
 
   // Initialize the weak formulation.
   CustomWeakForm wf("Air", MU_0, "Iron", MU_IRON, GAMMA_IRON,
@@ -173,8 +176,8 @@ int main(int argc, char* argv[])
   // Show the reference solution - the final result.
   sview.set_title("Fine mesh solution");
 
-  RealFilter real_filter(ref_sln);
-  sview.show(&real_filter);
+  MeshFunctionSharedPtr<double> real_filter(new RealFilter (ref_sln));
+  sview.show(real_filter);
 
   // Wait for all views to be closed.
   Views::View::wait();

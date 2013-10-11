@@ -86,6 +86,9 @@ int main(int argc, char* argv[])
 
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  
+  // Set the space to adaptivity.
+  adaptivity.set_space(space);
 
   // Initialize the weak formulation
   Hermes2DFunction<double> f(-heat_src);
@@ -111,21 +114,15 @@ int main(int argc, char* argv[])
 
   // Project the initial condition on the FE space to obtain initial
   // coefficient vector for the Newton's method.
-  Hermes::Mixins::Loggable::Static::info("Projecting initial condition to obtain initial vector on the coarse mesh.");
-  double* coeff_vec_coarse = new double[space->get_num_dofs()];
   MeshFunctionSharedPtr<double>  init_sln(new InitialSolutionHeatTransfer(mesh));
-  OGProjection<double>::project_global(space, init_sln, coeff_vec_coarse);
 
   // Initialize Newton solver on coarse mesh.
   Hermes::Mixins::Loggable::Static::info("Solving on coarse mesh:");
   NewtonSolver<double> newton_coarse(&wf, space);
-  newton_coarse.set_verbose_output(Hermes::Mixins::Loggable::Static::info);
 
-  // Perform initial Newton's iteration on coarse mesh, to obtain 
-  // good initial guess for the Newton's method on the fine mesh.
   try
   {
-    newton_coarse.solve(coeff_vec_coarse);
+    newton_coarse.solve(init_sln);
   }
   catch(std::exception& e)
   {
@@ -136,9 +133,7 @@ int main(int argc, char* argv[])
   Solution<double>::vector_to_solution(newton_coarse.get_sln_vector(), space, sln);
 
   // Cleanup after the Newton loop on the coarse mesh.
-  DiscreteProblem<double> dp(&wf, space);
-  delete [] coeff_vec_coarse;
-  NewtonSolver<double> newton(&dp);
+  NewtonSolver<double> newton(&wf, space);
   newton.set_verbose_output(Hermes::Mixins::Loggable::Static::info);
 
   // Adaptivity loop.

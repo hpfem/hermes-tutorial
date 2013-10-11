@@ -2349,7 +2349,7 @@ extern double fabs ( double );
 // extern double j0 ( double );
 // extern double j1 ( double );
 extern double sqrt ( double );
-extern double cbrt ( double );
+double cbrt ( double x ) { return std::pow(x, 1./3.); };
 extern double exp ( double );
 extern double log ( double );
 extern double sin ( double );

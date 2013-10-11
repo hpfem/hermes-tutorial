@@ -139,6 +139,9 @@ int main(int argc, char* argv[])
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
   int ndof = space->get_num_dofs();
+  
+  // Set the space to adaptivity.
+  adaptivity.set_space(space);
 
   // Convert initial condition into a Solution.
   MeshFunctionSharedPtr<double> sln_time_prev(new CustomInitialCondition(mesh));
@@ -240,12 +243,12 @@ int main(int argc, char* argv[])
         sprintf(title, "Temporal error est, spatial adaptivity step %d", as);     
         time_error_view.set_title(title);
         time_error_view.show_mesh(false);
-        AbsFilter abs_tef(time_error_fn);
-        time_error_view.show(&abs_tef, HERMES_EPS_HIGH);
+        MeshFunctionSharedPtr<double> abs_tef(new AbsFilter(time_error_fn));
+        time_error_view.show(abs_tef, HERMES_EPS_HIGH);
 
-        DefaultErrorCalculator<double, HERMES_HCURL_NORM> errorCalculatorTime(RelativeErrorToGlobalNorm, 1);
-        errorCalculatorTime.calculate_errors(time_error_fn, ref_sln);
-        rel_err_time = errorCalculatorTime.get_total_error_squared() * 100;
+        DefaultNormCalculator<double, HERMES_L2_NORM> normCalculatorTime(1);
+        normCalculatorTime.calculate_norm(time_error_fn);
+        rel_err_time = 100. * normCalculatorTime.calculate_norm(time_error_fn) / normCalculatorTime.calculate_norm(ref_sln);
         if (ADAPTIVE_TIME_STEP_ON == false) Hermes::Mixins::Loggable::Static::info("rel_err_time: %g%%", rel_err_time);
       }
 

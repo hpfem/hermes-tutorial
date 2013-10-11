@@ -46,7 +46,7 @@ const double THRESHOLD = 0.3;
 // H2D_HP_ANISO_H, H2D_HP_ANISO_P, H2D_HP_ANISO.
 const CandList CAND_LIST = H2D_HP_ANISO;
 // Stopping criterion for adaptivity.
-const double ERR_STOP = 1.0;
+const double ERR_STOP = .1;
 // Error calculation & adaptivity.
 DefaultErrorCalculator<double, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
 // Stopping criterion for an adaptivity step.
@@ -108,6 +108,9 @@ int main(int argc, char* argv[])
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
   int ndof_coarse = space->get_num_dofs();
+  
+  // Set the space to adaptivity.
+  adaptivity.set_space(space);
 
   // Previous time level solution (initialized by initial condition).
   MeshFunctionSharedPtr<double> sln_time_prev(new CustomInitialCondition(mesh));

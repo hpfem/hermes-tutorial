@@ -20,7 +20,7 @@ Ord InitialSolutionHeatTransfer::ord(double x, double y) const
 
 MeshFunction<double>* InitialSolutionHeatTransfer::clone() const
 {
-  return new InitialSolutionHeatTransfer(*this);
+  return new InitialSolutionHeatTransfer(this->mesh);
 }
 
 InitialSolutionHeatTransfer::~InitialSolutionHeatTransfer()

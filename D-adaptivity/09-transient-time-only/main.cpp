@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
     sview_high.set_title(title);
     sview_high.show(sln_time_new);
 
-    DefaultErrorCalculator<double, HERMES_HCURL_NORM> errorCalculatorTime(RelativeErrorToGlobalNorm, 1);
+    DefaultErrorCalculator<double, HERMES_H1_NORM> errorCalculatorTime(RelativeErrorToGlobalNorm, 1);
     errorCalculatorTime.calculate_errors(time_error_fn, sln_time_new);
     double rel_err_time = errorCalculatorTime.get_total_error_squared() * 100;
 

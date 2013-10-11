@@ -44,7 +44,7 @@ const int INIT_REF_BDY = 5;
 // polynomial degrees can still vary.
 const bool MULTI = true;                          
 // Parameter influencing the candidate selection.
-const double THRESHOLD = 1.3;
+const double THRESHOLD = .8;
 // Predefined list of element refinement candidates. Possible values are
 // H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO,
 // H2D_HP_ANISO_H, H2D_HP_ANISO_P, H2D_HP_ANISO.
@@ -109,7 +109,10 @@ int main(int argc, char* argv[])
 
   // Create H1 spaces with default shapeset for both displacement components.
   SpaceSharedPtr<double> u_space(new H1Space<double>(u_mesh, &bcs_u, P_INIT_U));
-  SpaceSharedPtr<double>  v_space(new H1Space<double>(MULTI ? v_mesh : u_mesh, &bcs_v, P_INIT_V));
+  SpaceSharedPtr<double> v_space(new H1Space<double>(MULTI ? v_mesh : u_mesh, &bcs_v, P_INIT_V));
+  Hermes::vector<SpaceSharedPtr<double> > spaces(u_space, v_space);
+  // Set the spaces to adaptivity.
+  adaptivity.set_spaces(spaces);
 
   // Initialize coarse and reference mesh solutions.
   MeshFunctionSharedPtr<double>  u_sln(new Solution<double>), v_sln(new Solution<double>),
@@ -130,6 +133,10 @@ int main(int argc, char* argv[])
   SimpleGraph graph_dof_est, graph_cpu_est; 
   SimpleGraph graph_dof_exact, graph_cpu_exact;
 
+  // Newton
+  NewtonSolver<double> newton(&wf, spaces);
+  newton.set_tolerance(1e-1, Hermes::Solvers::ResidualNormAbsolute);
+    
   // Adaptivity loop:
   int as = 1; 
   bool done = false;
@@ -147,23 +154,20 @@ int main(int argc, char* argv[])
     Space<double>::ReferenceSpaceCreator v_ref_space_creator(v_space, v_ref_mesh);
     SpaceSharedPtr<double> v_ref_space = v_ref_space_creator.create_ref_space();
 
-    Hermes::vector<SpaceSharedPtr<double> > ref_spaces_const(u_ref_space, v_ref_space);
+    Hermes::vector<SpaceSharedPtr<double> > ref_spaces(u_ref_space, v_ref_space);
 
-    int ndof_ref = Space<double>::get_num_dofs(ref_spaces_const);
+    int ndof_ref = Space<double>::get_num_dofs(ref_spaces);
 
     // Initialize reference problem.
     Hermes::Mixins::Loggable::Static::info("Solving on reference mesh.");
     
-    DiscreteProblem<double> dp(&wf, ref_spaces_const);
-    NewtonSolver<double> newton(&dp);
-    newton.set_tolerance(1e-1, Hermes::Solvers::ResidualNormAbsolute);
-
     // Time measurement.
     cpu_time.tick();
     
     // Perform Newton's iteration.
     try
     {
+      newton.set_spaces(ref_spaces);
       newton.solve();
     }
     catch(std::exception& e)
@@ -172,12 +176,11 @@ int main(int argc, char* argv[])
     }
 
     // Translate the resulting coefficient vector into the instance of Solution.
-    Solution<double>::vector_to_solutions(newton.get_sln_vector(), ref_spaces_const, 
-                                          Hermes::vector<MeshFunctionSharedPtr<double> >(u_ref_sln, v_ref_sln));
+    Solution<double>::vector_to_solutions(newton.get_sln_vector(), ref_spaces, Hermes::vector<MeshFunctionSharedPtr<double> >(u_ref_sln, v_ref_sln));
 
     // Project the fine mesh solution onto the coarse mesh.
     Hermes::Mixins::Loggable::Static::info("Projecting reference solution on coarse mesh.");
-    OGProjection<double>::project_global(Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space), 
+    OGProjection<double>::project_global(spaces, 
                                  Hermes::vector<MeshFunctionSharedPtr<double> >(u_ref_sln, v_ref_sln), 
                                  Hermes::vector<MeshFunctionSharedPtr<double> >(u_sln, v_sln)); 
    
@@ -208,7 +211,7 @@ int main(int argc, char* argv[])
          v_space->get_num_dofs(), v_ref_space->get_num_dofs());
     Hermes::Mixins::Loggable::Static::info("ndof_coarse_total: %d, ndof_fine_total: %d",
          Space<double>::get_num_dofs(Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space)), 
-         Space<double>::get_num_dofs(ref_spaces_const));
+         Space<double>::get_num_dofs(ref_spaces));
     Hermes::Mixins::Loggable::Static::info("err_est_rel_total: %g%%, err_est_exact_total: %g%%", err_est_rel, err_exact_rel);
 
     // Add entry to DOF and CPU convergence graphs.

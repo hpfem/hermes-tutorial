@@ -43,9 +43,9 @@ const double THRESHOLD = 0.3;
 const CandList CAND_LIST = H2D_HP_ANISO;
 // Stopping criterion for adaptivity (rel. error tolerance between the
 // reference mesh and coarse mesh solution in percent).
-const double ERR_STOP = 1.0;
+const double ERR_STOP = 1e-2;
 // Error calculation & adaptivity.
-DefaultErrorCalculator< ::complex, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
+DefaultErrorCalculator< ::complex, HERMES_HCURL_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
 // Stopping criterion for an adaptivity step.
 AdaptStoppingCriterionSingleElement< ::complex> stoppingCriterion(THRESHOLD);
 // Adaptivity processor class.
@@ -80,6 +80,9 @@ int main(int argc, char* argv[])
   // Create an Hcurl space with default shapeset.
   SpaceSharedPtr< ::complex> space(new HcurlSpace< ::complex>(mesh, &bcs, P_INIT));
   int ndof = space->get_num_dofs();
+  
+  // Set the space to adaptivity.
+  adaptivity.set_space(space);
 
   // Initialize the weak formulation.
   CustomWeakForm wf(MU_R, KAPPA);
@@ -149,7 +152,7 @@ int main(int argc, char* argv[])
       v_view.show(real_filter);
       o_view.show(space);
       lin.save_solution_vtk(real_filter, "sln.vtk", "a");
-      ord.save_mesh_vtk(space, "mesh->vtk");
+      ord.save_mesh_vtk(space, "mesh.vtk");
       lin.free();
     }
 
