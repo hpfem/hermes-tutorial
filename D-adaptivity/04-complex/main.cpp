@@ -32,13 +32,13 @@ const CandList CAND_LIST = H2D_HP_ANISO;
 // Stopping criterion for adaptivity.
 const double ERR_STOP = 1.0;                      
 // Error calculation & adaptivity.
-DefaultErrorCalculator<::complex, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
+DefaultErrorCalculator< ::complex, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
 // Stopping criterion for an adaptivity step.
-AdaptStoppingCriterionSingleElement<::complex> stoppingCriterion(THRESHOLD);
+AdaptStoppingCriterionSingleElement< ::complex> stoppingCriterion(THRESHOLD);
 // Adaptivity processor class.
-Adapt<::complex> adaptivity(&errorCalculator, &stoppingCriterion);
+Adapt< ::complex> adaptivity(&errorCalculator, &stoppingCriterion);
 // Selector.
-H1ProjBasedSelector<::complex> selector(CAND_LIST);
+H1ProjBasedSelector< ::complex> selector(CAND_LIST);
 
 // Problem parameters.
 const double MU_0 = 4.0*M_PI*1e-7;
@@ -63,12 +63,12 @@ int main(int argc, char* argv[])
   for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
 
   // Initialize boundary conditions.
-  Hermes::Hermes2D::DefaultEssentialBCConst<::complex> 
+  Hermes::Hermes2D::DefaultEssentialBCConst< ::complex> 
       bc_essential("Dirichlet", ::complex(0.0, 0.0));
-  EssentialBCs<::complex> bcs(&bc_essential);
+  EssentialBCs< ::complex> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  SpaceSharedPtr<::complex> space(new  H1Space<::complex>(mesh, &bcs, P_INIT));
+  SpaceSharedPtr< ::complex> space(new  H1Space< ::complex>(mesh, &bcs, P_INIT));
   int ndof = space->get_num_dofs();
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
@@ -77,10 +77,10 @@ int main(int argc, char* argv[])
     "Wire", MU_0, ::complex(J_EXT, 0.0), OMEGA);
 
   // Initialize coarse and reference mesh solution.
-  MeshFunctionSharedPtr<::complex> sln(new Solution<::complex>), ref_sln(new Solution<::complex>);
+  MeshFunctionSharedPtr< ::complex> sln(new Solution< ::complex>), ref_sln(new Solution< ::complex>);
 
   // Initialize refinement selector.
-  H1ProjBasedSelector<::complex> 
+  H1ProjBasedSelector< ::complex> 
       selector(CAND_LIST, H2DRS_DEFAULT_ORDER);
 
   // Initialize views.
@@ -100,19 +100,19 @@ int main(int argc, char* argv[])
     // Construct globally refined reference mesh and setup reference space.
     Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
     MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
-    Space<::complex>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
-    SpaceSharedPtr<::complex> ref_space = ref_space_creator.create_ref_space();
+    Space< ::complex>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
+    SpaceSharedPtr< ::complex> ref_space = ref_space_creator.create_ref_space();
     int ndof_ref = ref_space->get_num_dofs();
 
     // Initialize reference problem.
     Hermes::Mixins::Loggable::Static::info("Solving on reference mesh.");
-    DiscreteProblem<::complex> dp(&wf, ref_space);
+    DiscreteProblem< ::complex> dp(&wf, ref_space);
 
     // Time measurement.
     cpu_time.tick();
 
     // Perform Newton's iteration and translate the resulting coefficient vector into a Solution.
-    Hermes::Hermes2D::NewtonSolver<::complex> newton(&dp);
+    Hermes::Hermes2D::NewtonSolver< ::complex> newton(&dp);
 
     try{
       newton.solve();
@@ -122,14 +122,14 @@ int main(int argc, char* argv[])
       std::cout << e.what();
       
     }
-    Hermes::Hermes2D::Solution<::complex>::vector_to_solution(newton.get_sln_vector(), ref_space, ref_sln);
+    Hermes::Hermes2D::Solution< ::complex>::vector_to_solution(newton.get_sln_vector(), ref_space, ref_sln);
 
     // Time measurement.
     cpu_time.tick();
 
     // Project the fine mesh solution onto the coarse mesh.
     Hermes::Mixins::Loggable::Static::info("Projecting reference solution on coarse mesh.");
-    OGProjection<::complex> ogProjection; ogProjection.project_global(space, ref_sln, sln);
+    OGProjection< ::complex> ogProjection; ogProjection.project_global(space, ref_sln, sln);
 
     // View the coarse mesh solution and polynomial orders.
     MeshFunctionSharedPtr<double> real_filter(new RealFilter(sln));

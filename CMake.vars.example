@@ -27,8 +27,3 @@ else()
   set(TRILINOS_ROOT "~/solvers/trilinos")
 endif()
 SET(WITH_TRILINOS YES)
-
-# Experimental
-# Turn on Zoltan AND MPI
-# SET(WITH_ZOLTAN YES)
-# SET(WITH_MPI NO)
