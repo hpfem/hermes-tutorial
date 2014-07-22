@@ -60,7 +60,7 @@ const int NEWTON_MAX_ITER = 100;
 //   Implicit_SDIRK_CASH_3_23_embedded, Implicit_ESDIRK_TRBDF2_3_23_embedded, Implicit_ESDIRK_TRX2_3_23_embedded, 
 //   Implicit_SDIRK_BILLINGTON_3_23_embedded, Implicit_SDIRK_CASH_5_24_embedded, Implicit_SDIRK_CASH_5_34_embedded, 
 //   Implicit_DIRK_ISMAIL_7_45_embedded. 
-ButcherTableType butcher_table_type = Implicit_SDIRK_2_2;
+ButcherTableType butcher_table_type = Implicit_Crank_Nicolson_2_2;
 
 // Problem parameters.
 // Temperature of the ground (also initial temperature).
@@ -100,9 +100,8 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation.
   double current_time = 0;
-
-  CustomWeakFormHeatRK wf("Boundary_air", ALPHA, LAMBDA, HEATCAP, RHO, 
-                          &current_time, TEMP_INIT, T_FINAL);
+  WeakFormSharedPtr<double> wf(new CustomWeakFormHeatRK("Boundary_air", ALPHA, LAMBDA, HEATCAP, RHO,
+                          &current_time, TEMP_INIT, T_FINAL));
   
   // Initialize boundary conditions.
   DefaultEssentialBCConst<double> bc_essential("Boundary_ground", TEMP_INIT);
@@ -119,7 +118,8 @@ int main(int argc, char* argv[])
   Tview.fix_scale_width(30);
 
   // Initialize Runge-Kutta time stepping.
-  RungeKutta<double> runge_kutta(&wf, space, &bt);
+  RungeKutta<double> runge_kutta(wf, space, &bt);
+  runge_kutta.set_verbose_output(true);
 
   // Time stepping loop:
   int ts = 1;

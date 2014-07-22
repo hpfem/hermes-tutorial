@@ -7,9 +7,9 @@ using namespace Hermes::Hermes2D;
 using namespace Hermes::Hermes2D::Views;
 
 //  The purpose of this example is to show how to use Trilinos for nonlinear PDE problems. It 
-//  compares performance of the Newton's method in Hermes (assembling via the DiscreteProblem<double> 
+//  compares performance of the Newton's method in Hermes (assembling and solving via the NewtonSolver<double> 
 //  class and matrix problem solution via UMFpack) with the performance of the Trilinos/NOX 
-//  solver (using the Hermes DiscreteProblem<double> class to assemble discrete problems).
+//  solver (using the internal Hermes DiscreteProblem<double> class to assemble discrete problems).
 //
 //  PDE:  - \nabla (k \nabla u) - f = 0
 //  k = (1 + sqr(u_x) + sqr(u_y))^{-0.5}
@@ -99,13 +99,10 @@ int main(int argc, char* argv[])
   cpu_time.tick();
 
   // Initialize weak formulation,
-  CustomWeakForm wf1;
-
-  // Initialize the discrete problem.
-  DiscreteProblem<double> dp1(&wf1, space);
+  WeakFormSharedPtr<double> wf1(new CustomWeakForm);
 
   // Initialize the Newton solver.
-  Hermes::Hermes2D::NewtonSolver<double> newton(&dp1);
+  Hermes::Hermes2D::NewtonSolver<double> newton(wf1, space);
 
   // Perform Newton's iteration and translate the resulting coefficient vector into a Solution.
   MeshFunctionSharedPtr<double> sln1(new Solution<double>);
@@ -120,8 +117,7 @@ int main(int argc, char* argv[])
   catch(std::exception& e)
   {
     std::cout << e.what();
-    
-  }
+}
 
   // Translate the solution vector into a Solution.
   Hermes::Hermes2D::Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln1);
@@ -155,14 +151,11 @@ int main(int argc, char* argv[])
   double proj_time = cpu_time.tick().last();
 
   // Initialize the weak formulation for Trilinos.
-  CustomWeakForm wf2(TRILINOS_JFNK, PRECOND == 1, PRECOND == 2);
-
-  // Initialize DiscreteProblem.
-  DiscreteProblemNOX<double> dp2(&wf2, space);
+  WeakFormSharedPtr<double> wf2(new CustomWeakForm(TRILINOS_JFNK, PRECOND == 1, PRECOND == 2));
 
   // Initialize the NOX solver with the vector "coeff_vec".
   Hermes::Mixins::Loggable::Static::info("Initializing NOX.");
-  NewtonSolverNOX<double> solver_nox(&dp2);
+  NewtonSolverNOX<double> solver_nox(wf2, space);
   solver_nox.set_output_flags(message_type);
 
   solver_nox.set_ls_tolerance(ls_tolerance);
@@ -190,8 +183,7 @@ int main(int argc, char* argv[])
   catch(std::exception& e)
   {
     std::cout << e.what();
-    
-  }
+}
 
   Solution<double>::vector_to_solution(solver_nox.get_sln_vector(), space, sln2);
   Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)", 

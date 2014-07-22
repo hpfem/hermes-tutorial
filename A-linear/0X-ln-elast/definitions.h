@@ -17,9 +17,9 @@ private:
   public:
     CustomJacobianElast00(int i, int j, double lambda, double mu, Hermes2DFunction<double>* lambdaF, Hermes2DFunction<double>* muF) : MatrixFormVol<double>(i, j), lambda(lambda), mu(mu), lambdaF(lambdaF), muF(muF) {};
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
-                         Func<double> *v, Geom<double> *e, Func<double>* *ext) const;
+                         Func<double> *v, GeomVol<double> *e, Func<double>* *ext) const;
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v,
-                    Geom<Ord> *e, Func<Ord>* *ext) const;
+                    GeomVol<Ord> *e, Func<Ord>* *ext) const;
     virtual MatrixFormVol<double>* clone() const;
     protected:
       double lambda;
@@ -32,9 +32,9 @@ private:
   public:
     CustomJacobianElast01(int i, int j, double lambda, double mu, Hermes2DFunction<double>* lambdaF, Hermes2DFunction<double>* muF) : MatrixFormVol<double>(i, j), lambda(lambda), mu(mu), lambdaF(lambdaF), muF(muF) {};
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
-                         Func<double> *v, Geom<double> *e, Func<double>* *ext) const;
+                         Func<double> *v, GeomVol<double> *e, Func<double>* *ext) const;
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v,
-                    Geom<Ord> *e, Func<Ord>* *ext) const;
+                    GeomVol<Ord> *e, Func<Ord>* *ext) const;
     virtual MatrixFormVol<double>* clone() const;
     protected:
       double lambda;
@@ -47,9 +47,9 @@ private:
   public:
     CustomJacobianElast10(int i, int j, double lambda, double mu, Hermes2DFunction<double>* lambdaF, Hermes2DFunction<double>* muF) : MatrixFormVol<double>(i, j), lambda(lambda), mu(mu), lambdaF(lambdaF), muF(muF) {};
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
-                         Func<double> *v, Geom<double> *e, Func<double>* *ext) const;
+                         Func<double> *v, GeomVol<double> *e, Func<double>* *ext) const;
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v,
-                    Geom<Ord> *e, Func<Ord>* *ext) const;
+                    GeomVol<Ord> *e, Func<Ord>* *ext) const;
     virtual MatrixFormVol<double>* clone() const;
     protected:
       double lambda;
@@ -62,9 +62,9 @@ private:
   public:
     CustomJacobianElast11(int i, int j, double lambda, double mu, Hermes2DFunction<double>* lambdaF, Hermes2DFunction<double>* muF) : MatrixFormVol<double>(i, j), lambda(lambda), mu(mu), lambdaF(lambdaF), muF(muF) {};
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
-                         Func<double> *v, Geom<double> *e, Func<double>* *ext) const;
+                         Func<double> *v, GeomVol<double> *e, Func<double>* *ext) const;
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v,
-                    Geom<Ord> *e, Func<Ord>* *ext) const;
+                    GeomVol<Ord> *e, Func<Ord>* *ext) const;
     virtual MatrixFormVol<double>* clone() const;
     protected:
       double lambda;
@@ -80,9 +80,9 @@ private:
     {
     }
     virtual double value(int n, double *wt, Func<double> *u_ext[],
-                         Func<double> *v, Geom<double> *e, Func<double>* *ext) const;
+                         Func<double> *v, GeomVol<double> *e, Func<double>* *ext) const;
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
-                    Geom<Ord> *e, Func<Ord>* *ext) const;
+                    GeomVol<Ord> *e, Func<Ord>* *ext) const;
     virtual VectorFormVol<double>* clone() const;
     private:
     double lambda;
@@ -99,9 +99,9 @@ private:
     }
 
     virtual double value(int n, double *wt, Func<double> *u_ext[],
-                         Func<double> *v, Geom<double> *e, Func<double>* *ext) const;
+                         Func<double> *v, GeomVol<double> *e, Func<double>* *ext) const;
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
-                    Geom<Ord> *e, Func<Ord>* *ext) const;
+                    GeomVol<Ord> *e, Func<Ord>* *ext) const;
     virtual VectorFormVol<double>* clone() const;
     private:
     double lambda;
@@ -196,19 +196,19 @@ protected:
 class CustomFilterS11 : public Hermes::Hermes2D::DXDYFilter<double>
 {
 public:
-  CustomFilterS11(Hermes::vector<MeshFunctionSharedPtr<double> > solutions, CustomMu* mu, CustomLambda* lambda) : Hermes::Hermes2D::DXDYFilter<double>(solutions), mu(mu), lambda(lambda)
+  CustomFilterS11(std::vector<MeshFunctionSharedPtr<double> > solutions, CustomMu* mu, CustomLambda* lambda) : DXDYFilter(solutions), mu(mu), lambda(lambda)
 {
 }
 virtual MeshFunction<double>* clone() const
 {
-  Hermes::vector<MeshFunctionSharedPtr<double> > slns;
+  std::vector<MeshFunctionSharedPtr<double> > slns;
   for(int i = 0; i < this->num; i++)
     slns.push_back(this->sln[i]->clone());
   CustomFilterS11* filter = new CustomFilterS11(slns, mu, lambda);
   return filter;
 }
 private:
-virtual void filter_fn(int n, double* x, double* y, Hermes::vector<double *> values, Hermes::vector<double *> dx, Hermes::vector<double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
+virtual void filter_fn(int n, double* x, double* y, std::vector<const double *> values, std::vector<const double *> dx, std::vector<const double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
 CustomMu* mu;
 CustomLambda* lambda;
 };
@@ -217,19 +217,19 @@ CustomLambda* lambda;
 class CustomFilterS12 : public Hermes::Hermes2D::DXDYFilter<double>
 {
 public:
-  CustomFilterS12(Hermes::vector<MeshFunctionSharedPtr<double> > solutions, double mu) : Hermes::Hermes2D::DXDYFilter<double>(solutions), mu(mu)
-{
+    CustomFilterS12(std::vector<MeshFunctionSharedPtr<double> > solutions, double mu) : DXDYFilter(solutions), mu(mu)
+  {
 }
 virtual MeshFunction<double>* clone() const
 {
-  Hermes::vector<MeshFunctionSharedPtr<double> > slns;
+  std::vector<MeshFunctionSharedPtr<double> > slns;
   for(int i = 0; i < this->num; i++)
     slns.push_back(this->sln[i]->clone());
   CustomFilterS12* filter = new CustomFilterS12(slns, mu);
   return filter;
 }
 private:
-virtual void filter_fn(int n, double* x, double* y, Hermes::vector<double *> values, Hermes::vector<double *> dx, Hermes::vector<double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
+virtual void filter_fn(int n, double* x, double* y, std::vector<const double *> values, std::vector<const double *> dx, std::vector<const double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
 double mu;
 };
 
@@ -237,19 +237,19 @@ double mu;
 class CustomFilterS22 : public Hermes::Hermes2D::DXDYFilter<double>
 {
 public:
-  CustomFilterS22(Hermes::vector<MeshFunctionSharedPtr<double> > solutions, double mu, double lambda) : Hermes::Hermes2D::DXDYFilter<double>(solutions), mu(mu), lambda(lambda)
-{
+    CustomFilterS22(std::vector<MeshFunctionSharedPtr<double> > solutions, double mu, double lambda) : DXDYFilter(solutions), mu(mu), lambda(lambda)
+  {
 }
 virtual MeshFunction<double>* clone() const
 {
-  Hermes::vector<MeshFunctionSharedPtr<double> > slns;
+  std::vector<MeshFunctionSharedPtr<double> > slns;
   for(int i = 0; i < this->num; i++)
     slns.push_back(this->sln[i]->clone());
   CustomFilterS22* filter = new CustomFilterS22(slns, mu, lambda);
   return filter;
 }
 private:
-virtual void filter_fn(int n, double* x, double* y, Hermes::vector<double *> values, Hermes::vector<double *> dx, Hermes::vector<double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
+virtual void filter_fn(int n, double* x, double* y, std::vector<const double *> values, std::vector<const double *> dx, std::vector<const double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
 double mu;
 double lambda;
 };

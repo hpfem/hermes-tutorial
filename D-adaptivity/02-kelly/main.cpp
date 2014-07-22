@@ -90,12 +90,12 @@ int main(int argc, char* argv[])
   mloader.load("motor.mesh", &mesh);
 
   // Initialize the weak formulation.
-  CustomWeakFormPoisson wf("Motor", EPS_MOTOR, "Air", EPS_AIR, &mesh);
+  WeakFormSharedPtr<double> wf(new CustomWeakFormPoisson("Motor", EPS_MOTOR, "Air", EPS_AIR, &mesh));
   
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_essential_out("Outer", 0.0);
   DefaultEssentialBCConst<double> bc_essential_stator("Stator", VOLTAGE);
-  EssentialBCs<double> bcs(Hermes::vector<EssentialBoundaryCondition<double> *>(&bc_essential_out, &bc_essential_stator));
+  EssentialBCs<double> bcs(std::vector<EssentialBoundaryCondition<double> *>(&bc_essential_out, &bc_essential_stator));
 
   // Create an H1 space with default shapeset.
   H1Space<double> space(&mesh, &bcs, P_INIT);
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
 
     // Initialize reference problem.
     Hermes::Mixins::Loggable::Static::info("Solving.");
-    DiscreteProblem<double> dp(&wf, &space);
+    DiscreteProblem<double> dp(wf, &space);
     
     NewtonSolver<double> newton(&dp);
     newton.set_verbose_output(false);
@@ -142,8 +142,7 @@ int main(int argc, char* argv[])
     catch(std::exception& e)
     {
       std::cout << e.what();
-      
-    }
+}
     // Translate the resulting coefficient vector into the instance of Solution.
     Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);
     
@@ -154,7 +153,7 @@ int main(int argc, char* argv[])
     if (VTK_VISUALIZATION) 
     {
       // Output solution in VTK format.
-      Views::Linearizer lin;
+      Views::Linearizer lin(FileExport);
       char* title = new char[100];
       sprintf(title, "sln-%d.vtk", as);
       lin.save_solution_vtk(&sln, title, "Potential", false);
@@ -197,7 +196,7 @@ int main(int argc, char* argv[])
     
     if (USE_EPS_IN_INTERFACE_ESTIMATOR)
       // Use normalization by energy norm.
-      adaptivity.set_error_form(new EnergyErrorForm(&wf));
+      adaptivity.set_error_form(new EnergyErrorForm(wf));
     
     // Note that there is only one solution (the only one available) passed to BasicKellyAdapt::calc_err_est
     // and there is also no "solutions_for_adapt" parameter. The last parameter, "error_flags", is left 
@@ -230,13 +229,13 @@ int main(int argc, char* argv[])
       done = adaptivity.adapt(THRESHOLD, STRATEGY, MESH_REGULARITY);
 
       // Increase the counter of performed adaptivity steps.
-      if (done == false)  
+      if (!done)  
         as++;
     }
     if (space.get_num_dofs() >= NDOF_STOP) 
       done = true;
   }
-  while (done == false);
+  while (!done);
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 

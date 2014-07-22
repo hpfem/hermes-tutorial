@@ -74,13 +74,11 @@ int main(int argc, char* argv[])
     mesh->refine_all_elements();
 
   // Initialize the weak formulation.
-  CustomWeakFormPoisson wf("Aluminum", new Hermes1DFunction<double>(LAMBDA_AL), 
-                           "Copper", new Hermes1DFunction<double>(LAMBDA_CU), 
-                           new Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
+  WeakFormSharedPtr<double> wf(new CustomWeakFormPoisson("Aluminum", new Hermes1DFunction<double>(LAMBDA_AL), "Copper",
+    new Hermes1DFunction<double>(LAMBDA_CU), new Hermes2DFunction<double>(-VOLUME_HEAT_SRC)));
   
   // Initialize essential boundary conditions.
-  DefaultEssentialBCConst<double> bc_essential(
-      Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"), FIXED_BDY_TEMP);
+  DefaultEssentialBCConst<double> bc_essential({"Bottom", "Inner", "Outer", "Left"}, FIXED_BDY_TEMP);
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
@@ -88,24 +86,17 @@ int main(int argc, char* argv[])
   int ndof = space->get_num_dofs();
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
-  // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, space);
-
   // Initialize Newton solver.
-  NewtonSolver<double> newton(&dp);
+  NewtonSolver<double> newton(wf, space);
 
   // Perform Newton's iteration.
   try
   {
-    // When newton.solve() is used without any parameters, this means that the initial coefficient 
-    // vector will be the zero vector, tolerance will be 1e-8, maximum allowed number of iterations 
-    // will be 100, and residual will be measured using Euclidean vector norm.
     newton.solve();
   }
   catch(std::exception& e)
   {
     std::cout << e.what();
-    
   }
 
   // Translate the resulting coefficient vector into a Solution.
@@ -116,7 +107,7 @@ int main(int argc, char* argv[])
   if (VTK_VISUALIZATION) 
   {
     // Output solution in VTK format.
-    Linearizer lin;
+    Linearizer lin(FileExport);
     bool mode_3D = true;
     lin.save_solution_vtk(sln, "sln.vtk", "Temperature", mode_3D);
     Hermes::Mixins::Loggable::Static::info("Solution in VTK format saved to file %s.", "sln.vtk");
@@ -131,12 +122,9 @@ int main(int argc, char* argv[])
   if (HERMES_VISUALIZATION) 
   {
     ScalarView view("Solution", new WinGeom(0, 0, 440, 350));
-    // Hermes uses adaptive FEM to approximate higher-order FE solutions with linear
-    // triangles for OpenGL. The second parameter of View::show() sets the error 
-    // tolerance for that. Options are HERMES_EPS_LOW, HERMES_EPS_NORMAL (default), 
-    // HERMES_EPS_HIGH and HERMES_EPS_VERYHIGH. The size of the graphics file grows 
-    // considerably with more accurate representation, so use it wisely.
-    view.show(sln, HERMES_EPS_HIGH);
+    // See the Doxygen documentation for explanation.
+    view.set_linearizer_criterion(LinearizerCriterionAdaptive(HERMES_EPS_VERYHIGH));
+    view.show(sln);
     View::wait();
   }
 

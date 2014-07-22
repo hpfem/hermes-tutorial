@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
   CustomFunction f(slope);
 
   // Initialize the weak formulation.
-  WeakFormsH1::DefaultWeakFormPoisson<double> wf(HERMES_ANY, new Hermes1DFunction<double>(1.0), &f);
+  WeakFormSharedPtr<double> wf(new WeakFormsH1::DefaultWeakFormPoisson<double>(HERMES_ANY, new Hermes1DFunction<double>(1.0), &f));
   
   // Initialize boundary conditions
   DefaultEssentialBCNonConst<double> bc_essential("Bdy", exact);
@@ -142,7 +142,6 @@ int main(int argc, char* argv[])
 
     // Initialize reference problem.
     Hermes::Mixins::Loggable::Static::info("Solving on reference mesh.");
-    DiscreteProblemNOX<double> dp(&wf, ref_space);
 
     // Time measurement.
     cpu_time.tick();
@@ -152,7 +151,7 @@ int main(int argc, char* argv[])
     memset(coeff_vec, 0, ndof_ref * sizeof(double));
 
     // Initialize NOX solver.
-    NewtonSolverNOX<double> solver(&dp);
+    NewtonSolverNOX<double> solver(wf, ref_space);
     solver.set_output_flags(message_type);
 
     solver.set_ls_tolerance(ls_tolerance);
@@ -233,13 +232,13 @@ int main(int argc, char* argv[])
       done = adaptivity.adapt(&selector);
 
       // Increase the counter of adaptivity steps.
-      if (done == false)  as++;
+      if (!done)  as++;
     }
 
     // Clean up.
     delete [] coeff_vec;
   }
-  while (done == false);
+  while (!done);
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 

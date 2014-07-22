@@ -12,18 +12,18 @@ CustomWeakForm::CustomWeakForm(std::string left_bottom_bnd_part, bool DG) : Weak
 CustomWeakForm::MatrixFormVol::MatrixFormVol(int i, int j) : Hermes::Hermes2D::MatrixFormVol<double>(i, j) { }
 
 template<typename Real, typename Scalar>
-Scalar CustomWeakForm::MatrixFormVol::matrix_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, Func<Scalar> **ext) const {
+Scalar CustomWeakForm::MatrixFormVol::matrix_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v, GeomVol<Real> *e, Func<Scalar> **ext) const {
   Scalar result = Scalar(0);
   for (int i = 0; i < n; i++)
     result += -wt[i] * u->val[i] * static_cast<CustomWeakForm*>(wf)->calculate_a_dot_v(e->x[i], e->y[i], v->dx[i], v->dy[i]);
   return result;
 }
 
-double CustomWeakForm::MatrixFormVol::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, Func<double> **ext) const {
+double CustomWeakForm::MatrixFormVol::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v, GeomVol<double> *e, Func<double> **ext) const {
   return matrix_form<double, double>(n, wt, u_ext, u, v, e, ext);
 }
 
-Ord CustomWeakForm::MatrixFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const {
+Ord CustomWeakForm::MatrixFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, GeomVol<Ord> *e, Func<Ord> **ext) const {
   return matrix_form<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
 }
 
@@ -35,18 +35,18 @@ Hermes::Hermes2D::MatrixFormVol<double>* CustomWeakForm::MatrixFormVol::clone() 
 CustomWeakForm::VectorFormVol::VectorFormVol(int i) : Hermes::Hermes2D::VectorFormVol<double>(i) { }
 
 template<typename Real, typename Scalar>
-Scalar CustomWeakForm::VectorFormVol::vector_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, Geom<Real> *e, Func<Scalar> **ext) const {
+Scalar CustomWeakForm::VectorFormVol::vector_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v, GeomVol<Real> *e, Func<Scalar> **ext) const {
   Scalar result = Scalar(0);
   for (int i = 0; i < n; i++)
     result += wt[i] * F(e->x[i], e->y[i]) * v->val[i];
   return result;
 }
 
-double CustomWeakForm::VectorFormVol::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, Func<double> **ext) const {
+double CustomWeakForm::VectorFormVol::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, GeomVol<double> *e, Func<double> **ext) const {
   return vector_form<double, double>(n, wt, u_ext, v, e, ext);
 }
 
-Ord CustomWeakForm::VectorFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const {
+Ord CustomWeakForm::VectorFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, GeomVol<Ord> *e, Func<Ord> **ext) const {
   return vector_form<Ord, Ord>(n, wt, u_ext, v, e, ext);
 }
 
@@ -64,7 +64,7 @@ Real CustomWeakForm::VectorFormVol::F(Real x, Real y) const {
 CustomWeakForm::MatrixFormSurface::MatrixFormSurface(int i, int j) : Hermes::Hermes2D::MatrixFormSurf<double>(i, j) { }
 
 template<typename Real, typename Scalar>
-Scalar CustomWeakForm::MatrixFormSurface::matrix_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, Func<Scalar> **ext) const {
+Scalar CustomWeakForm::MatrixFormSurface::matrix_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v, GeomSurf<Real> *e, Func<Scalar> **ext) const {
   Scalar result = Scalar(0);
 
   for (int i = 0; i < n; i++) {
@@ -76,11 +76,11 @@ Scalar CustomWeakForm::MatrixFormSurface::matrix_form(int n, double *wt, Func<Sc
   return result;
 }
 
-double CustomWeakForm::MatrixFormSurface::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, Func<double> **ext) const {
+double CustomWeakForm::MatrixFormSurface::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v, GeomSurf<double> *e, Func<double> **ext) const {
   return matrix_form<double, double>(n, wt, u_ext, u, v, e, ext);
 }
 
-Ord CustomWeakForm::MatrixFormSurface::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const {
+Ord CustomWeakForm::MatrixFormSurface::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, GeomSurf<Ord> *e, Func<Ord> **ext) const {
   return matrix_form<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
 }
 
@@ -92,7 +92,7 @@ Hermes::Hermes2D::MatrixFormSurf<double>* CustomWeakForm::MatrixFormSurface::clo
 CustomWeakForm::MatrixFormInterface::MatrixFormInterface(int i, int j) : Hermes::Hermes2D::MatrixFormDG<double>(i, j) { }
 
 template<typename Real, typename Scalar>
-Scalar CustomWeakForm::MatrixFormInterface::matrix_form(int n, double *wt, DiscontinuousFunc<Scalar> *u_ext[], DiscontinuousFunc<Real> *u, DiscontinuousFunc<Real> *v, Geom<Real> *e, DiscontinuousFunc<Scalar> **ext) const {
+Scalar CustomWeakForm::MatrixFormInterface::matrix_form(int n, double *wt, DiscontinuousFunc<Scalar> *u_ext[], DiscontinuousFunc<Real> *u, DiscontinuousFunc<Real> *v, GeomSurf<Real> *e, DiscontinuousFunc<Scalar> **ext) const {
   Scalar result = Scalar(0);
 
   for (int i = 0; i < n; i++) {
@@ -107,13 +107,13 @@ Scalar CustomWeakForm::MatrixFormInterface::matrix_form(int n, double *wt, Disco
 }
 
 double CustomWeakForm::MatrixFormInterface::value(int n, double *wt, DiscontinuousFunc<double> **u_ext, DiscontinuousFunc<double> *u, DiscontinuousFunc<double> *v,
-                                                  Geom<double> *e, DiscontinuousFunc<double> **ext) const
+  GeomSurf<double> *e, DiscontinuousFunc<double> **ext) const
 {
   return matrix_form<double, double>(n, wt, u_ext, u, v, e, ext);
 }
 
 Ord CustomWeakForm::MatrixFormInterface::ord(int n, double *wt, DiscontinuousFunc<Ord> **u_ext, DiscontinuousFunc<Ord> *u, DiscontinuousFunc<Ord> *v,
-                                             Geom<Ord> *e, DiscontinuousFunc<Ord> **ext) const
+  GeomSurf<Ord> *e, DiscontinuousFunc<Ord> **ext) const
 {
   return matrix_form<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
 }
@@ -125,7 +125,7 @@ Hermes::Hermes2D::MatrixFormDG<double>* CustomWeakForm::MatrixFormInterface::clo
 
 CustomWeakForm::VectorFormSurface::VectorFormSurface(int i, std::string left_bottom_bnd_part) : Hermes::Hermes2D::VectorFormSurf<double>(i) { this->set_area(left_bottom_bnd_part); }
 
-double CustomWeakForm::VectorFormSurface::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, Func<double> **ext) const {
+double CustomWeakForm::VectorFormSurface::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, GeomSurf<double> *e, Func<double> **ext) const {
   double result = 0;
   for (int i = 0; i < n; i++) {
     double x = e->x[i], y = e->y[i];
@@ -136,7 +136,7 @@ double CustomWeakForm::VectorFormSurface::value(int n, double *wt, Func<double> 
   return result;
 }
 
-Ord CustomWeakForm::VectorFormSurface::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const {
+Ord CustomWeakForm::VectorFormSurface::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, GeomSurf<Ord> *e, Func<Ord> **ext) const {
   Ord result = Ord(0);
   for (int i = 0; i < n; i++)
     result += -wt[i] * v->val[i];

@@ -10,8 +10,8 @@ class DiscontinuityDetector
 {
 public:
   /// Constructor.
-  DiscontinuityDetector(Hermes::vector<SpaceSharedPtr<double> > spaces, 
-                        Hermes::vector<MeshFunctionSharedPtr<double> > solutions);
+  DiscontinuityDetector(std::vector<SpaceSharedPtr<double> > spaces, 
+                        std::vector<MeshFunctionSharedPtr<double> > solutions);
 
   /// Destructor.
    ~DiscontinuityDetector();
@@ -21,8 +21,8 @@ public:
 
 protected:
   /// Members.
-  Hermes::vector<SpaceSharedPtr<double> > spaces;
-  Hermes::vector<MeshFunctionSharedPtr<double> > solutions;
+  std::vector<SpaceSharedPtr<double> > spaces;
+  std::vector<MeshFunctionSharedPtr<double> > solutions;
   std::set<int> discontinuous_element_ids;
   MeshSharedPtr mesh;
 };
@@ -31,8 +31,8 @@ class KrivodonovaDiscontinuityDetector : public DiscontinuityDetector
 {
 public:
   /// Constructor.
-  KrivodonovaDiscontinuityDetector(Hermes::vector<SpaceSharedPtr<double> > spaces, 
-                        Hermes::vector<MeshFunctionSharedPtr<double> > solutions);
+  KrivodonovaDiscontinuityDetector(std::vector<SpaceSharedPtr<double> > spaces, 
+                        std::vector<MeshFunctionSharedPtr<double> > solutions);
 
   /// Destructor.
    ~KrivodonovaDiscontinuityDetector();
@@ -59,8 +59,8 @@ class KuzminDiscontinuityDetector : public DiscontinuityDetector
 {
 public:
   /// Constructor.
-  KuzminDiscontinuityDetector(Hermes::vector<SpaceSharedPtr<double> > spaces, 
-                        Hermes::vector<MeshFunctionSharedPtr<double> > solutions, bool limit_all_orders_independently = false);
+  KuzminDiscontinuityDetector(std::vector<SpaceSharedPtr<double> > spaces, 
+                        std::vector<MeshFunctionSharedPtr<double> > solutions, bool limit_all_orders_independently = false);
 
   /// Destructor.
    ~KuzminDiscontinuityDetector();
@@ -110,7 +110,7 @@ public:
     Kuzmin
   };
   /// Constructor.
-  FluxLimiter(LimitingType type, double* solution_vector, Hermes::vector<SpaceSharedPtr<double> > spaces, bool Kuzmin_limit_all_orders_independently = false);
+  FluxLimiter(LimitingType type, double* solution_vector, std::vector<SpaceSharedPtr<double> > spaces, bool Kuzmin_limit_all_orders_independently = false);
   FluxLimiter(LimitingType type, double* solution_vector, SpaceSharedPtr<double> space, bool Kuzmin_limit_all_orders_independently = false);
 
   /// Destructor.
@@ -118,19 +118,19 @@ public:
 
   /// Do the limiting.
   /// With the possibility to also limit the spaces from which the spaces in the constructors are refined.
-  virtual void limit_according_to_detector(Hermes::vector<SpaceSharedPtr<double> > coarse_spaces_to_limit = Hermes::vector<SpaceSharedPtr<double> >());
+  virtual void limit_according_to_detector(std::vector<SpaceSharedPtr<double> > coarse_spaces_to_limit = std::vector<SpaceSharedPtr<double> >());
   
   /// For Kuzmin's detector.
-  virtual void limit_second_orders_according_to_detector(Hermes::vector<SpaceSharedPtr<double> > coarse_spaces_to_limit = Hermes::vector<SpaceSharedPtr<double> >());
+  virtual void limit_second_orders_according_to_detector(std::vector<SpaceSharedPtr<double> > coarse_spaces_to_limit = std::vector<SpaceSharedPtr<double> >());
   
-  void get_limited_solutions(Hermes::vector<MeshFunctionSharedPtr<double> > solutions_to_limit);
+  void get_limited_solutions(std::vector<MeshFunctionSharedPtr<double> > solutions_to_limit);
   void get_limited_solution(MeshFunctionSharedPtr<double> solution_to_limit);
 protected:
   /// Members.
   double* solution_vector;
-  Hermes::vector<SpaceSharedPtr<double> > spaces;
+  std::vector<SpaceSharedPtr<double> > spaces;
   DiscontinuityDetector* detector;
-  Hermes::vector<MeshFunctionSharedPtr<double> > limited_solutions;
+  std::vector<MeshFunctionSharedPtr<double> > limited_solutions;
 };
 
 #endif

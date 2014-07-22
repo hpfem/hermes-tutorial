@@ -117,7 +117,8 @@ int main(int argc, char* argv[])
   if (bt.is_fully_implicit()) Hermes::Mixins::Loggable::Static::info("Using a %d-stage fully implicit R-K method.", bt.get_size());
 
   // Turn off adaptive time stepping if R-K method is not embedded.
-  if (bt.is_embedded() == false && ADAPTIVE_TIME_STEP_ON == true) {
+  if (bt.is_embedded() == false && ADAPTIVE_TIME_STEP_ON == true)
+  {
     throw Hermes::Exceptions::Exception("R-K method not embedded, turning off adaptive time stepping.");
     ADAPTIVE_TIME_STEP_ON = false;
   }
@@ -149,10 +150,7 @@ int main(int argc, char* argv[])
   // Initialize the weak formulation
   CustomNonlinearity lambda(alpha);
   Hermes2DFunction<double> f(heat_src);
-  WeakFormsH1::DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &f);
-
-  // Initialize the discrete problem.
-  DiscreteProblem<double> dp(&wf, space);
+  WeakFormSharedPtr<double> wf(new WeakFormsH1::DefaultWeakFormPoisson<double>(HERMES_ANY, &lambda, &f));
 
   // Create a refinement selector.
   H1ProjBasedSelector<double> selector(CAND_LIST, H2DRS_DEFAULT_ORDER);
@@ -206,13 +204,14 @@ int main(int argc, char* argv[])
     else time_error_fn = NULL;
     bool done = false; int as = 1;
     double err_est;
-    do {
+    do
+    {
       Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
       MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
       Space<double>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
       SpaceSharedPtr<double> ref_space = ref_space_creator.create_ref_space();
 
-      RungeKutta<double> runge_kutta(&wf, ref_space, &bt);
+      RungeKutta<double> runge_kutta(wf, ref_space, &bt);
 
       // Runge-Kutta step on the fine mesh.
       Hermes::Mixins::Loggable::Static::info("Runge-Kutta time step on fine mesh (t = %g s, tau = %g s, stages: %d).", 
@@ -228,8 +227,7 @@ int main(int argc, char* argv[])
       catch(Exceptions::Exception& e)
       {
         std::cout << e.what();
-        
-      }
+}
 
       /* If ADAPTIVE_TIME_STEP_ON == true, estimate temporal error. 
          If too large or too small, then adjust it and restart the time step. */
@@ -244,7 +242,8 @@ int main(int argc, char* argv[])
         time_error_view.set_title(title);
         time_error_view.show_mesh(false);
         MeshFunctionSharedPtr<double> abs_tef(new AbsFilter(time_error_fn));
-        time_error_view.show(abs_tef, HERMES_EPS_HIGH);
+        time_error_view.set_linearizer_criterion(LinearizerCriterionAdaptive(HERMES_EPS_NORMAL));
+        time_error_view.show(abs_tef);
 
         DefaultNormCalculator<double, HERMES_L2_NORM> normCalculatorTime(1);
         normCalculatorTime.calculate_norm(time_error_fn);
@@ -287,11 +286,12 @@ int main(int argc, char* argv[])
 
       // Show spatial error.
       sprintf(title, "Spatial error est, spatial adaptivity step %d", as);  
-      DiffFilter<double>* space_error_fn = new DiffFilter<double>(Hermes::vector<MeshFunctionSharedPtr<double> >(ref_sln, sln));   
+      MeshFunctionSharedPtr<double> space_error_fn(new DiffFilter<double>(std::vector<MeshFunctionSharedPtr<double> >({ ref_sln, sln })));
       space_error_view.set_title(title);
       space_error_view.show_mesh(false);
-      AbsFilter abs_sef(space_error_fn);
-      space_error_view.show(&abs_sef, HERMES_EPS_HIGH);
+      MeshFunctionSharedPtr<double> abs_sef(new AbsFilter(space_error_fn));
+      space_error_view.set_linearizer_criterion(LinearizerCriterionFixed(2));
+      space_error_view.show(abs_sef);
 
       // Calculate element errors and spatial error estimate.
       Hermes::Mixins::Loggable::Static::info("Calculating spatial error estimate.");
@@ -312,7 +312,7 @@ int main(int argc, char* argv[])
           as++;
       }
     }
-    while (done == false);
+    while (!done);
 
     // Visualize the solution and mesh.
     char title[100];

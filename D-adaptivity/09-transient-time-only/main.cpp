@@ -105,14 +105,14 @@ int main(int argc, char* argv[])
   // Initialize the weak formulation
   CustomNonlinearity lambda(alpha);
   Hermes2DFunction<double> f(heat_src);
-  WeakFormsH1::DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &f);
+  WeakFormSharedPtr<double> wf(new WeakFormsH1::DefaultWeakFormPoisson<double>(HERMES_ANY, &lambda, &f));
 
   // Initialize views.
   ScalarView sview_high("Solution (higher-order)", new WinGeom(0, 0, 500, 400));
   ScalarView eview("Temporal error", new WinGeom(500, 0, 500, 400));
   eview.fix_scale_width(50);
 
-  RungeKutta<double> runge_kutta(&wf, space, &bt);
+  RungeKutta<double> runge_kutta(wf, space, &bt);
 
   // Graph for time step history.
   SimpleGraph time_step_graph;
@@ -181,8 +181,7 @@ int main(int argc, char* argv[])
 
     // Increase counter of time steps.
     ts++;
-
-  } 
+} 
   while (current_time < T_FINAL);
 
   // Wait for all views to be closed.

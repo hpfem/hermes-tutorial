@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
   CustomRightHandSide2 g2(K, D_v);
 
   // Initialize the weak formulation.
-  CustomWeakForm wf(&g1, &g2);
+  WeakFormSharedPtr<double> wf(new CustomWeakForm(&g1, &g2));
   
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_u("Bdy", 0.0);
@@ -110,9 +110,8 @@ int main(int argc, char* argv[])
   // Create H1 spaces with default shapeset for both displacement components.
   SpaceSharedPtr<double> u_space(new H1Space<double>(u_mesh, &bcs_u, P_INIT_U));
   SpaceSharedPtr<double> v_space(new H1Space<double>(MULTI ? v_mesh : u_mesh, &bcs_v, P_INIT_V));
-  Hermes::vector<SpaceSharedPtr<double> > spaces(u_space, v_space);
   // Set the spaces to adaptivity.
-  adaptivity.set_spaces(spaces);
+  adaptivity.set_spaces({ u_space, v_space });
 
   // Initialize coarse and reference mesh solutions.
   MeshFunctionSharedPtr<double>  u_sln(new Solution<double>), v_sln(new Solution<double>),
@@ -134,7 +133,7 @@ int main(int argc, char* argv[])
   SimpleGraph graph_dof_exact, graph_cpu_exact;
 
   // Newton
-  NewtonSolver<double> newton(&wf, spaces);
+  NewtonSolver<double> newton(wf, { u_space, v_space });
   newton.set_tolerance(1e-1, Hermes::Solvers::ResidualNormAbsolute);
     
   // Adaptivity loop:
@@ -154,10 +153,6 @@ int main(int argc, char* argv[])
     Space<double>::ReferenceSpaceCreator v_ref_space_creator(v_space, v_ref_mesh);
     SpaceSharedPtr<double> v_ref_space = v_ref_space_creator.create_ref_space();
 
-    Hermes::vector<SpaceSharedPtr<double> > ref_spaces(u_ref_space, v_ref_space);
-
-    int ndof_ref = Space<double>::get_num_dofs(ref_spaces);
-
     // Initialize reference problem.
     Hermes::Mixins::Loggable::Static::info("Solving on reference mesh.");
     
@@ -167,7 +162,7 @@ int main(int argc, char* argv[])
     // Perform Newton's iteration.
     try
     {
-      newton.set_spaces(ref_spaces);
+      newton.set_spaces({ u_ref_space, v_ref_space });
       newton.solve();
     }
     catch(std::exception& e)
@@ -176,13 +171,13 @@ int main(int argc, char* argv[])
     }
 
     // Translate the resulting coefficient vector into the instance of Solution.
-    Solution<double>::vector_to_solutions(newton.get_sln_vector(), ref_spaces, Hermes::vector<MeshFunctionSharedPtr<double> >(u_ref_sln, v_ref_sln));
+    Solution<double>::vector_to_solutions(newton.get_sln_vector(), { u_ref_space, v_ref_space }, { u_ref_sln, v_ref_sln });
 
     // Project the fine mesh solution onto the coarse mesh.
     Hermes::Mixins::Loggable::Static::info("Projecting reference solution on coarse mesh.");
-    OGProjection<double>::project_global(spaces, 
-                                 Hermes::vector<MeshFunctionSharedPtr<double> >(u_ref_sln, v_ref_sln), 
-                                 Hermes::vector<MeshFunctionSharedPtr<double> >(u_sln, v_sln)); 
+    OGProjection<double>::project_global({ u_space, v_space },
+                                 {u_ref_sln, v_ref_sln}, 
+                                 { u_sln, v_sln });
    
     cpu_time.tick();
 
@@ -193,12 +188,11 @@ int main(int argc, char* argv[])
     o_view_1.show(v_space);
 
     // Calculate element errors and total error estimate.
-    errorCalculator.calculate_errors(Hermes::vector<MeshFunctionSharedPtr<double> >(u_sln, v_sln),
-      Hermes::vector<MeshFunctionSharedPtr<double> >(exact_u, exact_v), false);
+    errorCalculator.calculate_errors({u_sln, v_sln},
+      {exact_u, exact_v}, false);
     double err_exact_rel = errorCalculator.get_total_error_squared() * 100;
     // Calculate exact error.
-    errorCalculator.calculate_errors(Hermes::vector<MeshFunctionSharedPtr<double> >(u_sln, v_sln),
-      Hermes::vector<MeshFunctionSharedPtr<double> >(u_ref_sln, v_ref_sln));
+    errorCalculator.calculate_errors({ u_sln, v_sln }, { u_ref_sln, v_ref_sln });
     double err_est_rel = errorCalculator.get_total_error_squared() * 100;
 
     // Time measurement.
@@ -210,18 +204,18 @@ int main(int argc, char* argv[])
     Hermes::Mixins::Loggable::Static::info("ndof_coarse[1]: %d, ndof_fine[1]: %d",
          v_space->get_num_dofs(), v_ref_space->get_num_dofs());
     Hermes::Mixins::Loggable::Static::info("ndof_coarse_total: %d, ndof_fine_total: %d",
-         Space<double>::get_num_dofs(Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space)), 
-         Space<double>::get_num_dofs(ref_spaces));
+      Space<double>::get_num_dofs({ u_space, v_space }),
+         Space<double>::get_num_dofs({ u_ref_space, v_ref_space }));
     Hermes::Mixins::Loggable::Static::info("err_est_rel_total: %g%%, err_est_exact_total: %g%%", err_est_rel, err_exact_rel);
 
     // Add entry to DOF and CPU convergence graphs.
-    graph_dof_est.add_values(Space<double>::get_num_dofs(Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space)), 
+    graph_dof_est.add_values(Space<double>::get_num_dofs({ u_space, v_space }),
       err_est_rel);
     graph_dof_est.save("conv_dof_est.dat");
     graph_cpu_est.add_values(cpu_time.accumulated(), err_est_rel);
     graph_cpu_est.save("conv_cpu_est.dat");
 
-    graph_dof_exact.add_values(Space<double>::get_num_dofs(Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space)), 
+    graph_dof_exact.add_values(Space<double>::get_num_dofs({ u_space, v_space }),
       err_exact_rel);
     graph_dof_exact.save("conv_dof_exact.dat");
     graph_cpu_exact.add_values(cpu_time.accumulated(), err_exact_rel);
@@ -233,13 +227,13 @@ int main(int argc, char* argv[])
     else 
     {
       Hermes::Mixins::Loggable::Static::info("Adapting coarse mesh.");
-      done = adaptivity.adapt(Hermes::vector<RefinementSelectors::Selector<double> *>(&selector, &selector));
+      done = adaptivity.adapt({ &selector, &selector });
     }
 
     // Increase counter.
     as++;
   }
-  while (done == false);
+  while (!done);
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 

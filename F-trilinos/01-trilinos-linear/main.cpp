@@ -81,16 +81,13 @@ int main(int argc, char **argv)
   int ndof = Space<double>::get_num_dofs(space);
   Hermes::Mixins::Loggable::Static::info("ndof: %d", ndof);
 
-  Hermes::Mixins::Loggable::Static::info("---- Assembling by DiscreteProblem, solving by regular solver:");
-
-  // Initialize the linear discrete problem.
-  DiscreteProblem<double> dp1(&wf1, space);
+  Hermes::Mixins::Loggable::Static::info("---- Assembling by NewtonSolver, solving by regular solver:");
   
   // Begin time measurement of assembly.
   cpu_time.tick();
 
   // Initialize the Newton solver.
-  Hermes::Hermes2D::NewtonSolver<double> newton(&dp1);
+  Hermes::Hermes2D::NewtonSolver<double> newton(wf1, space);
 
   // Perform Newton's iteration and translate the resulting coefficient vector into a Solution.
   MeshFunctionSharedPtr<double> sln1(new Solution<double>);
@@ -102,8 +99,7 @@ int main(int argc, char **argv)
   catch(std::exception& e)
   {
     std::cout << e.what();
-    
-  }
+}
 
   // Translate solution vector into a Solution.
   Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln1);
@@ -127,13 +123,10 @@ int main(int argc, char **argv)
   
   // TRILINOS PART:
 
-  Hermes::Mixins::Loggable::Static::info("---- Assembling by DiscreteProblem, solving by NOX:");
+  Hermes::Mixins::Loggable::Static::info("---- Assembling by NewtonSolverNOX, solving by NOX:");
 
   // Initialize the weak formulation for Trilinos.
-  CustomWeakFormPoisson wf2(TRILINOS_JFNK);
-  
-  // Initialize DiscreteProblem.
-  DiscreteProblemNOX<double> dp2(&wf2, space);
+  WeakFormSharedPtr<double> wf2(new CustomWeakFormPoisson(TRILINOS_JFNK));
   
   // Time measurement.
   cpu_time.tick();
@@ -145,7 +138,7 @@ int main(int argc, char **argv)
 
   // Initialize the NOX solver.
   Hermes::Mixins::Loggable::Static::info("Initializing NOX.");
-  NewtonSolverNOX<double> nox_solver(&dp2);
+  NewtonSolverNOX<double> nox_solver(wf2, space);
   nox_solver.set_output_flags(message_type);
 
   // Set various NOX parameters.
@@ -173,8 +166,7 @@ int main(int argc, char **argv)
   catch(std::exception& e)
   {
     std::cout << e.what();
-    
-  }
+}
 
   // Convert resulting coefficient vector into a Solution.
   Solution<double>::vector_to_solution(nox_solver.get_sln_vector(), space, sln2);

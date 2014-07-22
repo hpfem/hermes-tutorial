@@ -88,11 +88,8 @@ int main(int argc, char* argv[])
   ConstantSolution<double> t_prev_time(mesh, TEMP_INIT);
 
   // Initialize the weak formulation.
-  CustomWeakForm wf(Hermes::vector<std::string>("Bdy_right", "Bdy_top", "Bdy_left"), 
+  CustomWeakForm wf({"Bdy_right", "Bdy_top", "Bdy_left"}, 
                     HEATCAP, RHO, TAU, LAMBDA, ALPHA, TEMP_EXT, &t_prev_time, TRILINOS_JFNK);
-
-  // Initialize the finite element problem.
-  DiscreteProblemNOX<double> dp(&wf, space);
 
   // Project the function "t_prev_time" on the FE space 
   // in order to obtain initial vector for NOX. 
@@ -102,7 +99,7 @@ int main(int argc, char* argv[])
 
   // Initialize the NOX solver.
   Hermes::Mixins::Loggable::Static::info("Initializing NOX.");
-  NewtonSolverNOX<double> solver_nox(&dp);
+  NewtonSolverNOX<double> solver_nox(wf, space);
   solver_nox.set_output_flags(message_type);
 
   solver_nox.set_ls_type(iterative_method);
@@ -140,8 +137,7 @@ int main(int argc, char* argv[])
     catch(std::exception& e)
     {
       std::cout << e.what();
-      
-    }
+}
 
     Solution<double>::vector_to_solution(solver_nox.get_sln_vector(), space, &t_prev_time);
 

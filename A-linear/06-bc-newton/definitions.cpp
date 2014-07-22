@@ -26,7 +26,7 @@ CustomWeakFormPoissonNewton::CustomWeakFormPoissonNewton(std::string mat_al, Her
 
 /* Custom non-constant Dirichlet condition */
 
-CustomDirichletCondition::CustomDirichletCondition(Hermes::vector<std::string> markers, 
+CustomDirichletCondition::CustomDirichletCondition(std::vector<std::string> markers, 
                                                    double A, double B, double C)
     : EssentialBoundaryCondition<double>(markers), A(A), B(B), C(C) 
 { 
@@ -37,7 +37,7 @@ EssentialBoundaryCondition<double>::EssentialBCValueType CustomDirichletConditio
   return EssentialBoundaryCondition<double>::BC_FUNCTION; 
 }
 
-double CustomDirichletCondition::value(double x, double y, double n_x, double n_y, double t_x, double t_y) const 
+double CustomDirichletCondition::value(double x, double y) const 
 {
   return A*x + B*y + C;
 }

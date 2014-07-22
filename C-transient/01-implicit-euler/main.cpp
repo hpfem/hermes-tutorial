@@ -61,8 +61,8 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation.
   double current_time = 0;
-  CustomWeakFormHeatRK1 wf("Boundary air", ALPHA, LAMBDA, HEATCAP, RHO, time_step, 
-                           &current_time, TEMP_INIT, T_FINAL, tsln);
+  WeakFormSharedPtr<double> wf(new CustomWeakFormHeatRK1("Boundary air", ALPHA, LAMBDA, HEATCAP, RHO, time_step, 
+                           &current_time, TEMP_INIT, T_FINAL, tsln));
   
   // Initialize boundary conditions.
   DefaultEssentialBCConst<double> bc_essential("Boundary ground", TEMP_INIT);
@@ -72,12 +72,9 @@ int main(int argc, char* argv[])
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
   int ndof = space->get_num_dofs();
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
- 
-  // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, space);
 
   // Initialize Newton solver.
-  NewtonSolver<double> newton(&dp);
+  NewtonSolver<double> newton(wf, space);
   newton.set_jacobian_constant();
   // Initialize views.
   ScalarView Tview("Temperature", new WinGeom(0, 0, 450, 600));
@@ -98,8 +95,7 @@ int main(int argc, char* argv[])
     catch(std::exception& e)
     {
       std::cout << e.what();
-      
-    }
+}
 
     // Translate the resulting coefficient vector into the Solution sln.
     Solution<double>::vector_to_solution(newton.get_sln_vector(), space, tsln);

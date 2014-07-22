@@ -32,15 +32,14 @@ class CustomEssentialBCNonConst : public EssentialBoundaryCondition<double>
 {
 public:
   CustomEssentialBCNonConst(std::string marker) 
-           : EssentialBoundaryCondition<double>(Hermes::vector<std::string>()) 
+           : EssentialBoundaryCondition<double>(std::vector<std::string>()) 
   {
     this->markers.push_back(marker);
   }
 
   virtual EssentialBCValueType get_value_type() const;
 
-  virtual double value(double x, double y, double n_x, double n_y, 
-                       double t_x, double t_y) const;
+  virtual double value(double x, double y) const;
 };
 
 

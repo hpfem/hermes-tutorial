@@ -35,8 +35,8 @@ int main(int argc, char* argv[])
   // Define nonlinear thermal conductivity lambda(u) via a cubic spline.
   // Step 1: Fill the x values and use lambda_macro(u) = 1 + u^4 for the y values.
 #define lambda_macro(x) (1 + Hermes::pow(x, 4))
-  Hermes::vector<double> lambda_pts(-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0);
-  Hermes::vector<double> lambda_val;
+  std::vector<double> lambda_pts({ -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0 });
+  std::vector<double> lambda_val;
   for (unsigned int i = 0; i < lambda_pts.size(); i++) 
     lambda_val.push_back(lambda_macro(lambda_pts[i]));
   // Step 2: Create the cubic spline (and plot it for visual control). 
@@ -75,10 +75,10 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation.
   Hermes2DFunction<double> src(-heat_src);
-  DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &src);
+  WeakFormSharedPtr<double> wf(new DefaultWeakFormPoisson<double>(HERMES_ANY, &lambda, &src));
 
   // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, space);
+  DiscreteProblem<double> dp(wf, space);
 
   // Project the initial condition on the FE space to obtain initial 
   // coefficient vector for the Newton's method.

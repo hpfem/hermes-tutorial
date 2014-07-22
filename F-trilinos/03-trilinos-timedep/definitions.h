@@ -7,7 +7,7 @@ using namespace Hermes::Hermes2D::Views;
 class CustomWeakForm : public WeakForm<double>
 {
 public:
-  CustomWeakForm(Hermes::vector<std::string> newton_boundaries, double heatcap, 
+  CustomWeakForm(std::vector<std::string> newton_boundaries, double heatcap, 
                  double rho, double tau, double lambda, double alpha, double temp_ext, 
                  Solution<double>* sln_prev_time, bool JFNK = false);
 
@@ -21,10 +21,10 @@ private:
       : MatrixFormVol<double>(i, j), heatcap(heatcap), rho(rho), lambda(lambda), tau(tau) { this->setSymFlag(HERMES_SYM); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                         Func<double> *v, Geom<double> *e, Func<double> **ext) const;
+                         Func<double> *v, GeomVol<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                    Geom<Ord> *e, Func<Ord> **ext) const;
+                    GeomVol<Ord> *e, Func<Ord> **ext) const;
     
     MatrixFormVol<double>* clone() const;
 
@@ -34,14 +34,14 @@ private:
   class JacobianFormSurf : public MatrixFormSurf<double>
   {
   public:
-    JacobianFormSurf(int i, int j, Hermes::vector<std::string> newton_boundaries, double alpha, double lambda) 
+    JacobianFormSurf(int i, int j, std::vector<std::string> newton_boundaries, double alpha, double lambda) 
       : MatrixFormSurf<double>(i, j), alpha(alpha), lambda(lambda) { this->set_areas(newton_boundaries); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                         Func<double> *v, Geom<double> *e, Func<double> **ext) const;
+                         Func<double> *v, GeomSurf<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                    Geom<Ord> *e, Func<Ord> **ext) const;
+                    GeomSurf<Ord> *e, Func<Ord> **ext) const;
     
     MatrixFormSurf<double>* clone() const;
 
@@ -55,10 +55,10 @@ private:
             : VectorFormVol<double>(i), heatcap(heatcap), rho(rho), lambda(lambda), tau(tau)  {};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
-                         Geom<double> *e, Func<double> **ext) const;
+                         GeomVol<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                    Geom<Ord> *e, Func<Ord> **ext) const;
+                    GeomVol<Ord> *e, Func<Ord> **ext) const;
     
     VectorFormVol<double>* clone() const;
 
@@ -69,14 +69,14 @@ private:
   class ResidualFormSurf : public VectorFormSurf<double>
   {
   public:
-    ResidualFormSurf(int i, Hermes::vector<std::string> newton_boundaries, double alpha, double lambda, double temp_ext) 
+    ResidualFormSurf(int i, std::vector<std::string> newton_boundaries, double alpha, double lambda, double temp_ext) 
       : VectorFormSurf<double>(i), alpha(alpha), lambda(lambda), temp_ext(temp_ext)  { this->set_areas(newton_boundaries); };
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
-                         Geom<double> *e, Func<double> **ext) const;
+                         GeomSurf<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                    Geom<Ord> *e, Func<Ord> **ext) const;
+                    GeomSurf<Ord> *e, Func<Ord> **ext) const;
     
     VectorFormSurf<double>* clone() const;
 

@@ -32,7 +32,7 @@ CustomWeakFormPicard::CustomWeakFormPicard(MeshFunctionSharedPtr<double> prev_it
 
 double CustomWeakFormPicard::CustomJacobian::value(int n, double *wt, Func<double> *u_ext[], 
                                                    Func<double> *u, Func<double> *v, 
-                                                   Geom<double> *e, Func<double> **ext) const
+                                                   GeomVol<double> *e, Func<double> **ext) const
 {
   double result = 0;
   for (int i = 0; i < n; i++) 
@@ -44,7 +44,7 @@ double CustomWeakFormPicard::CustomJacobian::value(int n, double *wt, Func<doubl
 
 Ord CustomWeakFormPicard::CustomJacobian::ord(int n, double *wt, Func<Ord> *u_ext[], 
                                               Func<Ord> *u, Func<Ord> *v,
-                                              Geom<Ord> *e, Func<Ord> **ext) const 
+                                              GeomVol<Ord> *e, Func<Ord> **ext) const 
 {
   Ord result = Ord(0);
   for (int i = 0; i < n; i++) 
@@ -60,7 +60,7 @@ MatrixFormVol<double>* CustomWeakFormPicard::CustomJacobian::clone() const
 }
 
 double CustomWeakFormPicard::CustomResidual::value(int n, double *wt, Func<double> *u_ext[],
-                                                   Func<double> *v, Geom<double> *e, Func<double> **ext) const 
+                                                   Func<double> *v, GeomVol<double> *e, Func<double> **ext) const 
 {
   double result = 0;
   for (int i = 0; i < n; i++) 
@@ -71,7 +71,7 @@ double CustomWeakFormPicard::CustomResidual::value(int n, double *wt, Func<doubl
 }
 
 Ord CustomWeakFormPicard::CustomResidual::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                                              Geom<Ord> *e, Func<Ord> **ext) const 
+                                              GeomVol<Ord> *e, Func<Ord> **ext) const 
 {
   Ord result = Ord(0);
   for (int i = 0; i < n; i++) 
@@ -91,8 +91,7 @@ EssentialBoundaryCondition<double>::EssentialBCValueType CustomEssentialBCNonCon
   return EssentialBoundaryCondition<double>::BC_FUNCTION; 
 }
 
-double CustomEssentialBCNonConst::value(double x, double y, double n_x, double n_y, 
-                                        double t_x, double t_y) const
+double CustomEssentialBCNonConst::value(double x, double y) const
 {
   return (x+10) * (y+10) / 100.;
 }

@@ -14,8 +14,7 @@ public:
 
   inline EssentialBCValueType  get_value_type() const;
 
-  virtual double value(double x, double y, double n_x, double n_y, 
-                       double t_x, double t_y) const;
+  virtual double value(double x, double y) const;
 };
 
 /* Weak forms */
@@ -32,10 +31,10 @@ private:
     MatrixFormVolGeneral(int i, int j);
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                         Func<double> *v, Geom<double> *e, Func<double> **ext) const;
+      Func<double> *v, GeomVol<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-                    Geom<Ord> *e, Func<Ord> **ext) const;
+                    GeomVol<Ord> *e, Func<Ord> **ext) const;
 
     MatrixFormVol<double>* clone() const;
   };
@@ -46,10 +45,10 @@ private:
     VectorFormVolGeneral(int i);
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
-                         Geom<double> *e, Func<double> **ext) const;
+      GeomVol<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                    Geom<Ord> *e, Func<Ord> **ext) const;
+      GeomVol<Ord> *e, Func<Ord> **ext) const;
 
     VectorFormVol<double>* clone() const;
   private:
@@ -62,10 +61,10 @@ private:
     VectorFormSurfGeneral(int i, std::string area = HERMES_ANY);
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
-                         Geom<double> *e, Func<double> **ext) const;
+                         GeomSurf<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                    Geom<Ord> *e, Func<Ord> **ext) const;
+      GeomSurf<Ord> *e, Func<Ord> **ext) const;
 
     VectorFormSurf<double>* clone() const;
   private:

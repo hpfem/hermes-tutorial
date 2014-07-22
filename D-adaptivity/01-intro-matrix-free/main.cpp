@@ -86,12 +86,12 @@ int main(int argc, char* argv[])
   mloader.load("domain.mesh", mesh);
 
   // Initialize the weak formulation.
-  CustomWeakFormPoisson wf("Motor", EPS_MOTOR, "Air", EPS_AIR, TRILINOS_JFNK);
+  WeakFormSharedPtr<double> wf(new CustomWeakFormPoisson("Motor", EPS_MOTOR, "Air", EPS_AIR, TRILINOS_JFNK));
   
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_essential_out("Outer", 0.0);
   DefaultEssentialBCConst<double> bc_essential_stator("Stator", VOLTAGE);
-  EssentialBCs<double> bcs(Hermes::vector<EssentialBoundaryCondition<double> *>(&bc_essential_out, &bc_essential_stator));
+  EssentialBCs<double> bcs(std::vector<EssentialBoundaryCondition<double> *>(&bc_essential_out, &bc_essential_stator));
 
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 
 
     // Initialize (new) fine mesh problem.
-    DiscreteProblemNOX<double> dp(&wf, ref_space);
+    DiscreteProblemNOX<double> dp(wf, ref_space);
     
     // Allocate initial coefficient vector for the Newton's method
     // on the (new) fine mesh.
@@ -177,8 +177,7 @@ int main(int argc, char* argv[])
     catch(std::exception& e)
     {
       std::cout << e.what();
-      
-    }
+}
 
     // Translate the resulting coefficient vector into the instance of Solution.
     Solution<double>::vector_to_solution(newton_nox.get_sln_vector(), ref_space_new, ref_sln);
@@ -200,7 +199,7 @@ int main(int argc, char* argv[])
     if (VTK_VISUALIZATION) 
     {
       // Output solution in VTK format.
-      Views::Linearizer lin;
+      Views::Linearizer lin(FileExport);
       char* title = new char[100];
       sprintf(title, "sln-%d.vtk", as);
       lin.save_solution_vtk(sln, title, "Potential", false);
@@ -251,14 +250,14 @@ int main(int argc, char* argv[])
       done = adaptivity.adapt(&selector);
 
       // Increase the counter of performed adaptivity steps.
-      if (done == false)  
+      if (!done)  
         as++;
     }
 
     // Clean up.
     delete [] coeff_vec;
   }
-  while (done == false);
+  while (!done);
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 

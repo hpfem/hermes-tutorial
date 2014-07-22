@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
   // Initialize the weak formulation
   CustomNonlinearity lambda(alpha);
   Hermes2DFunction<double> f(heat_src);
-  WeakFormsH1::DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &f);
+  WeakFormSharedPtr<double> wf(new WeakFormsH1::DefaultWeakFormPoisson<double>(HERMES_ANY, &lambda, &f));
 
   // Next time level solution.
   MeshFunctionSharedPtr<double> sln_time_new(new Solution<double>(mesh));
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
   ordview.show(space);
 
   // Initialize Runge-Kutta time stepping.
-  RungeKutta<double> runge_kutta(&wf, space, &bt);
+  RungeKutta<double> runge_kutta(wf, space, &bt);
 
   // Time stepping loop.
   double current_time = 0; int ts = 1;
@@ -195,8 +195,7 @@ int main(int argc, char* argv[])
       catch (Exceptions::Exception& e)
       {
         std::cout << e.what();
-
-      }
+}
 
       // Project the fine mesh solution onto the coarse mesh.
       MeshFunctionSharedPtr<double> sln_coarse(new Solution<double>);
@@ -232,7 +231,7 @@ int main(int argc, char* argv[])
       sprintf(title, "Mesh, time %g", current_time);
       ordview.set_title(title);
       ordview.show(space);
-    } while (done == false);
+    } while (!done);
 
     sln_time_prev->copy(sln_time_new);
 

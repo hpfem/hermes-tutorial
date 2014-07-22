@@ -49,15 +49,11 @@ int main(int argc, char* argv[])
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
   // Initialize the weak formulation.
-  WeakFormsH1::DefaultWeakFormPoisson<double> wf(HERMES_ANY, 
-      new Hermes1DFunction<double>(1.0), new Hermes2DFunction<double>(-const_f));
-
-  // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, space);
+  WeakFormSharedPtr<double> wf(new WeakFormsH1::DefaultWeakFormPoisson<double>(HERMES_ANY, new Hermes1DFunction<double>(1.0), new Hermes2DFunction<double>(-const_f)));
 
   // Perform Newton's iteration.
   MeshFunctionSharedPtr<double> sln(new Solution<double>);
-  NewtonSolver<double> newton(&dp);
+  NewtonSolver<double> newton(wf, space);
   try
   {
     newton.solve();
@@ -65,8 +61,7 @@ int main(int argc, char* argv[])
   catch(std::exception& e)
   {
     std::cout << e.what();
-    
-  }
+}
 
   Hermes::Hermes2D::Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);
   

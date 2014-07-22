@@ -21,7 +21,7 @@ CustomWeakFormLinearElasticity::CustomWeakFormLinearElasticity(double E, double 
 // Jacobian lin elast 0-0
 double CustomWeakFormLinearElasticity::CustomJacobianElast00::value(int n, double *wt, Func<double> *u_ext[],
                                                    Func<double> *u, Func<double> *v,
-                                                   Geom<double> *e, Func<double>* *ext) const
+                                                   GeomVol<double> *e, Func<double>* *ext) const
 {
   double result = 0;
   for (int i = 0; i < n; i++)
@@ -34,7 +34,7 @@ double CustomWeakFormLinearElasticity::CustomJacobianElast00::value(int n, doubl
 
 Ord CustomWeakFormLinearElasticity::CustomJacobianElast00::ord(int n, double *wt, Func<Ord> *u_ext[],
                                               Func<Ord> *u, Func<Ord> *v,
-                                              Geom<Ord> *e, Func<Ord>* *ext) const
+                                              GeomVol<Ord> *e, Func<Ord>* *ext) const
 {
   Ord result = Ord(0);
   for (int i = 0; i < n; i++)
@@ -53,7 +53,7 @@ MatrixFormVol<double>* CustomWeakFormLinearElasticity::CustomJacobianElast00::cl
 // Jacobian lin elast 0-1
 double CustomWeakFormLinearElasticity::CustomJacobianElast01::value(int n, double *wt, Func<double> *u_ext[],
                                                    Func<double> *u, Func<double> *v,
-                                                   Geom<double> *e, Func<double>* *ext) const
+                                                   GeomVol<double> *e, Func<double>* *ext) const
 {
   double result = 0;
   for (int i = 0; i < n; i++)
@@ -66,7 +66,7 @@ double CustomWeakFormLinearElasticity::CustomJacobianElast01::value(int n, doubl
 
 Ord CustomWeakFormLinearElasticity::CustomJacobianElast01::ord(int n, double *wt, Func<Ord> *u_ext[],
                                               Func<Ord> *u, Func<Ord> *v,
-                                              Geom<Ord> *e, Func<Ord>* *ext) const
+                                              GeomVol<Ord> *e, Func<Ord>* *ext) const
 {
   Ord result = Ord(0);
   for (int i = 0; i < n; i++)
@@ -85,7 +85,7 @@ MatrixFormVol<double>* CustomWeakFormLinearElasticity::CustomJacobianElast01::cl
 // Jacobian lin elast 1-0
 double CustomWeakFormLinearElasticity::CustomJacobianElast10::value(int n, double *wt, Func<double> *u_ext[],
                                                    Func<double> *u, Func<double> *v,
-                                                   Geom<double> *e, Func<double>* *ext) const
+                                                   GeomVol<double> *e, Func<double>* *ext) const
 {
   double result = 0;
   for (int i = 0; i < n; i++)
@@ -98,7 +98,7 @@ double CustomWeakFormLinearElasticity::CustomJacobianElast10::value(int n, doubl
 
 Ord CustomWeakFormLinearElasticity::CustomJacobianElast10::ord(int n, double *wt, Func<Ord> *u_ext[],
                                               Func<Ord> *u, Func<Ord> *v,
-                                              Geom<Ord> *e, Func<Ord>* *ext) const
+                                              GeomVol<Ord> *e, Func<Ord>* *ext) const
 {
   Ord result = Ord(0);
   for (int i = 0; i < n; i++)
@@ -117,7 +117,7 @@ MatrixFormVol<double>* CustomWeakFormLinearElasticity::CustomJacobianElast10::cl
 // Jacobian lin elast 1-1
 double CustomWeakFormLinearElasticity::CustomJacobianElast11::value(int n, double *wt, Func<double> *u_ext[],
                                                    Func<double> *u, Func<double> *v,
-                                                   Geom<double> *e, Func<double>* *ext) const
+                                                   GeomVol<double> *e, Func<double>* *ext) const
 {
   double result = 0;
   for (int i = 0; i < n; i++)
@@ -130,7 +130,7 @@ double CustomWeakFormLinearElasticity::CustomJacobianElast11::value(int n, doubl
 
 Ord CustomWeakFormLinearElasticity::CustomJacobianElast11::ord(int n, double *wt, Func<Ord> *u_ext[],
                                               Func<Ord> *u, Func<Ord> *v,
-                                              Geom<Ord> *e, Func<Ord>* *ext) const
+                                              GeomVol<Ord> *e, Func<Ord>* *ext) const
 {
   Ord result = Ord(0);
   for (int i = 0; i < n; i++)
@@ -148,7 +148,7 @@ MatrixFormVol<double>* CustomWeakFormLinearElasticity::CustomJacobianElast11::cl
 
 //residuum lin elast 0
 double CustomWeakFormLinearElasticity::CustomVectorRes0::value(int n, double *wt, Func<double> *u_ext[],
-                                                   Func<double> *v, Geom<double> *e, Func<double>* *ext) const
+                                                   Func<double> *v, GeomVol<double> *e, Func<double>* *ext) const
 {
   double result = 0;
   for (int i = 0; i < n; i++)
@@ -160,7 +160,7 @@ double CustomWeakFormLinearElasticity::CustomVectorRes0::value(int n, double *wt
 }
 
 Ord CustomWeakFormLinearElasticity::CustomVectorRes0::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
-                                              Geom<Ord> *e, Func<Ord>* *ext) const
+                                              GeomVol<Ord> *e, Func<Ord>* *ext) const
 {
   Ord result = Ord(0);
   for (int i = 0; i < n; i++)
@@ -178,7 +178,7 @@ VectorFormVol<double>* CustomWeakFormLinearElasticity::CustomVectorRes0::clone()
 
 //residuum lin elast 1
 double CustomWeakFormLinearElasticity::CustomVectorRes1::value(int n, double *wt, Func<double> *u_ext[],
-                                                   Func<double> *v, Geom<double> *e, Func<double>* *ext) const
+                                                   Func<double> *v, GeomVol<double> *e, Func<double>* *ext) const
 {
   double result = 0;
   for (int i = 0; i < n; i++)
@@ -190,7 +190,7 @@ double CustomWeakFormLinearElasticity::CustomVectorRes1::value(int n, double *wt
 }
 
 Ord CustomWeakFormLinearElasticity::CustomVectorRes1::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
-                                              Geom<Ord> *e, Func<Ord>* *ext) const
+                                              GeomVol<Ord> *e, Func<Ord>* *ext) const
 {
   Ord result = Ord(0);
   for (int i = 0; i < n; i++)
@@ -339,7 +339,7 @@ MeshFunction<double>* ExactSolutionMu::clone() const
 
 
 // Custom filter S11
-void CustomFilterS11::filter_fn(int n, double* x, double* y, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
+void CustomFilterS11::filter_fn(int n, double* x, double* y, std::vector<const double*> values, std::vector<const double*> dx, std::vector<const double*> dy,
                       double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)
@@ -351,7 +351,7 @@ void CustomFilterS11::filter_fn(int n, double* x, double* y, Hermes::vector<doub
 }
 
 // Custom filter S12
-void CustomFilterS12::filter_fn(int n, double* x, double* y, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
+void CustomFilterS12::filter_fn(int n, double* x, double* y, std::vector<const double*> values, std::vector<const double*> dx, std::vector<const double*> dy,
                       double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)
@@ -363,7 +363,7 @@ void CustomFilterS12::filter_fn(int n, double* x, double* y, Hermes::vector<doub
 }
 
 // Custom filter S22
-void CustomFilterS22::filter_fn(int n, double* x, double* y, Hermes::vector<double*> values, Hermes::vector<double*> dx, Hermes::vector<double*> dy,
+void CustomFilterS22::filter_fn(int n, double* x, double* y, std::vector<const double*> values, std::vector<const double*> dx, std::vector<const double*> dy,
                       double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)

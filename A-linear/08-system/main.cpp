@@ -65,18 +65,14 @@ int main(int argc, char* argv[])
   // Create x- and y- displacement space using the default H1 shapeset.
   SpaceSharedPtr<double> u1_space(new H1Space<double>(mesh, &bcs, P_INIT));
   SpaceSharedPtr<double> u2_space(new H1Space<double>(mesh, &bcs, P_INIT));
-  Hermes::vector<SpaceSharedPtr<double> > spaces(u1_space, u2_space);
-  int ndof = Space<double>::get_num_dofs(spaces);
+  int ndof = Space<double>::get_num_dofs({ u1_space, u2_space });
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
   // Initialize the weak formulation.
-  CustomWeakFormLinearElasticity wf(E, nu, rho*g1, "Top", f0, f1);
-
-  // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, spaces);
+  WeakFormSharedPtr<double> wf(new CustomWeakFormLinearElasticity(E, nu, rho*g1, "Top", f0, f1));
 
   // Initialize Newton solver.
-  NewtonSolver<double> newton(&dp);
+  NewtonSolver<double> newton(wf, { u1_space, u2_space });
   newton.set_verbose_output(true);
 
   // Perform Newton's iteration.
@@ -87,12 +83,11 @@ int main(int argc, char* argv[])
   catch(std::exception& e)
   {
     std::cout << e.what();
-    
-  }
+}
 
   // Translate the resulting coefficient vector into the Solution sln.
   MeshFunctionSharedPtr<double> u1_sln(new Solution<double>), u2_sln(new Solution<double>);
-  Solution<double>::vector_to_solutions(newton.get_sln_vector(), spaces, Hermes::vector<MeshFunctionSharedPtr<double> >(u1_sln, u2_sln));
+  Solution<double>::vector_to_solutions(newton.get_sln_vector(), { u1_space, u2_space }, { u1_sln, u2_sln });
   
   // Visualize the solution.
   ScalarView view("Von Mises stress [Pa]", new WinGeom(590, 0, 700, 400));
@@ -100,9 +95,10 @@ int main(int argc, char* argv[])
   double lambda = (E * nu) / ((1 + nu) * (1 - 2*nu));  
   // Second Lame constant.
   double mu = E / (2*(1 + nu));                        
-  MeshFunctionSharedPtr<double> stress(new VonMisesFilter(Hermes::vector<MeshFunctionSharedPtr<double> >(u1_sln, u2_sln), lambda, mu));
+  MeshFunctionSharedPtr<double> stress(new VonMisesFilter({u1_sln, u2_sln}, lambda, mu));
   view.show_mesh(false);
-  view.show(stress, HERMES_EPS_HIGH, H2D_FN_VAL_0, u1_sln, u2_sln, 1.5e5);
+  view.set_linearizer_criterion(LinearizerCriterionAdaptive(HERMES_EPS_NORMAL));
+  view.show(stress, H2D_FN_VAL_0, u1_sln, u2_sln, 1.5e5);
 
   // Wait for the view to be closed.
   View::wait();

@@ -50,7 +50,7 @@ const int NEWTON_MAX_ITER = 100;
 //   Implicit_SDIRK_CASH_3_23_embedded, Implicit_ESDIRK_TRBDF2_3_23_embedded, Implicit_ESDIRK_TRX2_3_23_embedded,
 //   Implicit_SDIRK_BILLINGTON_3_23_embedded, Implicit_SDIRK_CASH_5_24_embedded, Implicit_SDIRK_CASH_5_34_embedded,
 //   Implicit_DIRK_ISMAIL_7_45_embedded.
-ButcherTableType butcher_table_type = Implicit_SDIRK_2_2;
+ButcherTableType butcher_table_type = Implicit_RK_1;
 
 // Problem parameters.
 // Parameter for nonlinear thermal conductivity.
@@ -90,13 +90,13 @@ int main(int argc, char* argv[])
   // Initialize the weak formulation
   CustomNonlinearity lambda(alpha);
   Hermes2DFunction<double> f(heat_src);
-  DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &f);
+  WeakFormSharedPtr<double> wf(new DefaultWeakFormPoisson<double>(HERMES_ANY, &lambda, &f));
 
   // Next time level solution.
   MeshFunctionSharedPtr<double> sln_time_new(new Solution<double>(mesh));
 
   // Initialize Runge-Kutta time stepping.
-  RungeKutta<double> runge_kutta(&wf, space, &bt);
+  RungeKutta<double> runge_kutta(wf, space, &bt);
 
   // Initialize views.
   ScalarView sview("Solution", new WinGeom(0, 0, 500, 400));
@@ -114,9 +114,9 @@ int main(int argc, char* argv[])
     bool block_diagonal_jacobian = false;
     double damping_coeff = 1.0;
     double max_allowed_residual_norm = 1e10;
-    Hermes::vector<MeshFunctionSharedPtr<double> > slns_time_prev;
+    std::vector<MeshFunctionSharedPtr<double> > slns_time_prev;
     slns_time_prev.push_back(sln_time_prev);
-    Hermes::vector<MeshFunctionSharedPtr<double> > slns_time_new;
+    std::vector<MeshFunctionSharedPtr<double> > slns_time_new;
     slns_time_new.push_back(sln_time_new);
     try
     {
@@ -141,7 +141,8 @@ int main(int argc, char* argv[])
     char title[100];
     sprintf(title, "Solution, t = %g", current_time);
     sview.set_title(title);
-    sview.show(sln_time_new, HERMES_EPS_HIGH);
+    sview.set_linearizer_criterion(LinearizerCriterionAdaptive(HERMES_EPS_HIGH));
+    sview.show(sln_time_new);
     oview.show(space);
 
     // Copy solution for the new time step.

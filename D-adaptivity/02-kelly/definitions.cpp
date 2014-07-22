@@ -29,7 +29,7 @@ double CustomWeakFormPoisson::get_element_eps(Hermes2D::Geom< double >* e)
 
 double ResidualErrorForm::value(int n, double* wt, 
                                 Func< double >* u_ext[], Func< double >* u, 
-                                Geom< double >* e, ExtData< double >* ext) const
+                                GeomVol< double >* e, ExtData< double >* ext) const
 {
 #ifdef H2D_SECOND_DERIVATIVES_ENABLED
   double result = 0.;
@@ -47,7 +47,7 @@ double ResidualErrorForm::value(int n, double* wt,
 
 Ord ResidualErrorForm::ord(int n, double* wt, 
                                    Func< Ord >* u_ext[], Func< Ord >* u, 
-                                   Geom< Ord >* e, ExtData< Ord >* ext) const
+                                   GeomVol< Ord >* e, ExtData< Ord >* ext) const
 {
 #ifdef H2D_SECOND_DERIVATIVES_ENABLED
   return sqr(u->laplace[0]);
@@ -59,7 +59,7 @@ Ord ResidualErrorForm::ord(int n, double* wt,
 
 double EnergyErrorForm::value(int n, double* wt, 
                               Func< double >* u_ext[], Func< double >* u, Func< double >* v, 
-                              Geom< double >* e, ExtData< double >* ext) const
+                              GeomVol< double >* e, ExtData< double >* ext) const
 {
   double result = 0;
   for (int i = 0; i < n; i++)
@@ -70,7 +70,7 @@ double EnergyErrorForm::value(int n, double* wt,
 
 Ord EnergyErrorForm::ord(int n, double* wt, 
                                  Func< Ord >* u_ext[], Func< Ord >* u, Func< Ord >* v,
-                                 Geom< Ord >* e, ExtData< Ord >* ext) const
+                                 GeomVol< Ord >* e, ExtData< Ord >* ext) const
 {
   return u->dx[0] * v->dx[0] + u->dy[0] * v->dy[0];
 }

@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
   // Create H1 spaces with default shapesets.
   SpaceSharedPtr<double> t_space(new H1Space<double>(mesh, &bcs_t, P_INIT));
   SpaceSharedPtr<double> c_space(new H1Space<double>(mesh, &bcs_c, P_INIT));
-  int ndof = Space<double>::get_num_dofs(Hermes::vector<SpaceSharedPtr<double> >(t_space, c_space));
+  int ndof = Space<double>::get_num_dofs(std::vector<SpaceSharedPtr<double> >(t_space, c_space));
   Hermes::Mixins::Loggable::Static::info("ndof = %d.", ndof);
 
   // Define initial conditions.
@@ -96,9 +96,9 @@ int main(int argc, char* argv[])
   MeshFunctionSharedPtr<double> c_prev_newton(new Solution<double>);
 
   // Filters for the reaction rate omega and its derivatives.
-  MeshFunctionSharedPtr<double> omega(new CustomFilter(Hermes::vector<MeshFunctionSharedPtr<double> >(t_prev_time_1, c_prev_time_1), Le, alpha, beta, kappa, x1, TAU));
-  MeshFunctionSharedPtr<double> omega_dt(new CustomFilterDt(Hermes::vector<MeshFunctionSharedPtr<double> >(t_prev_time_1, c_prev_time_1), Le, alpha, beta, kappa, x1, TAU));
-  MeshFunctionSharedPtr<double> omega_dc(new CustomFilterDc(Hermes::vector<MeshFunctionSharedPtr<double> >(t_prev_time_1, c_prev_time_1), Le, alpha, beta, kappa, x1, TAU));
+  MeshFunctionSharedPtr<double> omega(new CustomFilter({t_prev_time_1, c_prev_time_1}, Le, alpha, beta, kappa, x1, TAU));
+  MeshFunctionSharedPtr<double> omega_dt(new CustomFilterDt({t_prev_time_1, c_prev_time_1}, Le, alpha, beta, kappa, x1, TAU));
+  MeshFunctionSharedPtr<double> omega_dc(new CustomFilterDc({t_prev_time_1, c_prev_time_1}, Le, alpha, beta, kappa, x1, TAU));
 
   // Initialize visualization.
   ScalarView rview("Reaction rate", new WinGeom(0, 0, 800, 230));
@@ -111,18 +111,15 @@ int main(int argc, char* argv[])
   // in order to obtain initial vector for NOX. 
   Hermes::Mixins::Loggable::Static::info("Projecting initial solutions on the FE meshes.");
   double* coeff_vec = new double[ndof];
-  OGProjection<double>::project_global(Hermes::vector<SpaceSharedPtr<double> >(t_space, c_space), 
-                                       Hermes::vector<MeshFunctionSharedPtr<double> >(t_prev_time_1, c_prev_time_1),
+  OGProjection<double>::project_global({t_space, c_space}, 
+                                       {t_prev_time_1, c_prev_time_1},
                                        coeff_vec);
 
   // Measure the projection time.
   double proj_time = cpu_time.tick().last();
 
-  // Initialize finite element problem.
-  DiscreteProblemNOX<double> dp(&wf, Hermes::vector<SpaceSharedPtr<double> >(t_space, c_space));
-
   // Initialize NOX solver and preconditioner.
-  NewtonSolverNOX<double> solver(&dp);
+  NewtonSolverNOX<double> solver(wf, { t_space, c_space });
   MlPrecond<double> pc("sa");
   if (PRECOND)
   {
@@ -151,10 +148,9 @@ int main(int argc, char* argv[])
     catch(std::exception& e)
     {
       std::cout << e.what();
-      
-    }
+}
 
-    Solution<double>::vector_to_solutions(solver.get_sln_vector(), Hermes::vector<SpaceSharedPtr<double> >(t_space, c_space),  Hermes::vector<MeshFunctionSharedPtr<double> >(t_prev_newton, c_prev_newton));
+    Solution<double>::vector_to_solutions(solver.get_sln_vector(), {t_space, c_space},  std::vector<MeshFunctionSharedPtr<double> >(t_prev_newton, c_prev_newton));
 
     cpu_time.tick();
     Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)",

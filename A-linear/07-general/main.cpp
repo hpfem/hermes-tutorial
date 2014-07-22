@@ -56,10 +56,10 @@ int main(int argc, char* argv[])
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
   // Initialize the weak formulation.
-  CustomWeakFormGeneral wf("Horizontal");
+  WeakFormSharedPtr<double> wf(new CustomWeakFormGeneral("Horizontal"));
 
   // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, space);
+  DiscreteProblem<double> dp(wf, space);
 
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp);
@@ -72,8 +72,7 @@ int main(int argc, char* argv[])
   catch(std::exception& e)
   {
     std::cout << e.what();
-    
-  }
+}
 
   // Translate the resulting coefficient vector into a Solution.
   MeshFunctionSharedPtr<double> sln(new Solution<double>);

@@ -52,8 +52,8 @@ int main(int argc, char* argv[])
   // Define nonlinear thermal conductivity lambda(u) via a cubic spline.
   // Step 1: Fill the x values and use lambda_macro(u) = 1 + u^4 for the y values.
   #define lambda_macro(x) (1 + std::pow(x, 4))
-  Hermes::vector<double> lambda_pts(-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0);
-  Hermes::vector<double> lambda_val;
+  std::vector<double> lambda_pts({ -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0 });
+  std::vector<double> lambda_val;
   for (unsigned int i = 0; i < lambda_pts.size(); i++) lambda_val.push_back(lambda_macro(lambda_pts[i]));
   // Step 2: Create the cubic spline (and plot it for visual control). 
   double bc_left = 0.0;
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation
   Hermes2DFunction<double> f(-heat_src);
-  WeakFormsH1::DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &f);
+  WeakFormSharedPtr<double> wf(new WeakFormsH1::DefaultWeakFormPoisson<double>(HERMES_ANY, &lambda, &f));
 
   // Create a selector which will select optimal candidate.
   H1ProjBasedSelector<double> selector(CAND_LIST, H2DRS_DEFAULT_ORDER);
@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
 
   // Initialize Newton solver on coarse mesh.
   Hermes::Mixins::Loggable::Static::info("Solving on coarse mesh:");
-  NewtonSolver<double> newton_coarse(&wf, space);
+  NewtonSolver<double> newton_coarse(wf, space);
 
   try
   {
@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
   Solution<double>::vector_to_solution(newton_coarse.get_sln_vector(), space, sln);
 
   // Cleanup after the Newton loop on the coarse mesh.
-  NewtonSolver<double> newton(&wf, space);
+  NewtonSolver<double> newton(wf, space);
   newton.set_verbose_output(Hermes::Mixins::Loggable::Static::info);
 
   // Adaptivity loop.
@@ -176,8 +176,7 @@ int main(int argc, char* argv[])
     catch(std::exception& e)
     {
       std::cout << e.what();
-      
-    }
+}
 
     // Translate the resulting coefficient vector into the Solution<double> ref_sln.
     Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, ref_sln);
@@ -222,7 +221,7 @@ int main(int argc, char* argv[])
 
     as++;
   }
-  while (done == false);
+  while (!done);
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 

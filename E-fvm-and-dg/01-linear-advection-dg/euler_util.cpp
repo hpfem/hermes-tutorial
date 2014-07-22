@@ -2,16 +2,16 @@
 #include "limits.h"
 #include <limits>
 
-DiscontinuityDetector::DiscontinuityDetector(Hermes::vector<SpaceSharedPtr<double> > spaces, 
-  Hermes::vector<MeshFunctionSharedPtr<double> > solutions) : spaces(spaces), solutions(solutions)
+DiscontinuityDetector::DiscontinuityDetector(std::vector<SpaceSharedPtr<double> > spaces, 
+  std::vector<MeshFunctionSharedPtr<double> > solutions) : spaces(spaces), solutions(solutions)
 {
 };
 
 DiscontinuityDetector::~DiscontinuityDetector()
 {};
 
-KrivodonovaDiscontinuityDetector::KrivodonovaDiscontinuityDetector(Hermes::vector<SpaceSharedPtr<double> > spaces, 
-  Hermes::vector<MeshFunctionSharedPtr<double> > solutions) : DiscontinuityDetector(spaces, solutions)
+KrivodonovaDiscontinuityDetector::KrivodonovaDiscontinuityDetector(std::vector<SpaceSharedPtr<double> > spaces, 
+  std::vector<MeshFunctionSharedPtr<double> > solutions) : DiscontinuityDetector(spaces, solutions)
 {
   // A check that all meshes are the same in the spaces.
   unsigned int mesh0_seq = spaces[0]->get_mesh()->get_seq();
@@ -88,7 +88,7 @@ double KrivodonovaDiscontinuityDetector::calculate_relative_flow_direction(Eleme
   int np = solutions[1]->get_quad_2d()->get_num_points(eo, e->get_mode());
 
   double3* tan = NULL;
-  Geom<double>* geom = init_geom_surf(solutions[0]->get_refmap(), edge_i, e->marker, eo, tan);
+  GeomSurf<double>* geom = init_geom_surf(solutions[0]->get_refmap(), edge_i, e->marker, eo, tan);
   double* jwt = new double[np];
   for(int i = 0; i < np; i++)
     jwt[i] = pt[i][2] * tan[i][2];
@@ -101,11 +101,8 @@ double KrivodonovaDiscontinuityDetector::calculate_relative_flow_direction(Eleme
   for(int point_i = 0; point_i < np; point_i++)
     result += jwt[point_i] * density_vel_x->val[point_i] * geom->nx[point_i] + density_vel_y->val[point_i] * geom->ny[point_i];
 
-  geom->free();
   delete geom;
   delete [] jwt;
-  density_vel_x->free_fn();
-  density_vel_y->free_fn();
   delete density_vel_x;
   delete density_vel_y;
 
@@ -147,7 +144,7 @@ void KrivodonovaDiscontinuityDetector::calculate_jumps(Element* e, int edge_i, d
     }
 
     double3* tan = NULL;
-    Geom<double>* geom = init_geom_surf(solutions[0]->get_refmap(), edge_i, e->marker, eo, tan);
+    GeomSurf<double>* geom = init_geom_surf(solutions[0]->get_refmap(), edge_i, e->marker, eo, tan);
     double* jwt = new double[np];
     for(int i = 0; i < np; i++)
       jwt[i] = pt[i][2] * tan[i][2];
@@ -191,17 +188,8 @@ void KrivodonovaDiscontinuityDetector::calculate_jumps(Element* e, int edge_i, d
       result[3] += jwt[point_i] * std::abs(energy_discontinuous.val[point_i] - energy_discontinuous.val_neighbor[point_i]);
     }
 
-    geom->free();
     delete geom;
     delete [] jwt;
-    density->free_fn();
-    density_vel_x->free_fn();
-    density_vel_y->free_fn();
-    energy->free_fn();
-    density_neighbor->free_fn();
-    density_vel_x_neighbor->free_fn();
-    density_vel_y_neighbor->free_fn();
-    energy_neighbor->free_fn();
 
     delete density;
     delete density_vel_x;
@@ -238,7 +226,7 @@ void KrivodonovaDiscontinuityDetector::calculate_norms(Element* e, int edge_i, d
   int np = solutions[0]->get_quad_2d()->get_num_points(eo, e->get_mode());
 
   double3* tan = NULL;
-  Geom<double>* geom = init_geom_surf(solutions[0]->get_refmap(), edge_i, e->marker, eo, tan);
+  GeomSurf<double>* geom = init_geom_surf(solutions[0]->get_refmap(), edge_i, e->marker, eo, tan);
   double* jwt = new double[np];
   for(int i = 0; i < np; i++)
     jwt[i] = pt[i][2] * tan[i][2];
@@ -256,14 +244,8 @@ void KrivodonovaDiscontinuityDetector::calculate_norms(Element* e, int edge_i, d
     result[3] = std::max(result[3], std::abs(energy->val[point_i]));
   }
 
-  geom->free();
   delete geom;
   delete [] jwt;
-
-  density->free_fn();
-  density_vel_x->free_fn();
-  density_vel_y->free_fn();
-  energy->free_fn();
 
   delete density;
   delete density_vel_x;
@@ -271,8 +253,8 @@ void KrivodonovaDiscontinuityDetector::calculate_norms(Element* e, int edge_i, d
   delete energy;
 };
 
-KuzminDiscontinuityDetector::KuzminDiscontinuityDetector(Hermes::vector<SpaceSharedPtr<double> > spaces, 
-  Hermes::vector<MeshFunctionSharedPtr<double> > solutions, bool limit_all_orders_independently) : DiscontinuityDetector(spaces, solutions), limit_all_orders_independently(limit_all_orders_independently)
+KuzminDiscontinuityDetector::KuzminDiscontinuityDetector(std::vector<SpaceSharedPtr<double> > spaces, 
+  std::vector<MeshFunctionSharedPtr<double> > solutions, bool limit_all_orders_independently) : DiscontinuityDetector(spaces, solutions), limit_all_orders_independently(limit_all_orders_independently)
 {
   // A check that all meshes are the same in the spaces.
   unsigned int mesh0_seq = spaces[0]->get_mesh()->get_seq();
@@ -680,7 +662,7 @@ void KuzminDiscontinuityDetector::find_alpha_i_second_order(double u_d_i_min[1][
   }
 }
 
-FluxLimiter::FluxLimiter(FluxLimiter::LimitingType type, double* solution_vector, Hermes::vector<SpaceSharedPtr<double> > spaces, bool Kuzmin_limit_all_orders_independently) : solution_vector(solution_vector), spaces(spaces)
+FluxLimiter::FluxLimiter(FluxLimiter::LimitingType type, double* solution_vector, std::vector<SpaceSharedPtr<double> > spaces, bool Kuzmin_limit_all_orders_independently) : solution_vector(solution_vector), spaces(spaces)
 {
   for(unsigned int sol_i = 0; sol_i < spaces.size(); sol_i++)
     limited_solutions.push_back(new Hermes::Hermes2D::Solution<double>(spaces[sol_i]->get_mesh()));
@@ -721,7 +703,7 @@ FluxLimiter::~FluxLimiter()
   delete detector;
 };
 
-void FluxLimiter::get_limited_solutions(Hermes::vector<MeshFunctionSharedPtr<double> > solutions_to_limit)
+void FluxLimiter::get_limited_solutions(std::vector<MeshFunctionSharedPtr<double> > solutions_to_limit)
 {
   for(unsigned int i = 0; i < solutions_to_limit.size(); i++)
     solutions_to_limit[i]->copy(this->limited_solutions[i]);
@@ -734,7 +716,7 @@ void FluxLimiter::get_limited_solution(MeshFunctionSharedPtr<double> solution_to
   solution_to_limit->copy(this->limited_solutions[0]);
 }
 
-void FluxLimiter::limit_according_to_detector(Hermes::vector<SpaceSharedPtr<double> > coarse_spaces_to_limit)
+void FluxLimiter::limit_according_to_detector(std::vector<SpaceSharedPtr<double> > coarse_spaces_to_limit)
 {
   std::set<int> discontinuous_elements = this->detector->get_discontinuous_element_ids();
 
@@ -753,7 +735,7 @@ void FluxLimiter::limit_according_to_detector(Hermes::vector<SpaceSharedPtr<doub
     // Now adjust the solutions.
     Solution<double>::vector_to_solutions(solution_vector, spaces, limited_solutions);
 
-    if(coarse_spaces_to_limit != Hermes::vector<SpaceSharedPtr<double> >()) 
+    if(coarse_spaces_to_limit != std::vector<SpaceSharedPtr<double> >()) 
     {
       // Now set the element order to zero.
       Element* e;
@@ -785,7 +767,7 @@ void FluxLimiter::limit_according_to_detector(Hermes::vector<SpaceSharedPtr<doub
     }
 };
 
-void FluxLimiter::limit_second_orders_according_to_detector(Hermes::vector<SpaceSharedPtr<double> > coarse_spaces_to_limit)
+void FluxLimiter::limit_second_orders_according_to_detector(std::vector<SpaceSharedPtr<double> > coarse_spaces_to_limit)
 {
 #ifdef H2D_USE_SECOND_DERIVATIVES
   std::set<int> discontinuous_elements;
@@ -820,7 +802,7 @@ void FluxLimiter::limit_second_orders_according_to_detector(Hermes::vector<Space
       this->detector = new KrivodonovaDiscontinuityDetector(spaces, limited_solutions);
     }
 
-    if(coarse_spaces_to_limit != Hermes::vector<SpaceSharedPtr<double> >()) 
+    if(coarse_spaces_to_limit != std::vector<SpaceSharedPtr<double> >()) 
     {
       // Now set the element order to zero.
       Element* e;

@@ -115,10 +115,10 @@ int main(int argc, char* argv[])
       done = adaptivity.adapt(&selector);
       
       // Increase the counter of performed adaptivity steps.
-      if (done == false)  as++;
+      if (!done)  as++;
     }
   }
-  while (done == false);
+  while (!done);
   
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 

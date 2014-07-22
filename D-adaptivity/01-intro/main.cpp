@@ -69,12 +69,12 @@ int main(int argc, char* argv[])
   mloader.load("domain.mesh", mesh);
 
   // Initialize the weak formulation.
-  CustomWeakFormPoisson wf("Motor", EPS_MOTOR, "Air", EPS_AIR);
+  WeakFormSharedPtr<double> wf(new CustomWeakFormPoisson("Motor", EPS_MOTOR, "Air", EPS_AIR));
   
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_essential_out("Outer", 0.0);
   DefaultEssentialBCConst<double> bc_essential_stator("Stator", VOLTAGE);
-  EssentialBCs<double> bcs(Hermes::vector<EssentialBoundaryCondition<double> *>(&bc_essential_out, &bc_essential_stator));
+  EssentialBCs<double> bcs({ &bc_essential_out, &bc_essential_stator });
 
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
@@ -100,8 +100,7 @@ int main(int argc, char* argv[])
   // Time measurement.
   Hermes::Mixins::TimeMeasurable cpu_time;
 
-  DiscreteProblem<double> dp(&wf, space);
-  NewtonSolver<double> newton(&dp);
+  NewtonSolver<double> newton(wf, space);
   newton.set_verbose_output(true);
 
   // Adaptivity loop:
@@ -149,7 +148,7 @@ int main(int argc, char* argv[])
     if (VTK_VISUALIZATION) 
     {
       // Output solution in VTK format.
-      Views::Linearizer lin;
+      Views::Linearizer lin(FileExport);
       char* title = new char[100];
       sprintf(title, "sln-%d.vtk", as);
       lin.save_solution_vtk(ref_sln, title, "Potential", false);
@@ -200,11 +199,11 @@ int main(int argc, char* argv[])
       done = adaptivity.adapt(&selector);
 
       // Increase the counter of performed adaptivity steps.
-      if (done == false)  
+      if (!done)  
         as++;
     }
   }
-  while (done == false);
+  while (!done);
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 

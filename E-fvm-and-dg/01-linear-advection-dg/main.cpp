@@ -64,14 +64,10 @@ int main(int argc, char* args[])
     MeshFunctionSharedPtr<double> sln_l2(new Solution<double>);
 
     // Initialize the weak formulation.
-    CustomWeakForm wf_l2(BDY_BOTTOM_LEFT);
-
-    // Initialize the FE problem.
-    DiscreteProblem<double> dp_l2(&wf_l2, space_l2);
-    dp_l2.set_linear();
+    WeakFormSharedPtr<double> wf_l2(new CustomWeakForm(BDY_BOTTOM_LEFT));
 
     // Initialize linear solver.
-    Hermes::Hermes2D::LinearSolver<double> linear_solver(&dp_l2);
+    Hermes::Hermes2D::LinearSolver<double> linear_solver(wf_l2, space_l2);
 
     Hermes::Mixins::Loggable::Static::info("Assembling Discontinuous Galerkin (nelem: %d, ndof: %d).", mesh->get_num_active_elements(), space_l2->get_num_dofs());
 
@@ -101,8 +97,7 @@ int main(int argc, char* args[])
     catch(std::exception& e)
     {
       std::cout << e.what();
-      
-    }
+}
   }
   if(WANT_FEM)
   {
@@ -113,16 +108,12 @@ int main(int argc, char* args[])
     MeshFunctionSharedPtr<double> sln_h1(new Solution<double>);
 
     // Initialize the weak formulation.
-    CustomWeakForm wf_h1(BDY_BOTTOM_LEFT, false);
-
-    // Initialize the FE problem.
-    DiscreteProblem<double> dp_h1(&wf_h1, space_h1);
-    dp_h1.set_linear();
+    WeakFormSharedPtr<double> wf_h1(new CustomWeakForm(BDY_BOTTOM_LEFT, false));
 
     Hermes::Mixins::Loggable::Static::info("Assembling Continuous FEM (nelem: %d, ndof: %d).", mesh->get_num_active_elements(), space_h1->get_num_dofs());
 
     // Initialize linear solver.
-    Hermes::Hermes2D::LinearSolver<double> linear_solver(&dp_h1);
+    Hermes::Hermes2D::LinearSolver<double> linear_solver(wf_h1, space_h1);
 
     // Solve the linear system. If successful, obtain the solution.
     Hermes::Mixins::Loggable::Static::info("Solving Continuous FEM.");
