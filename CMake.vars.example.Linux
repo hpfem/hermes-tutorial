@@ -1,0 +1,10 @@
+# LINUX
+
+# Hermes library installation directory (corresponds to CMAKE_INSTALL_PREFIX in the hermes CMake configuration + the library subdirectory)
+set(HERMES_DIRECTORY "/usr/local/lib")
+
+# Hermes headers installation directory (corresponds to CMAKE_INSTALL_PREFIX in the hermes CMake configuration + the headers subdirectory)
+set(HERMES_INCLUDE_PATH "/usr/local/include")
+
+# Hermes CMake.vars with installation configuration - if you installed Hermes and you did not use a CMake.vars file at all, default values are used and the following is ignored.
+set(HERMES_CMAKE_VARS_FILE_LOCATION "~/hermes/CMake.vars")

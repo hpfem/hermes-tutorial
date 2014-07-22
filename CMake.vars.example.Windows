@@ -1,0 +1,10 @@
+# WINDOWS
+
+# Hermes library installation directory (corresponds to CMAKE_INSTALL_PREFIX in the hermes CMake configuration + the library subdirectory)
+set(HERMES_DIRECTORY "d:/hpfem/hermes/dependencies/lib")
+
+# Hermes headers installation directory (corresponds to CMAKE_INSTALL_PREFIX in the hermes CMake configuration + the headers subdirectory)
+set(HERMES_INCLUDE_PATH "d:/hpfem/hermes/dependencies/include")
+
+# Hermes CMake.vars file with installation configuration corresponding to the installed version (otherwise linking problems will occur).
+set(HERMES_CMAKE_VARS_FILE_LOCATION "d:/hpfem/hermes/l-korous/hermes/CMake.vars")

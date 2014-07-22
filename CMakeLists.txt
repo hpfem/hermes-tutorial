@@ -1,8 +1,31 @@
 project(hermes-tutorial)
 	cmake_minimum_required(VERSION 2.8)
+  
+###########################################################################
+#############//////---------------------------------\\\\\\#################
+#############!!!!!! NEVER CHANGE THIS FILE DIRECTLY !!!!!!#################
+################!!!!!! USE the "CMake.vars" file !!!!!!####################
+#############\\\\\\---------------------------------//////#################
+###########################################################################
+#   __      __      __      __      __      __      __      __      __    #
+# /    \  /    \  /    \  /    \  /    \  /    \  /    \  /    \  /    \  #
+#| STOP || STOP || STOP || STOP || STOP || STOP || STOP || STOP || STOP | #
+# \ __ /  \ __ /  \ __ /  \ __ /  \ __ /  \ __ /  \ __ /  \ __ /  \ __ /  #
+#   ||      ||      ||      ||      ||      ||      ||      ||      ||    #
+#   ||      ||      ||      ||      ||      ||      ||      ||      ||    #
+#   ||      ||      ||      ||      ||      ||      ||      ||      ||    #
+#   ||      ||      ||      ||      ||      ||      ||      ||      ||    #
+#  /  \    /  \    /  \    /  \    /  \    /  \    /  \    /  \    /  \   #
+# ~~~~~~~ ~~~~~~~ ~~~~~~~ ~~~~~~~ ~~~~~~~ ~~~~~~~ ~~~~~~~ ~~~~~~~ ~~~~~~~ #
+###########################################################################
+#############//////---------------------------------\\\\\\#################
+#############!!!!!! NEVER CHANGE THIS FILE DIRECTLY !!!!!!#################
+################!!!!!! USE the "CMake.vars" file !!!!!!####################
+#############\\\\\\---------------------------------//////#################
+###########################################################################
 
-    set(CMAKE_MODULE_PATH ${CMAKE_HOME_DIRECTORY}/cmake)
-    include(CommonTargetProperties)
+  set(CMAKE_MODULE_PATH ${CMAKE_HOME_DIRECTORY}/cmake)
+  include(CommonTargetProperties)
 
   # For Win64
   if(${CMAKE_CL_64})
@@ -11,27 +34,15 @@ project(hermes-tutorial)
     set(WIN64 NO)
   endif(${CMAKE_CL_64})
 
-  # This has to be the same as in the library's CMake.
-  # Default "yes"
-  set(H2D_WITH_GLUT YES)
-  set(WITH_TC_MALLOC NO)
-  set(WITH_PARALUTION YES)
-  set(WITH_UMFPACK YES)
-  set(WITH_OPENMP YES)
-  # Default "no"
-  set(WITH_EXODUSII NO)
-  set(WITH_MUMPS NO)
-  set(WITH_MATIO NO)
-  set(WITH_BSON NO)
-  set(WITH_SUPERLU NO)
-
   # Where to look for the static libraries.
   set(HERMES_DIRECTORY /usr/local/lib)
   set(HERMES_INCLUDE_PATH /usr/local/include)
-  set(DEP_INCLUDE_PATHS /usr/local/include)
+  set(HERMES_SOURCE_DIRECTORY ~/hermes)
 
   # Allow to override the default values in CMake.vars:
   include(CMake.vars OPTIONAL)
+  include(".CMake.vars.default.Linux" OPTIONAL)
+  include(${HERMES_CMAKE_VARS_FILE_LOCATION} OPTIONAL)
 
   if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		# Disable all warnings and turn on only important ones:
@@ -127,7 +138,6 @@ project(hermes-tutorial)
 
   include_directories(${HERMES_COMMON_INCLUDE_PATH})
   include_directories(${HERMES2D_INCLUDE_PATH})
-  include_directories(${DEP_INCLUDE_PATHS})
 
   # Linear problems.
   add_subdirectory(A-linear)
@@ -152,16 +162,17 @@ project(hermes-tutorial)
   # Miscellaneous techniques.
   add_subdirectory(G-miscellaneous)
 
-  #------------------------------------------------------------------------------
+  #--------
   # Report.
   #~~~~~~~~
-  message("\nHermes-tutorial Configuration results")
-  message("---------------------")
+
+  message("\nHermes Tutorial Configuration results")
+  message("-------------------------------------")
   if(WIN32)
     message("Build for Win64: ${WIN64}")
   endif(WIN32)
-
-  message("\n-------Features-------")
+  
+  message("\n--------------Features---------------")
   message("Build with OpenMP: ${WITH_OPENMP}")
   message("Build with TCMalloc: ${WITH_TC_MALLOC}")
   message("Build with BSON: ${WITH_BSON}")
@@ -173,14 +184,20 @@ project(hermes-tutorial)
     message("Build with MPI: ${WITH_MPI}")
   endif()
   message("Build with EXODUSII: ${WITH_EXODUSII}")
-
-  message("\n-------Solvers-------")
+  message("-------------------------------------")
+  
+  message("\n---------------Solvers---------------")
   message("Build with UMFPACK: ${WITH_UMFPACK}")
   message("Build with PARALUTION: ${WITH_PARALUTION}")
-  message("Build with PETSC: !TO_DO!")
+  message("Build with PETSC: ${WITH_PETSC}")
   message("Build with MUMPS: ${WITH_MUMPS}")
   message("Build with SUPERLU${MT}: ${WITH_SUPERLU}")
-  message("Build with TRILINOS: !TO_DO!")
-
-  message("---------------------")
+  message("Build with TRILINOS: ${WITH_TRILINOS}")
+  message("-------------------------------------")
+  
+  if(WITH_H2D)
+    message("\n--------------Hermes2D---------------")
+    message(" Hermes2D with OpenGL: ${H2D_WITH_GLUT}")
+  endif(WITH_H2D)
+  message("-------------------------------------")
   message("\n")
