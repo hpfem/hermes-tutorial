@@ -11,7 +11,7 @@ using namespace Hermes::Hermes2D::Views;
 // The following parameters can be changed:
 
 // Number of initial uniform mesh refinements.
-const int INIT_REF_NUM = 4;                       
+const int INIT_REF_NUM = 4;
 // Polynomial degree of mesh elements.
 const int P_INIT = 1;
 
@@ -49,4 +49,3 @@ int main(int argc, char* argv[])
   View::wait();
   return 0;
 }
-

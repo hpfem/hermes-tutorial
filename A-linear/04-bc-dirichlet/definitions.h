@@ -11,8 +11,8 @@ class CustomWeakFormPoissonDirichlet : public WeakForm<double>
 {
 public:
   CustomWeakFormPoissonDirichlet(std::string mat_al, double lambda_al,
-                                 std::string mat_cu, double lambda_cu,
-                                 double vol_heat_src);
+    std::string mat_cu, double lambda_cu,
+    double vol_heat_src);
 };
 
 /* Custom non-constant Dirichlet condition */
@@ -22,11 +22,10 @@ class CustomDirichletCondition : public EssentialBoundaryCondition<double>
 public:
   CustomDirichletCondition(std::vector<std::string> markers, double A, double B, double C);
 
-  virtual EssentialBoundaryCondition<double>::EssentialBCValueType get_value_type() const; 
+  virtual EssentialBoundaryCondition<double>::EssentialBCValueType get_value_type() const;
 
-  virtual double value(double x, double y) const; 
+  virtual double value(double x, double y) const;
 
-  protected:
-    double A, B, C;
+protected:
+  double A, B, C;
 };
-

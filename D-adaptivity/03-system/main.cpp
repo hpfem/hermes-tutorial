@@ -32,23 +32,23 @@
 // single-mesh using the MULTI parameter.
 
 // Initial polynomial degree for u.
-const int P_INIT_U = 2;                           
+const int P_INIT_U = 2;
 // Initial polynomial degree for v.
-const int P_INIT_V = 1;                           
+const int P_INIT_V = 1;
 // Number of initial boundary refinements
-const int INIT_REF_BDY = 5;                       
+const int INIT_REF_BDY = 5;
 // MULTI = true  ... use multi-mesh,
 // MULTI = false ... use single-mesh.
 // Note: In the single mesh option, the meshes are
 // forced to be geometrically the same but the
 // polynomial degrees can still vary.
-const bool MULTI = true;                          
+const bool MULTI = true;
 // Parameter influencing the candidate selection.
 const double THRESHOLD = .8;
 // Predefined list of element refinement candidates. Possible values are
 // H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO,
 // H2D_HP_ANISO_H, H2D_HP_ANISO_P, H2D_HP_ANISO.
-const CandList CAND_LIST = H2D_HP_ANISO;          
+const CandList CAND_LIST = H2D_HP_ANISO;
 // Stopping criterion for adaptivity.
 const double ERR_STOP = 1.0;
 // Error calculation & adaptivity.
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation.
   WeakFormSharedPtr<double> wf(new CustomWeakForm(&g1, &g2));
-  
+
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_u("Bdy", 0.0);
   EssentialBCs<double> bcs_u(&bc_u);
@@ -129,15 +129,15 @@ int main(int argc, char* argv[])
   Views::OrderView o_view_1("Mesh[1]", new Views::WinGeom(1330, 0, 420, 350));
 
   // DOF and CPU convergence graphs.
-  SimpleGraph graph_dof_est, graph_cpu_est; 
+  SimpleGraph graph_dof_est, graph_cpu_est;
   SimpleGraph graph_dof_exact, graph_cpu_exact;
 
   // Newton
   NewtonSolver<double> newton(wf, { u_space, v_space });
   newton.set_tolerance(1e-1, Hermes::Solvers::ResidualNormAbsolute);
-    
+
   // Adaptivity loop:
-  int as = 1; 
+  int as = 1;
   bool done = false;
   do
   {
@@ -155,17 +155,17 @@ int main(int argc, char* argv[])
 
     // Initialize reference problem.
     Hermes::Mixins::Loggable::Static::info("Solving on reference mesh.");
-    
+
     // Time measurement.
     cpu_time.tick();
-    
+
     // Perform Newton's iteration.
     try
     {
       newton.set_spaces({ u_ref_space, v_ref_space });
       newton.solve();
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
       std::cout << e.what();
     }
@@ -176,20 +176,20 @@ int main(int argc, char* argv[])
     // Project the fine mesh solution onto the coarse mesh.
     Hermes::Mixins::Loggable::Static::info("Projecting reference solution on coarse mesh.");
     OGProjection<double>::project_global({ u_space, v_space },
-                                 {u_ref_sln, v_ref_sln}, 
-                                 { u_sln, v_sln });
-   
+    { u_ref_sln, v_ref_sln },
+    { u_sln, v_sln });
+
     cpu_time.tick();
 
     // View the coarse mesh solution and polynomial orders.
-    s_view_0.show(u_sln); 
+    s_view_0.show(u_sln);
     o_view_0.show(u_space);
-    s_view_1.show(v_sln); 
+    s_view_1.show(v_sln);
     o_view_1.show(v_space);
 
     // Calculate element errors and total error estimate.
-    errorCalculator.calculate_errors({u_sln, v_sln},
-      {exact_u, exact_v}, false);
+    errorCalculator.calculate_errors({ u_sln, v_sln },
+    { exact_u, exact_v }, false);
     double err_exact_rel = errorCalculator.get_total_error_squared() * 100;
     // Calculate exact error.
     errorCalculator.calculate_errors({ u_sln, v_sln }, { u_ref_sln, v_ref_sln });
@@ -200,12 +200,12 @@ int main(int argc, char* argv[])
 
     // Report results.
     Hermes::Mixins::Loggable::Static::info("ndof_coarse[0]: %d, ndof_fine[0]: %d",
-         u_space->get_num_dofs(), u_ref_space->get_num_dofs());
+      u_space->get_num_dofs(), u_ref_space->get_num_dofs());
     Hermes::Mixins::Loggable::Static::info("ndof_coarse[1]: %d, ndof_fine[1]: %d",
-         v_space->get_num_dofs(), v_ref_space->get_num_dofs());
+      v_space->get_num_dofs(), v_ref_space->get_num_dofs());
     Hermes::Mixins::Loggable::Static::info("ndof_coarse_total: %d, ndof_fine_total: %d",
       Space<double>::get_num_dofs({ u_space, v_space }),
-         Space<double>::get_num_dofs({ u_ref_space, v_ref_space }));
+      Space<double>::get_num_dofs({ u_ref_space, v_ref_space }));
     Hermes::Mixins::Loggable::Static::info("err_est_rel_total: %g%%, err_est_exact_total: %g%%", err_est_rel, err_exact_rel);
 
     // Add entry to DOF and CPU convergence graphs.
@@ -224,7 +224,7 @@ int main(int argc, char* argv[])
     // If err_est too large, adapt the mesh.
     if (err_est_rel < ERR_STOP)
       done = true;
-    else 
+    else
     {
       Hermes::Mixins::Loggable::Static::info("Adapting coarse mesh.");
       done = adaptivity.adapt({ &selector, &selector });
@@ -232,8 +232,7 @@ int main(int argc, char* argv[])
 
     // Increase counter.
     as++;
-  }
-  while (!done);
+  } while (!done);
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 

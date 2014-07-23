@@ -54,8 +54,8 @@ Adapt<::complex> adaptivity(&errorCalculator, &stoppingCriterion);
 H1ProjBasedSelector<::complex> selector(CAND_LIST);
 
 // Problem parameters.
-const double MU_R   = 1.0;
-const double KAPPA  = 1.0;
+const double MU_R = 1.0;
+const double KAPPA = 1.0;
 const double LAMBDA = 1.0;
 
 // Bessel functions, exact solution, and weak forms.
@@ -73,13 +73,13 @@ int main(int argc, char* argv[])
   for (int i = 0; i < INIT_REF_NUM; i++)  mesh->refine_all_elements();
 
   // Initialize boundary conditions.
-  Hermes::Hermes2D::DefaultEssentialBCConst<::complex> bc_essential(std::vector<std::string>({"Corner_horizontal", "Corner_vertical"}), ::complex(0.));
+  Hermes::Hermes2D::DefaultEssentialBCConst<::complex> bc_essential(std::vector<std::string>({ "Corner_horizontal", "Corner_vertical" }), ::complex(0.));
   EssentialBCs<::complex> bcs(&bc_essential);
 
   // Create an Hcurl space with default shapeset.
   SpaceSharedPtr<::complex> space(new HcurlSpace<::complex>(mesh, &bcs, P_INIT));
   int ndof = space->get_num_dofs();
-  
+
   // Set the space to adaptivity.
   adaptivity.set_space(space);
 
@@ -125,12 +125,12 @@ int main(int argc, char* argv[])
     // Initial coefficient vector for the Newton's method.
     ::complex* coeff_vec = new ::complex[ndof_ref];
     memset(coeff_vec, 0, ndof_ref * sizeof(::complex));
-    
+
     try
     {
       newton.solve(coeff_vec);
     }
-    catch(Hermes::Exceptions::Exception& e)
+    catch (Hermes::Exceptions::Exception& e)
     {
       e.print_msg();
     }
@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
     ogProjection.project_global(space, ref_sln, sln);
 
     // View the coarse mesh solution and polynomial orders.
-    if(HERMES_VISUALIZATION)
+    if (HERMES_VISUALIZATION)
     {
       MeshFunctionSharedPtr<double> real_filter(new RealFilter(sln));
       v_view.show(real_filter);
@@ -166,22 +166,21 @@ int main(int argc, char* argv[])
     graph_dof_exact.save("conv_dof_exact.dat");
 
     // If err_est_rel too large, adapt the mesh.
-    if(err_est_rel < ERR_STOP) done = true;
+    if (err_est_rel < ERR_STOP) done = true;
     else
     {
       done = adaptivity.adapt(&selector);
 
       // Increase the counter of performed adaptivity steps.
-      if(!done)  as++;
+      if (!done)  as++;
     }
 
     // Clean up.
-    delete [] coeff_vec;
-  }
-  while (!done);
+    delete[] coeff_vec;
+  } while (!done);
 
   // Show the reference solution - the final result.
-  if(HERMES_VISUALIZATION)
+  if (HERMES_VISUALIZATION)
   {
     v_view.set_title("Fine mesh solution (magnitude)");
     MeshFunctionSharedPtr<double> real_filter(new RealFilter(ref_sln));

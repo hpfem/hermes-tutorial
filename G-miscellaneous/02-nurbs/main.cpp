@@ -4,7 +4,7 @@ using namespace Hermes;
 using namespace Hermes::Hermes2D;
 
 // This example illustrates how to use full-featured NURBS. Simplified
-// format is enabled for circular arcs (see example 03-poisson). 
+// format is enabled for circular arcs (see example 03-poisson).
 //
 // PDE: Poisson equation -Laplace u - const_f = 0 with homogeneous (zero)
 //      Dirichlet boundary conditions.
@@ -14,20 +14,20 @@ using namespace Hermes::Hermes2D;
 
 // Choose one of the following mesh files:
 // Mesh containing NURBS with one control point.
-//const char* mesh_file = "domain-1.mesh";            
+//const char* mesh_file = "domain-1.mesh";
 // Mesh containing NURBS with two control points.
-const char* mesh_file = "domain-2.mesh";          
+const char* mesh_file = "domain-2.mesh";
 // Mesh containing NURBS with three control points.
-//const char* mesh_file = "domain-3.mesh";          
+//const char* mesh_file = "domain-3.mesh";
 
 // The following parameters can be also changed:
 // Uniform polynomial degree of mesh elements.
-const int P_INIT = 3;                             
+const int P_INIT = 3;
 // Number of initial uniform mesh refinements.
 const int INIT_REF_NUM = 2;
 
 // Problem parameters.
-const double const_f = 1.0;  
+const double const_f = 1.0;
 
 int main(int argc, char* argv[])
 {
@@ -58,13 +58,13 @@ int main(int argc, char* argv[])
   {
     newton.solve();
   }
-  catch(std::exception& e)
+  catch (std::exception& e)
   {
     std::cout << e.what();
-}
+  }
 
   Hermes::Hermes2D::Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);
-  
+
   // Visualize the solution.
   Views::ScalarView view("Solution", new Views::WinGeom(0, 0, 800, 350));
   view.show(sln);
@@ -74,4 +74,3 @@ int main(int argc, char* argv[])
 
   return 0;
 }
-

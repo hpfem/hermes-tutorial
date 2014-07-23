@@ -19,51 +19,51 @@ using namespace Hermes::Hermes2D::RefinementSelectors;
 //
 
 // Number of initial uniform mesh refinements.
-const int INIT_REF_NUM = 4;       
+const int INIT_REF_NUM = 4;
 // Initial polynomial degree of all mesh elements.
-const int P_INIT = 1;             
+const int P_INIT = 1;
 // Coefficient for the Nwwton boundary condition.
-const double ALPHA = 10.0;        
+const double ALPHA = 10.0;
 const double LAMBDA = 1e5;
 const double HEATCAP = 1e6;
 const double RHO = 3000.0;
 const double TEMP_EXT = 20.0;
 const double TEMP_INIT = 10.0;
-// Time step.        
-const double TAU = 50.0;          
+// Time step.
+const double TAU = 50.0;
 
 // NOX parameters.
 // true = Jacobian-free method (for NOX),
 // false = Newton (for NOX).
-const bool TRILINOS_JFNK = true;                 
+const bool TRILINOS_JFNK = true;
 // Preconditioning by jacobian in case of JFNK (for NOX),
 // default ML preconditioner in case of Newton.
-const bool PRECOND = true;                        
+const bool PRECOND = true;
 // Name of the iterative method employed by AztecOO (ignored
-// by the other solvers). 
+// by the other solvers).
 // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
-const char* iterative_method = "GMRES";           
-// Name of the preconditioner employed by AztecOO 
-// Possibilities: None" - No preconditioning. 
+const char* iterative_method = "GMRES";
+// Name of the preconditioner employed by AztecOO
+// Possibilities: None" - No preconditioning.
 // "AztecOO" - AztecOO internal preconditioner.
 // "New Ifpack" - Ifpack internal preconditioner.
 // "ML" - Multi level preconditione
-const char* preconditioner = "AztecOO";           
+const char* preconditioner = "AztecOO";
 // NOX error messages, see NOX_Utils.h.
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
-                                                  
+
 // Tolerance for linear system.
-double ls_tolerance = 1e-5;                       
+double ls_tolerance = 1e-5;
 // Flag for absolute value of the residuum.
-unsigned flag_absresid = 0;                       
+unsigned flag_absresid = 0;
 // Tolerance for absolute value of the residuum.
-double abs_resid = 1.0e-3;                        
+double abs_resid = 1.0e-3;
 // Flag for relative value of the residuum.
-unsigned flag_relresid = 1;                       
+unsigned flag_relresid = 1;
 // Tolerance for relative value of the residuum.
-double rel_resid = 1.0e-2;                        
+double rel_resid = 1.0e-2;
 // Max number of iterations.
-int max_iters = 100;                              
+int max_iters = 100;
 
 int main(int argc, char* argv[])
 {
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
   mloader.load("square.mesh", mesh);
 
   // Perform initial mesh refinemets.
-  for (int i=0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
+  for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
 
   // Initialize boundary conditions.
   DefaultEssentialBCConst<double> bc("Bdy_bottom", TEMP_INIT);
@@ -84,15 +84,15 @@ int main(int argc, char* argv[])
   int ndof = Space<double>::get_num_dofs(space);
   Hermes::Mixins::Loggable::Static::info("ndof: %d", ndof);
 
-  // Define constant initial condition. 
+  // Define constant initial condition.
   ConstantSolution<double> t_prev_time(mesh, TEMP_INIT);
 
   // Initialize the weak formulation.
-  CustomWeakForm wf({"Bdy_right", "Bdy_top", "Bdy_left"}, 
-                    HEATCAP, RHO, TAU, LAMBDA, ALPHA, TEMP_EXT, &t_prev_time, TRILINOS_JFNK);
+  CustomWeakForm wf({ "Bdy_right", "Bdy_top", "Bdy_left" },
+    HEATCAP, RHO, TAU, LAMBDA, ALPHA, TEMP_EXT, &t_prev_time, TRILINOS_JFNK);
 
-  // Project the function "t_prev_time" on the FE space 
-  // in order to obtain initial vector for NOX. 
+  // Project the function "t_prev_time" on the FE space
+  // in order to obtain initial vector for NOX.
   Hermes::Mixins::Loggable::Static::info("Projecting initial solution on the FE mesh->");
   double* coeff_vec = new double[ndof];
   OGProjection<double>::project_global(space, &t_prev_time, coeff_vec);
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
 
   // Initialize the view.
   ScalarView Tview("Temperature", new WinGeom(0, 0, 450, 400));
-  Tview.set_min_max_range(10,20);
+  Tview.set_min_max_range(10, 20);
 
   // Time stepping loop:
   double total_time = 0.0;
@@ -134,19 +134,19 @@ int main(int argc, char* argv[])
     {
       solver_nox.solve(coeff_vec);
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
       std::cout << e.what();
-}
+    }
 
     Solution<double>::vector_to_solution(solver_nox.get_sln_vector(), space, &t_prev_time);
 
     // Show the new solution.
     Tview.show(&t_prev_time);
 
-    Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)", 
+    Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)",
       solver_nox.get_num_iters(), solver_nox.get_residual());
-    Hermes::Mixins::Loggable::Static::info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
+    Hermes::Mixins::Loggable::Static::info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)",
       solver_nox.get_num_lin_iters(), solver_nox.get_achieved_tol());
   }
 

@@ -19,18 +19,18 @@ typedef std::complex<double> complex;
 //  The following parameters can be changed:
 
 // Number of initial uniform mesh refinements.
-const int INIT_REF_NUM = 0;                       
+const int INIT_REF_NUM = 0;
 // Initial polynomial degree of mesh elements.
-const int P_INIT = 1;                             
+const int P_INIT = 1;
 // Parameter influencing the candidate selection.
 
-const double THRESHOLD = 0.3;                           
+const double THRESHOLD = 0.3;
 // Predefined list of element refinement candidates. Possible values are
 // H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO,
 // H2D_HP_ANISO_H, H2D_HP_ANISO_P, H2D_HP_ANISO.
-const CandList CAND_LIST = H2D_HP_ANISO;          
+const CandList CAND_LIST = H2D_HP_ANISO;
 // Stopping criterion for adaptivity.
-const double ERR_STOP = 1.0;                      
+const double ERR_STOP = 1.0;
 // Error calculation & adaptivity.
 DefaultErrorCalculator< ::complex, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
 // Stopping criterion for an adaptivity step.
@@ -63,15 +63,15 @@ int main(int argc, char* argv[])
   for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
 
   // Initialize boundary conditions.
-  Hermes::Hermes2D::DefaultEssentialBCConst<::complex> 
-      bc_essential("Dirichlet", ::complex(0.0, 0.0));
+  Hermes::Hermes2D::DefaultEssentialBCConst<::complex>
+    bc_essential("Dirichlet", ::complex(0.0, 0.0));
   EssentialBCs<::complex> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<::complex> space(new  H1Space<::complex>(mesh, &bcs, P_INIT));
   int ndof = space->get_num_dofs();
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
-  
+
   // Set the space to adaptivity.
   adaptivity.set_space(space);
 
@@ -118,10 +118,10 @@ int main(int argc, char* argv[])
     {
       newton.solve();
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
       std::cout << e.what();
-}
+    }
     Hermes::Hermes2D::Solution<::complex>::vector_to_solution(newton.get_sln_vector(), ref_space, ref_sln);
 
     // Time measurement.
@@ -166,15 +166,14 @@ int main(int argc, char* argv[])
 
     // Increase counter.
     as++;
-  }
-  while (!done);
+  } while (!done);
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 
   // Show the reference solution - the final result.
   sview.set_title("Fine mesh solution");
 
-  MeshFunctionSharedPtr<double> real_filter(new RealFilter (ref_sln));
+  MeshFunctionSharedPtr<double> real_filter(new RealFilter(ref_sln));
   sview.show(real_filter);
 
   // Wait for all views to be closed.

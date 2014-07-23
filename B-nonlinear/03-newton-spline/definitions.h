@@ -14,7 +14,7 @@ using namespace Hermes::Hermes2D::Views;
 class CustomInitialCondition : public ExactSolutionScalar<double>
 {
 public:
-  CustomInitialCondition(MeshSharedPtr mesh) : ExactSolutionScalar<double>(mesh) 
+  CustomInitialCondition(MeshSharedPtr mesh) : ExactSolutionScalar<double>(mesh)
   {
   };
 
@@ -31,15 +31,13 @@ public:
 class CustomEssentialBCNonConst : public EssentialBoundaryCondition<double>
 {
 public:
-  CustomEssentialBCNonConst(std::string marker) 
-           : EssentialBoundaryCondition<double>(std::vector<std::string>()) 
+  CustomEssentialBCNonConst(std::string marker)
+    : EssentialBoundaryCondition<double>(std::vector<std::string>())
   {
-    this->markers.push_back(marker);
-  }
+      this->markers.push_back(marker);
+    }
 
   virtual EssentialBCValueType get_value_type() const;
 
   virtual double value(double x, double y) const;
 };
-
-

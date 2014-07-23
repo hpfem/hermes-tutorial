@@ -5,20 +5,20 @@ using namespace Hermes::Hermes2D;
 using namespace Hermes::Hermes2D::Views;
 
 // This example shows how to use the Hdiv space and
-// visualize finite element basis functions. Note that 
-// higher-order basis functions in this space comprise 
-// edge functions associated with mesh edges (normal 
+// visualize finite element basis functions. Note that
+// higher-order basis functions in this space comprise
+// edge functions associated with mesh edges (normal
 // component is zero on the boundary of the element patch
-// associated with the edge), and bubble functions 
-// associated with elements (normal component is 
+// associated with the edge), and bubble functions
+// associated with elements (normal component is
 // zero on the element boundary).
 //
 // The following parameters can be changed:
 
 // Initial uniform mesh refinement.
-int INIT_REF_NUM = 2;      
+int INIT_REF_NUM = 2;
 // Polynomial degree of mesh elements.
-int P_INIT = 3;            
+int P_INIT = 3;
 
 int main(int argc, char* argv[])
 {
@@ -41,4 +41,3 @@ int main(int argc, char* argv[])
   View::wait();
   return 0;
 }
-

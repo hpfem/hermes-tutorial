@@ -1,7 +1,7 @@
 #include "definitions.h"
 
-//  The purpose of this example is to use a simple linear problem with known 
-//  exact solution to show how to use NOX, and to compare its performance to 
+//  The purpose of this example is to use a simple linear problem with known
+//  exact solution to show how to use NOX, and to compare its performance to
 //  other linear solvers in Hermes (MUMPS, PETSc, UMFPACK, etc.).
 //
 //  PDE: Poisson equation.
@@ -15,42 +15,42 @@
 //  The following parameters can be changed:
 
 // Number of initial uniform mesh refinements.
-const int INIT_REF_NUM = 6;                       
+const int INIT_REF_NUM = 6;
 // Initial polynomial degree of all mesh elements.
-const int P_INIT = 3;                             
+const int P_INIT = 3;
 
 // NOX parameters.
 // true = Jacobian-free method (for NOX),
 // false = Newton (for NOX).
-const bool TRILINOS_JFNK = true;                  
+const bool TRILINOS_JFNK = true;
 // Preconditioning by jacobian in case of JFNK (for NOX),
 // default ML preconditioner in case of Newton.
-const bool PRECOND = true;                        
+const bool PRECOND = true;
 // Name of the iterative method employed by AztecOO (ignored
-// by the other solvers). 
+// by the other solvers).
 // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
-const char* iterative_method = "GMRES";           
-// Name of the preconditioner employed by AztecOO 
-// Possibilities: None" - No preconditioning. 
+const char* iterative_method = "GMRES";
+// Name of the preconditioner employed by AztecOO
+// Possibilities: None" - No preconditioning.
 // "AztecOO" - AztecOO internal preconditioner.
 // "New Ifpack" - Ifpack internal preconditioner.
 // "ML" - Multi level preconditione
-const char* preconditioner = "AztecOO";           
+const char* preconditioner = "AztecOO";
 // NOX error messages, see NOX_Utils.h.
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
-                                                  
+
 // Tolerance for linear system.
-double ls_tolerance = 1e-5;                       
+double ls_tolerance = 1e-5;
 // Flag for absolute value of the residuum.
-unsigned flag_absresid = 0;                       
+unsigned flag_absresid = 0;
 // Tolerance for absolute value of the residuum.
-double abs_resid = 1.0e-3;                        
+double abs_resid = 1.0e-3;
 // Flag for relative value of the residuum.
-unsigned flag_relresid = 1;                       
+unsigned flag_relresid = 1;
 // Tolerance for relative value of the residuum.
-double rel_resid = 1.0e-2;                        
+double rel_resid = 1.0e-2;
 // Max number of iterations.
-int max_iters = 100;                              
+int max_iters = 100;
 
 int main(int argc, char **argv)
 {
@@ -72,17 +72,17 @@ int main(int argc, char **argv)
   // Initialize boundary conditions
   DefaultEssentialBCNonConst<double> bc_essential("Bdy", exact);
   EssentialBCs<double> bcs(&bc_essential);
-  
+
   // Initialize the weak formulation.
   CustomWeakFormPoisson wf1;
- 
+
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
   int ndof = Space<double>::get_num_dofs(space);
   Hermes::Mixins::Loggable::Static::info("ndof: %d", ndof);
 
   Hermes::Mixins::Loggable::Static::info("---- Assembling by NewtonSolver, solving by regular solver:");
-  
+
   // Begin time measurement of assembly.
   cpu_time.tick();
 
@@ -96,10 +96,10 @@ int main(int argc, char **argv)
   {
     newton.solve();
   }
-  catch(std::exception& e)
+  catch (std::exception& e)
   {
     std::cout << e.what();
-}
+  }
 
   // Translate solution vector into a Solution.
   Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln1);
@@ -114,20 +114,20 @@ int main(int argc, char **argv)
 
   Hermes::Mixins::Loggable::Static::info("CPU time: %g s.", time);
   Hermes::Mixins::Loggable::Static::info("Exact H1 error: %g%%.", rel_err_1);
-    
+
   // View the solution and mesh.
   ScalarView sview("Solution", new WinGeom(0, 0, 440, 350));
   sview.show(sln1);
   //OrderView  oview("Polynomial orders", new WinGeom(450, 0, 400, 350));
   //oview.show(space);
-  
+
   // TRILINOS PART:
 
   Hermes::Mixins::Loggable::Static::info("---- Assembling by NewtonSolverNOX, solving by NOX:");
 
   // Initialize the weak formulation for Trilinos.
   WeakFormSharedPtr<double> wf2(new CustomWeakFormPoisson(TRILINOS_JFNK));
-  
+
   // Time measurement.
   cpu_time.tick();
 
@@ -163,17 +163,17 @@ int main(int argc, char **argv)
   {
     nox_solver.solve(coeff_vec);
   }
-  catch(std::exception& e)
+  catch (std::exception& e)
   {
     std::cout << e.what();
-}
+  }
 
   // Convert resulting coefficient vector into a Solution.
   Solution<double>::vector_to_solution(nox_solver.get_sln_vector(), space, sln2);
 
-  Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)", 
+  Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)",
     nox_solver.get_num_iters(), nox_solver.get_residual());
-  Hermes::Mixins::Loggable::Static::info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
+  Hermes::Mixins::Loggable::Static::info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)",
     nox_solver.get_num_lin_iters(), nox_solver.get_achieved_tol());
 
   // CPU time needed by NOX.
@@ -191,9 +191,9 @@ int main(int argc, char **argv)
 
   Hermes::Mixins::Loggable::Static::info("CPU time: %g s.", time);
   Hermes::Mixins::Loggable::Static::info("Exact H1 error: %g%%.", rel_err_2);
- 
+
   // Wait for all views to be closed.
   View::wait();
-  
+
   return 0;
 }

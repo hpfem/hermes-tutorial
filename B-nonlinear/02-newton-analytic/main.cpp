@@ -17,13 +17,13 @@ using namespace RefinementSelectors;
 //  The following parameters can be changed:
 
 // Initial polynomial degree.
-const int P_INIT = 2;                             
+const int P_INIT = 2;
 // Stopping criterion for the Newton's method.
-const double NEWTON_TOL = 1e-8;                   
+const double NEWTON_TOL = 1e-8;
 // Maximum allowed number of Newton iterations.
-const int NEWTON_MAX_ITER = 100;                  
+const int NEWTON_MAX_ITER = 100;
 // Number of initial uniform mesh refinements.
-const int INIT_GLOB_REF_NUM = 3;                  
+const int INIT_GLOB_REF_NUM = 3;
 // Number of initial refinements towards boundary.
 const int INIT_BDY_REF_NUM = 4;
 
@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
   mloader.load("square.mesh", mesh);
 
   // Perform initial mesh refinements.
-  for(int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh->refine_all_elements();
+  for (int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh->refine_all_elements();
   mesh->refine_towards_boundary("Bdy", INIT_BDY_REF_NUM);
 
   // Initialize boundary conditions.
@@ -59,26 +59,26 @@ int main(int argc, char* argv[])
   // Initialize the FE problem.
   DiscreteProblem<double> dp(wf, space);
 
-  // Project the initial condition on the FE space to obtain initial 
+  // Project the initial condition on the FE space to obtain initial
   // coefficient vector for the Newton's method.
-  // NOTE: If you want to start from the zero vector, just define 
+  // NOTE: If you want to start from the zero vector, just define
   // coeff_vec to be a vector of ndof zeros (no projection is needed).
   Hermes::Mixins::Loggable::Static::info("Projecting to obtain initial vector for the Newton's method.");
   double* coeff_vec = new double[ndof];
   MeshFunctionSharedPtr<double> init_sln(new CustomInitialCondition(mesh));
-  OGProjection<double>::project_global(space, init_sln, coeff_vec); 
+  OGProjection<double>::project_global(space, init_sln, coeff_vec);
 
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp);
   newton.set_max_allowed_iterations(NEWTON_MAX_ITER);
   newton.set_tolerance(NEWTON_TOL, Hermes::Solvers::ResidualNormAbsolute);
-    
+
   // Perform Newton's iteration.
   try
   {
     newton.solve(coeff_vec);
   }
-  catch(std::exception& e)
+  catch (std::exception& e)
   {
     std::cout << e.what();
   }
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
   //dp.get_all_profiling_output(std::cout);
 
   // Clean up.
-  delete [] coeff_vec;
+  delete[] coeff_vec;
 
   // Visualise the solution and mesh.
   ScalarView s_view("Solution", new WinGeom(0, 0, 440, 350));
@@ -104,4 +104,3 @@ int main(int argc, char* argv[])
   View::wait();
   return 0;
 }
-

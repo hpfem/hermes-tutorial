@@ -2,7 +2,7 @@
 
 using namespace RefinementSelectors;
 
-//  This example solves a nonlinear time-dependent problem using arbitrary 
+//  This example solves a nonlinear time-dependent problem using arbitrary
 //  Runge-Kutta methods.
 //
 //  For a list of available R-K methods see the file hermes_common/tables.h.
@@ -21,17 +21,17 @@ using namespace RefinementSelectors;
 //  The following parameters can be changed:
 
 // Number of initial uniform mesh refinements.
-const int INIT_GLOB_REF_NUM = 3;                   
+const int INIT_GLOB_REF_NUM = 3;
 // Number of initial refinements towards boundary.
-const int INIT_BDY_REF_NUM = 4;                    
+const int INIT_BDY_REF_NUM = 4;
 // Initial polynomial degree.
-const int P_INIT = 2;                              
+const int P_INIT = 2;
 // Time step.
-const double time_step = 0.2;                      
+const double time_step = 0.2;
 // Time interval length.
-const double T_FINAL = 5.0;                        
+const double T_FINAL = 5.0;
 // Stopping criterion for the Newton's method.
-const double NEWTON_TOL = 1e-5;                    
+const double NEWTON_TOL = 1e-5;
 // Maximum allowed number of Newton iterations.
 const int NEWTON_MAX_ITER = 100;
 
@@ -54,7 +54,7 @@ ButcherTableType butcher_table_type = Implicit_RK_1;
 
 // Problem parameters.
 // Parameter for nonlinear thermal conductivity.
-const double alpha = 4.0;                         
+const double alpha = 4.0;
 const double heat_src = 1.0;
 
 // Main function.
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
   mloader.load("square.mesh", mesh);
 
   // Initial mesh refinements.
-  for(int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh->refine_all_elements();
+  for (int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh->refine_all_elements();
   mesh->refine_towards_boundary("Bdy", INIT_BDY_REF_NUM);
 
   // Initialize boundary conditions.
@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
   {
     // Perform one Runge-Kutta time step according to the selected Butcher's table.
     Hermes::Mixins::Loggable::Static::info("Runge-Kutta time step (t = %g s, tau = %g s, stages: %d).",
-         current_time, time_step, bt.get_size());
+      current_time, time_step, bt.get_size());
     bool freeze_jacobian = false;
     bool block_diagonal_jacobian = false;
     double damping_coeff = 1.0;
@@ -126,10 +126,10 @@ int main(int argc, char* argv[])
       runge_kutta.set_max_allowed_iterations(NEWTON_MAX_ITER);
       runge_kutta.set_tolerance(NEWTON_TOL);
       runge_kutta.set_newton_max_allowed_residual_norm(max_allowed_residual_norm);
-      
+
       runge_kutta.rk_time_step_newton(slns_time_prev, slns_time_new);
     }
-    catch(Exceptions::Exception& e)
+    catch (Exceptions::Exception& e)
     {
       std::cout << e.what();
     }
@@ -150,8 +150,7 @@ int main(int argc, char* argv[])
 
     // Increase counter of time steps.
     ts++;
-  }
-  while (current_time < T_FINAL);
+  } while (current_time < T_FINAL);
 
   // Wait for all views to be closed.
   View::wait();

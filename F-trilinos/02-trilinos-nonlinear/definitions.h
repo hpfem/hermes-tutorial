@@ -5,7 +5,7 @@ using namespace Hermes::Hermes2D;
 using namespace Hermes::Hermes2D::Views;
 using namespace Hermes::Preconditioners;
 
-class CustomRightHandSide: public Hermes2DFunction<double>
+class CustomRightHandSide : public Hermes2DFunction<double>
 {
 public:
   CustomRightHandSide() : Hermes2DFunction<double>() {};
@@ -45,10 +45,10 @@ public:
 
   double value(double x, double y) const;
 
-  virtual void derivatives (double x, double y, double& dx, double& dy) const;
+  virtual void derivatives(double x, double y, double& dx, double& dy) const;
 
   virtual Ord ord(double x, double y) const;
-  
+
   MeshFunction<double>* clone() const;
 };
 
@@ -66,12 +66,12 @@ private:
   public:
     JacobianFormVol(int i, int j) : MatrixFormVol<double>(i, j) { this->setSymFlag(HERMES_SYM); };
 
-    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                 Func<double> *v, GeomVol<double> *e, Func<double> **ext) const;
+    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
+      Func<double> *v, GeomVol<double> *e, Func<double> **ext) const;
 
-    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-            GeomVol<Ord> *e, Func<Ord> **ext) const;
-    
+    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v,
+      GeomVol<Ord> *e, Func<Ord> **ext) const;
+
     MatrixFormVol<double>* clone() const;
   };
 
@@ -80,11 +80,11 @@ private:
   public:
     ResidualFormVol(int i, CustomRightHandSide* rhs) : VectorFormVol<double>(i), rhs(rhs) {};
 
-    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, 
-                         GeomVol<double> *e, Func<double> **ext) const;
+    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v,
+      GeomVol<double> *e, Func<double> **ext) const;
 
-    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                    GeomVol<Ord> *e, Func<Ord> **ext) const;
+    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
+      GeomVol<Ord> *e, Func<Ord> **ext) const;
 
     VectorFormVol<double>* clone() const;
 
@@ -98,13 +98,12 @@ private:
   public:
     PrecondFormVol(int i, int j) : MatrixFormVol<double>(i, j) { this->setSymFlag(HERMES_SYM); };
 
-    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, 
-                 Func<double> *v, GeomVol<double> *e, Func<double> **ext) const;
+    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
+      Func<double> *v, GeomVol<double> *e, Func<double> **ext) const;
 
-    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, 
-            GeomVol<Ord> *e, Func<Ord> **ext) const;
-    
+    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v,
+      GeomVol<Ord> *e, Func<Ord> **ext) const;
+
     MatrixFormVol<double>* clone() const;
   };
 };
-

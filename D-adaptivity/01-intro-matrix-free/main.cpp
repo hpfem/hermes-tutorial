@@ -3,8 +3,8 @@
 using namespace RefinementSelectors;
 using namespace Preconditioners;
 
-// This example is a matrix-free version of example 01-intro. It employs the 
-// Trilinos NOX package (Trilinos needs to be installed and enabled in CMake.vars). 
+// This example is a matrix-free version of example 01-intro. It employs the
+// Trilinos NOX package (Trilinos needs to be installed and enabled in CMake.vars).
 //
 // PDE: -div[eps_r(x,y) grad phi] = 0
 //      eps_r = EPS_1 in Omega_1 (surrounding air)
@@ -15,20 +15,20 @@ using namespace Preconditioners;
 //
 // The following parameters can be changed:
 
-// Set to "false" to suppress Hermes OpenGL visualization. 
-const bool HERMES_VISUALIZATION = true;           
+// Set to "false" to suppress Hermes OpenGL visualization.
+const bool HERMES_VISUALIZATION = true;
 // Set to "true" to enable VTK output.
-const bool VTK_VISUALIZATION = false;             
+const bool VTK_VISUALIZATION = false;
 // Initial polynomial degree of mesh elements.
-const int P_INIT = 2;                             
+const int P_INIT = 2;
 // Parameter influencing the candidate selection.
-const double THRESHOLD = 0.2;                      
+const double THRESHOLD = 0.2;
 // Predefined list of element refinement candidates. Possible values are
 // H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO, H2D_HP_ANISO_H
 // H2D_HP_ANISO_P, H2D_HP_ANISO.
-const CandList CAND_LIST = H2D_HP_ANISO_H;                 
+const CandList CAND_LIST = H2D_HP_ANISO_H;
 // Stopping criterion for adaptivity.
-const double ERR_STOP = 1.0;   
+const double ERR_STOP = 1.0;
 
 // Error calculation & adaptivity.
 DefaultErrorCalculator<double, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
@@ -48,35 +48,35 @@ const double EPS_AIR = 1.0 * EPS0;
 // NOX parameters.
 // true = Jacobian-free method (for NOX),
 // false = Newton (for NOX).
-const bool TRILINOS_JFNK = true;                  
+const bool TRILINOS_JFNK = true;
 // Preconditioning by jacobian in case of JFNK (for NOX),
 // default ML preconditioner in case of Newton.
-const bool PRECOND = true;                        
+const bool PRECOND = true;
 // Name of the iterative method employed by AztecOO (ignored
-// by the other solvers). 
+// by the other solvers).
 // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
-const char* iterative_method = "GMRES";           
-// Name of the preconditioner employed by AztecOO 
-// Possibilities: None" - No preconditioning. 
+const char* iterative_method = "GMRES";
+// Name of the preconditioner employed by AztecOO
+// Possibilities: None" - No preconditioning.
 // "AztecOO" - AztecOO internal preconditioner.
 // "New Ifpack" - Ifpack internal preconditioner.
 // "ML" - Multi level preconditione
-const char* preconditioner = "AztecOO";           
+const char* preconditioner = "AztecOO";
 // NOX error messages, see NOX_Utils.h.
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
-                                                  
+
 // Tolerance for linear system.
-double ls_tolerance = 1e-5;                       
+double ls_tolerance = 1e-5;
 // Flag for absolute value of the residuum.
-unsigned flag_absresid = 0;                       
+unsigned flag_absresid = 0;
 // Tolerance for absolute value of the residuum.
-double abs_resid = 1.0e-3;                        
+double abs_resid = 1.0e-3;
 // Flag for relative value of the residuum.
-unsigned flag_relresid = 1;                       
+unsigned flag_relresid = 1;
 // Tolerance for relative value of the residuum.
-double rel_resid = 1.0e-2;                        
+double rel_resid = 1.0e-2;
 // Max number of iterations.
-int max_iters = 100;                              
+int max_iters = 100;
 
 int main(int argc, char* argv[])
 {
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation.
   WeakFormSharedPtr<double> wf(new CustomWeakFormPoisson("Motor", EPS_MOTOR, "Air", EPS_AIR, TRILINOS_JFNK));
-  
+
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_essential_out("Outer", 0.0);
   DefaultEssentialBCConst<double> bc_essential_stator("Stator", VOLTAGE);
@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
   do
   {
     Hermes::Mixins::Loggable::Static::info("---- Adaptivity step %d:", as);
-    
+
     // Time measurement.
     cpu_time.tick();
 
@@ -131,10 +131,9 @@ int main(int argc, char* argv[])
     SpaceSharedPtr<double> ref_space = ref_space_creator.create_ref_space();
     int ndof_ref = ref_space->get_num_dofs();
 
-
     // Initialize (new) fine mesh problem.
     DiscreteProblemNOX<double> dp(wf, ref_space);
-    
+
     // Allocate initial coefficient vector for the Newton's method
     // on the (new) fine mesh.
     double* coeff_vec = new double[ndof_ref];
@@ -174,18 +173,18 @@ int main(int argc, char* argv[])
     {
       newton_nox.solve(coeff_vec);
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
       std::cout << e.what();
-}
+    }
 
     // Translate the resulting coefficient vector into the instance of Solution.
     Solution<double>::vector_to_solution(newton_nox.get_sln_vector(), ref_space_new, ref_sln);
 
     // Output.
-    Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)", 
+    Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)",
       newton_nox.get_num_iters(), newton_nox.get_residual());
-    Hermes::Mixins::Loggable::Static::info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
+    Hermes::Mixins::Loggable::Static::info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)",
       newton_nox.get_num_lin_iters(), newton_nox.get_achieved_tol());
 
     // Project the fine mesh solution on the coarse mesh.
@@ -196,7 +195,7 @@ int main(int argc, char* argv[])
     cpu_time.tick();
 
     // VTK output.
-    if (VTK_VISUALIZATION) 
+    if (VTK_VISUALIZATION)
     {
       // Output solution in VTK format.
       Views::Linearizer lin(FileExport);
@@ -213,7 +212,7 @@ int main(int argc, char* argv[])
     }
 
     // View the coarse mesh solution and polynomial orders.
-    if (HERMES_VISUALIZATION) 
+    if (HERMES_VISUALIZATION)
     {
       sview.show(sln);
       oview.show(space);
@@ -232,17 +231,17 @@ int main(int argc, char* argv[])
       space->get_num_dofs(), ref_space->get_num_dofs(), err_est_rel);
 
     // Add entry to DOF and CPU convergence graphs.
-    cpu_time.tick();    
+    cpu_time.tick();
     graph_cpu.add_values(cpu_time.accumulated(), err_est_rel);
     graph_cpu.save("conv_cpu_est.dat");
     graph_dof.add_values(space->get_num_dofs(), err_est_rel);
     graph_dof.save("conv_dof_est.dat");
-    
+
     // Skip the time spent to save the convergence graphs.
     cpu_time.tick();
 
     // If err_est too large, adapt the mesh.
-    if (err_est_rel < ERR_STOP) 
+    if (err_est_rel < ERR_STOP)
       done = true;
     else
     {
@@ -250,14 +249,13 @@ int main(int argc, char* argv[])
       done = adaptivity.adapt(&selector);
 
       // Increase the counter of performed adaptivity steps.
-      if (!done)  
+      if (!done)
         as++;
     }
 
     // Clean up.
-    delete [] coeff_vec;
-  }
-  while (!done);
+    delete[] coeff_vec;
+  } while (!done);
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 
@@ -271,4 +269,3 @@ int main(int argc, char* argv[])
 
   return 0;
 }
-

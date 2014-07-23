@@ -4,8 +4,8 @@ using namespace RefinementSelectors;
 using namespace Views;
 
 //  This example is derived from example P03-timedep/03-nonlinear
-//  and it shows how automatic adaptivity in space can be combined with 
-//  arbitrary Runge-Kutta methods in time. The example uses fixed time 
+//  and it shows how automatic adaptivity in space can be combined with
+//  arbitrary Runge-Kutta methods in time. The example uses fixed time
 //  step size.
 //
 //  For a list of available R-K methods see the file hermes_common/tables.h.
@@ -27,7 +27,7 @@ using namespace Views;
 const int INIT_REF_NUM = 2;
 // Initial polynomial degree of all mesh elements.
 const int P_INIT = 2;
-// Time step. 
+// Time step.
 double time_step = 0.05;
 // Time interval length.
 const double T_FINAL = 2.0;
@@ -35,9 +35,9 @@ const double T_FINAL = 2.0;
 // Adaptivity
 // Every UNREF_FREQth time step the mesh is derefined.
 const int UNREF_FREQ = 1;
-// 1... mesh reset to basemesh and poly degrees to P_INIT.   
+// 1... mesh reset to basemesh and poly degrees to P_INIT.
 // 2... one ref. layer shaved off, poly degrees reset to P_INIT.
-// 3... one ref. layer shaved off, poly degrees decreased by one. 
+// 3... one ref. layer shaved off, poly degrees decreased by one.
 const int UNREF_METHOD = 3;
 // Parameter influencing the candidate selection.
 const double THRESHOLD = 0.3;
@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
   int ndof_coarse = space->get_num_dofs();
-  
+
   // Set the space to adaptivity.
   adaptivity.set_space(space);
 
@@ -169,8 +169,8 @@ int main(int argc, char* argv[])
       }
     }
 
-    // Spatial adaptivity loop. Note: sln_time_prev must not be changed 
-    // during spatial adaptivity. 
+    // Spatial adaptivity loop. Note: sln_time_prev must not be changed
+    // during spatial adaptivity.
     bool done = false; int as = 1;
     double err_est;
     do {
@@ -195,7 +195,7 @@ int main(int argc, char* argv[])
       catch (Exceptions::Exception& e)
       {
         std::cout << e.what();
-}
+      }
 
       // Project the fine mesh solution onto the coarse mesh.
       MeshFunctionSharedPtr<double> sln_coarse(new Solution<double>);

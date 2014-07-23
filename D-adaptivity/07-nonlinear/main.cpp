@@ -16,11 +16,11 @@ using namespace Views;
 //  The following parameters can be changed:
 
 // Initial polynomial degree.
-const int P_INIT = 1;                             
+const int P_INIT = 1;
 // Number of initial uniform mesh refinements.
-const int INIT_GLOB_REF_NUM = 1;                  
+const int INIT_GLOB_REF_NUM = 1;
 // Number of initial refinements towards boundary.
-const int INIT_BDY_REF_NUM = 3;                   
+const int INIT_BDY_REF_NUM = 3;
 // Parameter influencing the candidate selection.
 const double THRESHOLD = 0.2;
 // Predefined list of element refinement candidates. Possible values are
@@ -30,9 +30,9 @@ const CandList CAND_LIST = H2D_HP_ANISO;
 // Stopping criterion for adaptivity.
 const double ERR_STOP = 1.0;
 // Stopping criterion for the Newton's method on coarse mesh.
-const double NEWTON_TOL_COARSE = 1e-4;            
+const double NEWTON_TOL_COARSE = 1e-4;
 // Stopping criterion for the Newton's method on fine mesh.
-const double NEWTON_TOL_FINE = 1e-8;              
+const double NEWTON_TOL_FINE = 1e-8;
 // Maximum allowed number of Newton iterations.
 const int NEWTON_MAX_ITER = 100;
 // Error calculation & adaptivity.
@@ -51,11 +51,11 @@ int main(int argc, char* argv[])
 {
   // Define nonlinear thermal conductivity lambda(u) via a cubic spline.
   // Step 1: Fill the x values and use lambda_macro(u) = 1 + u^4 for the y values.
-  #define lambda_macro(x) (1 + std::pow(x, 4))
+#define lambda_macro(x) (1 + std::pow(x, 4))
   std::vector<double> lambda_pts({ -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0 });
   std::vector<double> lambda_val;
   for (unsigned int i = 0; i < lambda_pts.size(); i++) lambda_val.push_back(lambda_macro(lambda_pts[i]));
-  // Step 2: Create the cubic spline (and plot it for visual control). 
+  // Step 2: Create the cubic spline (and plot it for visual control).
   double bc_left = 0.0;
   double bc_right = 0.0;
   bool first_der_left = false;
@@ -63,9 +63,9 @@ int main(int argc, char* argv[])
   bool extrapolate_der_left = true;
   bool extrapolate_der_right = true;
   CubicSpline lambda(lambda_pts, lambda_val, bc_left, bc_right, first_der_left, first_der_right,
-                     extrapolate_der_left, extrapolate_der_right);
+    extrapolate_der_left, extrapolate_der_right);
   Hermes::Mixins::Loggable::Static::info("Saving cubic spline into a Pylab file spline.dat.");
-  // The interval of definition of the spline will be 
+  // The interval of definition of the spline will be
   // extended by "interval_extension" on both sides.
   double interval_extension = 3.0;
   lambda.calculate_coeffs();
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
   mloader.load("square.mesh", mesh);
 
   // Perform initial mesh refinements.
-  for(int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh->refine_all_elements();
+  for (int i = 0; i < INIT_GLOB_REF_NUM; i++) mesh->refine_all_elements();
   mesh->refine_towards_boundary("Bdy", INIT_BDY_REF_NUM);
 
   // Initialize boundary conditions.
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
-  
+
   // Set the space to adaptivity.
   adaptivity.set_space(space);
 
@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
   {
     newton_coarse.solve(init_sln);
   }
-  catch(std::exception& e)
+  catch (std::exception& e)
   {
     std::cout << e.what();
   }
@@ -173,10 +173,10 @@ int main(int argc, char* argv[])
     {
       newton.solve(coeff_vec);
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
       std::cout << e.what();
-}
+    }
 
     // Translate the resulting coefficient vector into the Solution<double> ref_sln.
     Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, ref_sln);
@@ -217,11 +217,10 @@ int main(int argc, char* argv[])
     }
 
     // Clean up.
-    delete [] coeff_vec;
+    delete[] coeff_vec;
 
     as++;
-  }
-  while (!done);
+  } while (!done);
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 
@@ -234,4 +233,3 @@ int main(int argc, char* argv[])
   View::wait();
   return 0;
 }
-

@@ -3,19 +3,19 @@
 using namespace RefinementSelectors;
 using namespace Views;
 
-// This example shows how to adapt the mesh to match an arbitrary 
-// given function (no PDE solved). 
+// This example shows how to adapt the mesh to match an arbitrary
+// given function (no PDE solved).
 //
 // The following parameters can be changed:
 
 // Initial polynomial degree of mesh elements.
-const int P_INIT = 2;                             
+const int P_INIT = 2;
 // Parameter influencing the candidate selection.
-const double THRESHOLD = 0.2;                        
+const double THRESHOLD = 0.2;
 // Predefined list of element refinement candidates. Possible values are
 // H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO, H2D_HP_ANISO_H
-// H2D_HP_ANISO_P, H2D_HP_ANISO. 
-const CandList CAND_LIST = H2D_HP_ANISO;  
+// H2D_HP_ANISO_P, H2D_HP_ANISO.
+const CandList CAND_LIST = H2D_HP_ANISO;
 // Stopping criterion for adaptivity.
 const double ERR_STOP = 1e-2;
 // Error calculation & adaptivity.
@@ -37,10 +37,10 @@ int main(int argc, char* argv[])
   MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
   mloader.load("square.mesh", mesh);
-  
+
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, P_INIT));
-  
+
   // Set the space to adaptivity.
   adaptivity.set_space(space);
 
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   // Initialize coarse and reference mesh solution.
   MeshFunctionSharedPtr<double> sln(new Solution<double>);
   MeshFunctionSharedPtr<double> ref_sln(new ExactSolutionCustom(mesh));
-   
+
   // Initialize refinement selector.
   H1ProjBasedSelector<double> selector(CAND_LIST, H2DRS_DEFAULT_ORDER);
 
@@ -80,22 +80,22 @@ int main(int argc, char* argv[])
 
     // Time measurement.
     cpu_time.tick();
-    
+
     // Project the fine mesh solution onto the coarse mesh.
     Hermes::Mixins::Loggable::Static::info("Projecting reference solution on coarse mesh.");
-    OGProjection<double>::project_global(space, ref_sln, sln); 
-   
+    OGProjection<double>::project_global(space, ref_sln, sln);
+
     // View the coarse mesh solution and polynomial orders.
     sview.show(sln);
     oview.show(space);
 
     // Calculate element errors and total error estimate.
-    Hermes::Mixins::Loggable::Static::info("Calculating exact error."); 
+    Hermes::Mixins::Loggable::Static::info("Calculating exact error.");
     errorCalculator.calculate_errors(sln, ref_sln);
     double err_exact_rel = errorCalculator.get_total_error_squared() * 100;
 
     // Report results.
-    Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_fine: %d, err_exact_rel: %g%%", 
+    Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_fine: %d, err_exact_rel: %g%%",
       Space<double>::get_num_dofs(space), Space<double>::get_num_dofs(ref_space), err_exact_rel);
 
     // Time measurement.
@@ -109,17 +109,16 @@ int main(int argc, char* argv[])
 
     // If err_exact_rel too large, adapt the mesh.
     if (err_exact_rel < ERR_STOP) done = true;
-    else 
+    else
     {
       Hermes::Mixins::Loggable::Static::info("Adapting coarse mesh.");
       done = adaptivity.adapt(&selector);
-      
+
       // Increase the counter of performed adaptivity steps.
       if (!done)  as++;
     }
-  }
-  while (!done);
-  
+  } while (!done);
+
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 
   // Show the reference solution - the final result.

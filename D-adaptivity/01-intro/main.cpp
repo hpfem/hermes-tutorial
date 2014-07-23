@@ -13,13 +13,13 @@ using namespace RefinementSelectors;
 // the variable P_INIT. Before using adaptivity, you have to define a refinement
 // selector as shown below. The function adapt() takes the selector
 // as a parameter, along with THRESHOLD, STRATEGY, and MESH_REGULARITY.
-//   
+//
 // Additional control parameters are available, these will be demonstrated
 // in the following tutorial examples. In this example, two types of convergence
 // graphs are created -- error estimate wrt. the number of degrees of freedom
 // (DOF), and error estimate wrt. CPU time. Later we will show how to output
 // the error wrt. exact solution when exact solution is available.
-//   
+//
 // This example also demonstrates how to define different material parameters
 // in various parts of the computational domain, and how to measure time.
 //
@@ -32,20 +32,20 @@ using namespace RefinementSelectors;
 //
 // The following parameters can be changed:
 
-// Set to "false" to suppress Hermes OpenGL visualization. 
-const bool HERMES_VISUALIZATION = true;           
+// Set to "false" to suppress Hermes OpenGL visualization.
+const bool HERMES_VISUALIZATION = true;
 // Set to "true" to enable VTK output.
-const bool VTK_VISUALIZATION = false;             
+const bool VTK_VISUALIZATION = false;
 // Initial polynomial degree of mesh elements.
-const int P_INIT = 1;                             
+const int P_INIT = 1;
 // Parameter influencing the candidate selection.
-const double THRESHOLD = 0.8;                     
+const double THRESHOLD = 0.8;
 // Predefined list of element refinement candidates. Possible values are
 // H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO, H2D_HP_ANISO_H
 // H2D_HP_ANISO_P, H2D_HP_ANISO.
-const CandList CAND_LIST = H2D_HP_ANISO_H;        
+const CandList CAND_LIST = H2D_HP_ANISO_H;
 // Stopping criterion for adaptivity.
-const double ERR_STOP = 0.5;                      
+const double ERR_STOP = 0.5;
 // Error calculation & adaptivity.
 DefaultErrorCalculator<double, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
 // Stopping criterion for an adaptivity step.
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation.
   WeakFormSharedPtr<double> wf(new CustomWeakFormPoisson("Motor", EPS_MOTOR, "Air", EPS_AIR));
-  
+
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_essential_out("Outer", 0.0);
   DefaultEssentialBCConst<double> bc_essential_stator("Stator", VOLTAGE);
@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
   do
   {
     Hermes::Mixins::Loggable::Static::info("---- Adaptivity step %d:", as);
-    
+
     // Time measurement.
     cpu_time.tick();
 
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
 
     // Initialize fine mesh problem.
     Hermes::Mixins::Loggable::Static::info("Solving on fine mesh.");
-    
+
     newton.set_space(ref_space);
 
     // Perform Newton's iteration.
@@ -129,14 +129,14 @@ int main(int argc, char* argv[])
     {
       newton.solve();
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
       std::cout << e.what();
     }
 
     // Translate the resulting coefficient vector into the instance of Solution.
     Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, ref_sln);
-    
+
     // Project the fine mesh solution onto the coarse mesh.
     Hermes::Mixins::Loggable::Static::info("Projecting fine mesh solution on coarse mesh.");
     OGProjection<double>::project_global(space, ref_sln, sln);
@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
     cpu_time.tick();
 
     // VTK output.
-    if (VTK_VISUALIZATION) 
+    if (VTK_VISUALIZATION)
     {
       // Output solution in VTK format.
       Views::Linearizer lin(FileExport);
@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
     }
 
     // View the coarse mesh solution and polynomial orders.
-    if (HERMES_VISUALIZATION) 
+    if (HERMES_VISUALIZATION)
     {
       sview.show(sln);
       oview.show(space);
@@ -181,17 +181,17 @@ int main(int argc, char* argv[])
       space->get_num_dofs(), ref_space->get_num_dofs(), err_est_rel);
 
     // Add entry to DOF and CPU convergence graphs.
-    cpu_time.tick();    
+    cpu_time.tick();
     graph_cpu.add_values(cpu_time.accumulated(), err_est_rel);
     graph_cpu.save("conv_cpu_est.dat");
     graph_dof.add_values(space->get_num_dofs(), err_est_rel);
     graph_dof.save("conv_dof_est.dat");
-    
+
     // Skip the time spent to save the convergence graphs.
     cpu_time.tick();
 
     // If err_est too large, adapt the mesh.
-    if (err_est_rel < ERR_STOP) 
+    if (err_est_rel < ERR_STOP)
       done = true;
     else
     {
@@ -199,11 +199,10 @@ int main(int argc, char* argv[])
       done = adaptivity.adapt(&selector);
 
       // Increase the counter of performed adaptivity steps.
-      if (!done)  
+      if (!done)
         as++;
     }
-  }
-  while (!done);
+  } while (!done);
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 
@@ -217,4 +216,3 @@ int main(int argc, char* argv[])
 
   return 0;
 }
-

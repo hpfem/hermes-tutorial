@@ -7,7 +7,7 @@ using namespace Hermes::Hermes2D::Views;
 using namespace Hermes::Hermes2D::RefinementSelectors;
 
 //  The purpose of this example is to show how to use Trilinos while adapting mesh.
-//  Solved by NOX solver, either using Newton's method or JFNK, with or without 
+//  Solved by NOX solver, either using Newton's method or JFNK, with or without
 //  preconditioning. The underlying problem is benchmark "layer-interior".
 //
 //  PDE: -Laplace u - f = 0.
@@ -21,16 +21,16 @@ using namespace Hermes::Hermes2D::RefinementSelectors;
 //  The following parameters can be changed:
 
 // Initial polynomial degree of all mesh elements.
-const int P_INIT = 2;                      
+const int P_INIT = 2;
 // Number of initial uniform mesh refinements.
-const int INIT_REF_NUM = 1;                
+const int INIT_REF_NUM = 1;
 // Parameter influencing the candidate selection.
-const double THRESHOLD = 0.3;                  
+const double THRESHOLD = 0.3;
 // Predefined list of element refinement candidates. Possible values are
 // H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO,
 // H2D_HP_ANISO_H, H2D_HP_ANISO_P, H2D_HP_ANISO.
 // See User Documentation for details.
-const CandList CAND_LIST = H2D_HP_ANISO_H;               
+const CandList CAND_LIST = H2D_HP_ANISO_H;
 // Stopping criterion for adaptivity (rel. error tolerance between the
 // fine mesh and coarse mesh solution in percent).
 const double ERR_STOP = 26.0;
@@ -46,40 +46,40 @@ H1ProjBasedSelector<double> selector(CAND_LIST);
 
 // Problem parameters.
 // Slope of the layer inside the domain.
-double slope = 60;                                
+double slope = 60;
 
 // NOX parameters.
 // true = Jacobian-free method (for NOX),
 // false = Newton (for NOX).
-const bool TRILINOS_JFNK = true;                  
+const bool TRILINOS_JFNK = true;
 // Preconditioning by jacobian in case of JFNK (for NOX),
 // default ML preconditioner in case of Newton.
-const bool PRECOND = true;                        
+const bool PRECOND = true;
 // Name of the iterative method employed by AztecOO (ignored
-// by the other solvers). 
+// by the other solvers).
 // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
-const char* iterative_method = "GMRES";           
-// Name of the preconditioner employed by AztecOO 
-// Possibilities: None" - No preconditioning. 
+const char* iterative_method = "GMRES";
+// Name of the preconditioner employed by AztecOO
+// Possibilities: None" - No preconditioning.
 // "AztecOO" - AztecOO internal preconditioner.
 // "New Ifpack" - Ifpack internal preconditioner.
 // "ML" - Multi level preconditioner.
-const char* preconditioner = "AztecOO";           
+const char* preconditioner = "AztecOO";
 // NOX error messages, see NOX_Utils.h.
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
-                                                  
+
 // Tolerance for linear system.
-double ls_tolerance = 1e-5;                       
+double ls_tolerance = 1e-5;
 // Flag for absolute value of the residuum.
-unsigned flag_absresid = 0;                       
+unsigned flag_absresid = 0;
 // Tolerance for absolute value of the residuum.
-double abs_resid = 1.0e-3;                        
+double abs_resid = 1.0e-3;
 // Flag for relative value of the residuum.
-unsigned flag_relresid = 1;                       
+unsigned flag_relresid = 1;
 // Tolerance for relative value of the residuum.
-double rel_resid = 1.0e-2;                        
+double rel_resid = 1.0e-2;
 // Max number of iterations.
-int max_iters = 100;                              
+int max_iters = 100;
 
 int main(int argc, char* argv[])
 {
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 
   // Perform initial mesh refinements.
   for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
-  
+
   // Define exact solution.
   MeshFunctionSharedPtr<double> exact(new CustomExactSolution(mesh, slope));
 
@@ -99,14 +99,14 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation.
   WeakFormSharedPtr<double> wf(new WeakFormsH1::DefaultWeakFormPoisson<double>(HERMES_ANY, new Hermes1DFunction<double>(1.0), &f));
-  
+
   // Initialize boundary conditions
   DefaultEssentialBCNonConst<double> bc_essential("Bdy", exact);
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
-  
+
   // Initialize refinement selector.
   H1ProjBasedSelector<double> selector(CAND_LIST);
 
@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
     // Time measurement.
     cpu_time.tick();
 
-    // Initial coefficient vector for the Newton's method.  
+    // Initial coefficient vector for the Newton's method.
     double* coeff_vec = new double[ndof_ref];
     memset(coeff_vec, 0, ndof_ref * sizeof(double));
 
@@ -178,15 +178,15 @@ int main(int argc, char* argv[])
     {
       solver.solve(coeff_vec);
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
       std::cout << e.what();
     }
 
     Solution<double>::vector_to_solution(solver.get_sln_vector(), ref_space, ref_sln);
-    Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)", 
+    Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)",
       solver.get_num_iters(), solver.get_residual());
-    Hermes::Mixins::Loggable::Static::info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)", 
+    Hermes::Mixins::Loggable::Static::info("Total number of iterations in linsolver: %d (achieved tolerance in the last step: %g)",
       solver.get_num_lin_iters(), solver.get_achieved_tol());
 
     Hermes::Mixins::Loggable::Static::info("Projecting reference solution on coarse mesh.");
@@ -204,7 +204,6 @@ int main(int argc, char* argv[])
     // Calculate exact error.
     errorCalculator.calculate_errors(sln, ref_sln);
     double err_est_rel = errorCalculator.get_total_error_squared() * 100;
-
 
     // Report results.
     Hermes::Mixins::Loggable::Static::info("ndof_coarse: %d, ndof_fine: %d",
@@ -236,9 +235,8 @@ int main(int argc, char* argv[])
     }
 
     // Clean up.
-    delete [] coeff_vec;
-  }
-  while (!done);
+    delete[] coeff_vec;
+  } while (!done);
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 

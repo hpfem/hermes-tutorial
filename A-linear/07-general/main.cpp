@@ -16,9 +16,9 @@
 //  The following parameters can be changed:
 
 // Read the original or XML mesh file.
-const bool USE_XML_FORMAT = true;                 
+const bool USE_XML_FORMAT = true;
 // Initial polynomial degree of all mesh elements.
-const int P_INIT = 3;                             
+const int P_INIT = 3;
 // Number of initial uniform refinements.
 const int INIT_REF_NUM = 3;
 
@@ -32,11 +32,11 @@ int main(int argc, char* argv[])
   MeshSharedPtr mesh(new Mesh);
   if (USE_XML_FORMAT == true)
   {
-    MeshReaderH2DXML mloader;  
+    MeshReaderH2DXML mloader;
     Hermes::Mixins::Loggable::Static::info("Reading mesh in XML format.");
     mloader.load("domain.xml", mesh);
   }
-  else 
+  else
   {
     MeshReaderH2D mloader;
     Hermes::Mixins::Loggable::Static::info("Reading mesh in original format.");
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 
   // Perform initial mesh refinements.
   for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
-  
+
   // Initialize boundary conditions
   CustomEssentialBCNonConst bc_essential("Horizontal");
   EssentialBCs<double> bcs(&bc_essential);
@@ -69,10 +69,10 @@ int main(int argc, char* argv[])
   {
     newton.solve();
   }
-  catch(std::exception& e)
+  catch (std::exception& e)
   {
     std::cout << e.what();
-}
+  }
 
   // Translate the resulting coefficient vector into a Solution.
   MeshFunctionSharedPtr<double> sln(new Solution<double>);

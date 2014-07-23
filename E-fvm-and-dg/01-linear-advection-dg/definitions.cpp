@@ -4,7 +4,7 @@ CustomWeakForm::CustomWeakForm(std::string left_bottom_bnd_part, bool DG) : Weak
   add_matrix_form(new MatrixFormVol(0, 0));
   add_vector_form(new VectorFormVol(0));
   add_matrix_form_surf(new MatrixFormSurface(0, 0));
-  if(DG)
+  if (DG)
     add_matrix_form_DG(new MatrixFormInterface(0, 0));
   add_vector_form_surf(new VectorFormSurface(0, left_bottom_bnd_part));
 };
@@ -60,7 +60,6 @@ Real CustomWeakForm::VectorFormVol::F(Real x, Real y) const {
   return Real(0);
 }
 
-
 CustomWeakForm::MatrixFormSurface::MatrixFormSurface(int i, int j) : Hermes::Hermes2D::MatrixFormSurf<double>(i, j) { }
 
 template<typename Real, typename Scalar>
@@ -98,7 +97,7 @@ Scalar CustomWeakForm::MatrixFormInterface::matrix_form(int n, double *wt, Disco
   for (int i = 0; i < n; i++) {
     Real a_dot_n = static_cast<CustomWeakForm*>(wf)->calculate_a_dot_v(e->x[i], e->y[i], e->nx[i], e->ny[i]);
     Real jump_v = (v->fn_central == NULL ? -v->val_neighbor[i] : v->val[i]);
-    if(u->fn_central == NULL)
+    if (u->fn_central == NULL)
       result += wt[i] * static_cast<CustomWeakForm*>(wf)->upwind_flux(Scalar(0), u->val_neighbor[i], a_dot_n) * jump_v;
     else
       result += wt[i] * static_cast<CustomWeakForm*>(wf)->upwind_flux(u->val[i], Scalar(0), a_dot_n) * jump_v;
@@ -155,7 +154,7 @@ Real CustomWeakForm::VectorFormSurface::F(Real x, Real y) const{
 
 double CustomWeakForm::calculate_a_dot_v(double x, double y, double vx, double vy) const {
   double norm = std::max<double>(1e-12, std::sqrt(Hermes::sqr(x) + Hermes::sqr(y)));
-  return -y/norm*vx + x/norm*vy;
+  return -y / norm*vx + x / norm*vy;
 }
 
 Ord CustomWeakForm::calculate_a_dot_v(Ord x, Ord y, Ord vx, Ord vy) const {
@@ -163,9 +162,9 @@ Ord CustomWeakForm::calculate_a_dot_v(Ord x, Ord y, Ord vx, Ord vy) const {
 }
 
 double CustomWeakForm::upwind_flux(double u_cent, double u_neib, double a_dot_n) const {
-  return a_dot_n * (a_dot_n >= 0 ? u_cent : u_neib); 
+  return a_dot_n * (a_dot_n >= 0 ? u_cent : u_neib);
 }
 
 Ord CustomWeakForm::upwind_flux(Ord u_cent, Ord u_neib, Ord a_dot_n) const {
-  return a_dot_n * (u_cent + u_neib); 
+  return a_dot_n * (u_cent + u_neib);
 }

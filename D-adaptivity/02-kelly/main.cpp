@@ -2,29 +2,29 @@
 #include "definitions.h"
 
 // This example shows how to run adaptive h-FEM driven by the Kelly estimator and
-// set its basic control parameters. The underlying problem is the same as in 
+// set its basic control parameters. The underlying problem is the same as in
 // P04-adaptivity/01-intro, i.e., a planar model of an electrostatic micromotor (MEMS).
 //
-// In this example, adaptive mesh refinement is not based on comparing solutions on 
+// In this example, adaptive mesh refinement is not based on comparing solutions on
 // coarse and refined meshes as in previous tutorial, but rather on evaluating an
 // error estimate for each element. The basic error estimator developed by Kelly and
-// co-workers for elliptic problems is represented by class BasicKellyAdapt (its 
+// co-workers for elliptic problems is represented by class BasicKellyAdapt (its
 // base class KellyTypeAdapt may be used to adjust the estimator to more general
-// problems). It calculates the error of an element as L2 norm of jumps of 
-// solution accross element edges. In order to fully conform to the theory, it may 
-// also optionally include the L2 norm of the equation residual (variable 
+// problems). It calculates the error of an element as L2 norm of jumps of
+// solution accross element edges. In order to fully conform to the theory, it may
+// also optionally include the L2 norm of the equation residual (variable
 // USE_RESIDUAL_ESTIMATOR).
 //
-// Elements with highest error estimates will be refined according to the selected 
-// strategy (variables THRESHOLD and STRATEGY). See the User Documentation for more 
-// details. 
+// Elements with highest error estimates will be refined according to the selected
+// strategy (variables THRESHOLD and STRATEGY). See the User Documentation for more
+// details.
 //
-// Uniform initial polynomial degree of mesh elements can be set using the variable 
+// Uniform initial polynomial degree of mesh elements can be set using the variable
 // P_INIT. Additional control parameters are available, these will be demonstrated
-// in the following tutorial examples. 
+// in the following tutorial examples.
 //
-// In this example, two types of convergence graphs are created -- error estimate 
-// wrt. the number of degrees of freedom (DOF), and error estimate wrt. CPU time. 
+// In this example, two types of convergence graphs are created -- error estimate
+// wrt. the number of degrees of freedom (DOF), and error estimate wrt. CPU time.
 // Later we will show how to output the error wrt. exact solution when exact
 // solution is available.
 //
@@ -37,15 +37,15 @@
 //
 // The following parameters can be changed:
 
-// Set to "false" to suppress Hermes OpenGL visualization. 
-const bool HERMES_VISUALIZATION = true;           
+// Set to "false" to suppress Hermes OpenGL visualization.
+const bool HERMES_VISUALIZATION = true;
 // Set to "true" to enable VTK output.
-const bool VTK_VISUALIZATION = false;             
+const bool VTK_VISUALIZATION = false;
 // Initial polynomial degree of mesh elements.
-const int P_INIT = 2;                             
+const int P_INIT = 2;
 // This is a quantitative parameter of the adapt(...) function and
 // it has different meanings for various adaptive strategies.
-const double THRESHOLD = 0.3;                     
+const double THRESHOLD = 0.3;
 // Adaptive strategy:
 // STRATEGY = 0 ... refine elements until sqrt(THRESHOLD) times total
 //   error is processed. If more elements have similar errors, refine
@@ -54,28 +54,28 @@ const double THRESHOLD = 0.3;
 //   than THRESHOLD times maximum element error.
 // STRATEGY = 2 ... refine all elements whose error is larger
 //   than THRESHOLD.
-const int STRATEGY = 0;                           
+const int STRATEGY = 0;
 // Add also the norm of residual to the error estimate of each element.
-const bool USE_RESIDUAL_ESTIMATOR = false;          
+const bool USE_RESIDUAL_ESTIMATOR = false;
 // If true, the interface estimator is defined by jumps of fluxes; otherwise
 // jumps of normal derivatives are used.
-const bool USE_EPS_IN_INTERFACE_ESTIMATOR = true;   
+const bool USE_EPS_IN_INTERFACE_ESTIMATOR = true;
 // Maximum allowed level of hanging nodes:
 // MESH_REGULARITY = -1 ... arbitrary level hangning nodes (default),
 // MESH_REGULARITY = 1 ... at most one-level hanging nodes,
 // MESH_REGULARITY = 2 ... at most two-level hanging nodes, etc.
 // Note that regular meshes are not supported, this is due to
 // their notoriously bad performance.
-const int MESH_REGULARITY = -1;                   
+const int MESH_REGULARITY = -1;
 // Stopping criterion for adaptivity.
-const double ERR_STOP = 5e-6;                     
+const double ERR_STOP = 5e-6;
 // Adaptivity process stops when the number of degrees of freedom grows
 // over this limit. This is to prevent h-adaptivity to go on forever.
-const int NDOF_STOP = 60000;                      
+const int NDOF_STOP = 60000;
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK; 
-                                                  
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;
+
 // Problem parameters.
 const double EPS0 = 8.863e-12;
 const double VOLTAGE = 50.0;
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation.
   WeakFormSharedPtr<double> wf(new CustomWeakFormPoisson("Motor", EPS_MOTOR, "Air", EPS_AIR, &mesh));
-  
+
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_essential_out("Outer", 0.0);
   DefaultEssentialBCConst<double> bc_essential_stator("Stator", VOLTAGE);
@@ -120,14 +120,14 @@ int main(int argc, char* argv[])
   do
   {
     Hermes::Mixins::Loggable::Static::info("---- Adaptivity step %d:", as);
-    
+
     // Time measurement.
     cpu_time.tick();
 
     // Initialize reference problem.
     Hermes::Mixins::Loggable::Static::info("Solving.");
     DiscreteProblem<double> dp(wf, &space);
-    
+
     NewtonSolver<double> newton(&dp);
     newton.set_verbose_output(false);
 
@@ -139,18 +139,18 @@ int main(int argc, char* argv[])
     {
       newton.solve();
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
       std::cout << e.what();
-}
+    }
     // Translate the resulting coefficient vector into the instance of Solution.
     Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);
-    
+
     // Time measurement.
     cpu_time.tick();
 
     // VTK output.
-    if (VTK_VISUALIZATION) 
+    if (VTK_VISUALIZATION)
     {
       // Output solution in VTK format.
       Views::Linearizer lin(FileExport);
@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
     }
 
     // View the coarse mesh solution and polynomial orders.
-    if (HERMES_VISUALIZATION) 
+    if (HERMES_VISUALIZATION)
     {
       sview.show(&sln);
       oview.show(&space);
@@ -175,67 +175,66 @@ int main(int argc, char* argv[])
 
     // Skip visualization time.
     cpu_time.tick();
-    
+
     // Calculate element errors and total error estimate.
     Hermes::Mixins::Loggable::Static::info("Calculating error estimate.");
     bool ignore_visited_segments = true;
-    KellyTypeAdapt<double> adaptivity(&space, ignore_visited_segments, 
-                                      USE_EPS_IN_INTERFACE_ESTIMATOR 
-                                        ? 
-                                          new CustomInterfaceEstimatorScalingFunction("Motor", EPS_MOTOR, "Air", EPS_AIR)
-                                        :
-                                          new CustomInterfaceEstimatorScalingFunction);
-    
+    KellyTypeAdapt<double> adaptivity(&space, ignore_visited_segments,
+      USE_EPS_IN_INTERFACE_ESTIMATOR
+      ?
+      new CustomInterfaceEstimatorScalingFunction("Motor", EPS_MOTOR, "Air", EPS_AIR)
+      :
+      new CustomInterfaceEstimatorScalingFunction);
+
     adaptivity.add_error_estimator_surf(new Hermes::Hermes2D::BasicKellyAdapt<double>::ErrorEstimatorFormKelly());
-    
-    if (USE_RESIDUAL_ESTIMATOR) 
+
+    if (USE_RESIDUAL_ESTIMATOR)
     {
       adaptivity.add_error_estimator_vol(new ResidualErrorFormMotor("Motor", EPS_MOTOR));
       adaptivity.add_error_estimator_vol(new ResidualErrorFormAir("Air", EPS_AIR));
     }
-    
+
     if (USE_EPS_IN_INTERFACE_ESTIMATOR)
       // Use normalization by energy norm.
       adaptivity.set_error_form(new EnergyErrorForm(wf));
-    
+
     // Note that there is only one solution (the only one available) passed to BasicKellyAdapt::calc_err_est
-    // and there is also no "solutions_for_adapt" parameter. The last parameter, "error_flags", is left 
+    // and there is also no "solutions_for_adapt" parameter. The last parameter, "error_flags", is left
     // intact and has the meaning explained in P04-adaptivity/01-intro. You may however still call
     // adaptivity.calc_err_est with a solution, an exact solution and solutions_for_adapt=false to calculate
-    // error wrt. an exact solution (if provided). 
+    // error wrt. an exact solution (if provided).
     double err_est_rel = adaptivity.calc_err_est(&sln, HERMES_TOTAL_ERROR_REL | HERMES_ELEMENT_ERROR_REL) * 100;
 
     // Report results.
     Hermes::Mixins::Loggable::Static::info("ndof: %d, err_est_rel: %g%%", space.get_num_dofs(), err_est_rel);
 
     // Add entry to DOF and CPU convergence graphs.
-    cpu_time.tick();    
+    cpu_time.tick();
     graph_cpu.add_values(cpu_time.accumulated(), err_est_rel);
     graph_cpu.save("conv_cpu_est.dat");
     graph_dof.add_values(space.get_num_dofs(), err_est_rel);
     graph_dof.save("conv_dof_est.dat");
-    
+
     // Skip the time spent to save the convergence graphs.
     cpu_time.tick();
 
     // If err_est too large, adapt the mesh.
-    if (err_est_rel < ERR_STOP) 
+    if (err_est_rel < ERR_STOP)
       done = true;
     else
     {
       Hermes::Mixins::Loggable::Static::info("Adapting coarse mesh.");
-      
+
       // h-refinement is automatically selected here, no need for parameter "selector".
       done = adaptivity.adapt(THRESHOLD, STRATEGY, MESH_REGULARITY);
 
       // Increase the counter of performed adaptivity steps.
-      if (!done)  
+      if (!done)
         as++;
     }
-    if (space.get_num_dofs() >= NDOF_STOP) 
+    if (space.get_num_dofs() >= NDOF_STOP)
       done = true;
-  }
-  while (!done);
+  } while (!done);
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 
@@ -249,4 +248,3 @@ int main(int argc, char* argv[])
 
   return 0;
 }
-

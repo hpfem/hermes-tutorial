@@ -16,13 +16,13 @@ public:
 
   virtual Ord value(Ord u) const;
 
-  protected:
-    double alpha;
+protected:
+  double alpha;
 };
 
 /* Weak forms */
 
-// NOTE: The linear problem in the Picard's method is 
+// NOTE: The linear problem in the Picard's method is
 //       solved using the Newton's method.
 
 class CustomWeakFormPicard : public WeakForm<double>
@@ -37,49 +37,49 @@ private:
     CustomJacobian(int i, int j, Hermes1DFunction<double>* lambda) : MatrixFormVol<double>(i, j), lambda(lambda) {};
 
     virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
-                         Func<double> *v, GeomVol<double> *e, Func<double> **ext) const;
+      Func<double> *v, GeomVol<double> *e, Func<double> **ext) const;
 
     virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v,
-                    GeomVol<Ord> *e, Func<Ord> **ext) const;
-    
+      GeomVol<Ord> *e, Func<Ord> **ext) const;
+
     MatrixFormVol<double>* clone() const;
 
-    protected:
-      Hermes1DFunction<double>* lambda;
+  protected:
+    Hermes1DFunction<double>* lambda;
   };
 
   class CustomResidual : public VectorFormVol<double>
   {
   public:
-    CustomResidual(int i, Hermes1DFunction<double>* lambda, Hermes2DFunction<double>* f) 
-      : VectorFormVol<double>(i), lambda(lambda), f(f) 
+    CustomResidual(int i, Hermes1DFunction<double>* lambda, Hermes2DFunction<double>* f)
+      : VectorFormVol<double>(i), lambda(lambda), f(f)
     {
-    }
+      }
 
     virtual double value(int n, double *wt, Func<double> *u_ext[],
-                         Func<double> *v, GeomVol<double> *e, Func<double> **ext) const;
+      Func<double> *v, GeomVol<double> *e, Func<double> **ext) const;
 
-    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, 
-                    GeomVol<Ord> *e, Func<Ord> **ext) const;
+    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
+      GeomVol<Ord> *e, Func<Ord> **ext) const;
 
     VectorFormVol<double>* clone() const;
 
   private:
-      Hermes1DFunction<double>* lambda;
-      Hermes2DFunction<double>* f;
+    Hermes1DFunction<double>* lambda;
+    Hermes2DFunction<double>* f;
   };
 };
 
 /* Essential boundary conditions */
 
-class CustomEssentialBCNonConst : public EssentialBoundaryCondition<double> 
+class CustomEssentialBCNonConst : public EssentialBoundaryCondition<double>
 {
 public:
-  CustomEssentialBCNonConst(std::string marker) 
-           : EssentialBoundaryCondition<double>(std::vector<std::string>()) 
+  CustomEssentialBCNonConst(std::string marker)
+    : EssentialBoundaryCondition<double>(std::vector<std::string>())
   {
-    this->markers.push_back(marker);
-  };
+      this->markers.push_back(marker);
+    };
 
   virtual EssentialBoundaryCondition<double>::EssentialBCValueType get_value_type() const;
 

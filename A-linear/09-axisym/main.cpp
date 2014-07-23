@@ -16,25 +16,25 @@
 // The following parameters can be changed:
 
 // Read original or XML mesh file.
-const bool USE_XML_FORMAT = true;                 
-// Set to "false" to suppress Hermes OpenGL visualization. 
-const bool HERMES_VISUALIZATION = true;           
+const bool USE_XML_FORMAT = true;
+// Set to "false" to suppress Hermes OpenGL visualization.
+const bool HERMES_VISUALIZATION = true;
 // Set to "true" to enable VTK output.
-const bool VTK_VISUALIZATION = false;              
+const bool VTK_VISUALIZATION = false;
 // Uniform polynomial degree of all mesh elements.
-const int P_INIT = 4;                             
+const int P_INIT = 4;
 // Number of initial uniform mesh refinements.
 const int INIT_REF_NUM = 2;
 
 // Problem parameters.
 // Prescribed temperature on Gamma_bottom.
-const double T1 = 100.0;      
+const double T1 = 100.0;
 // Outer temperature.
-const double T0 = 0.0;        
+const double T0 = 0.0;
 // Thermal conductivity.
-const double LAMBDA = 386;    
+const double LAMBDA = 386;
 // Heat flux coefficient on Gamma_heat_flux.
-const double ALPHA = 20.0;    
+const double ALPHA = 20.0;
 
 int main(int argc, char* argv[])
 {
@@ -42,11 +42,11 @@ int main(int argc, char* argv[])
   MeshSharedPtr mesh(new Mesh);
   if (USE_XML_FORMAT == true)
   {
-    MeshReaderH2DXML mloader;  
+    MeshReaderH2DXML mloader;
     Hermes::Mixins::Loggable::Static::info("Reading mesh in XML format.");
     mloader.load("domain.xml", mesh);
   }
-  else 
+  else
   {
     MeshReaderH2D mloader;
     Hermes::Mixins::Loggable::Static::info("Reading mesh in original format.");
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
   }
 
   // Perform initial mesh refinements.
-  for(int i=0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
+  for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
 
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_essential("Bottom", T1);
@@ -79,17 +79,17 @@ int main(int argc, char* argv[])
   {
     newton.solve();
   }
-  catch(std::exception& e)
+  catch (std::exception& e)
   {
     std::cout << e.what();
-}
+  }
 
   // Translate the resulting coefficient vector into a Solution.
   MeshFunctionSharedPtr<double> sln(new Solution<double>);
   Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);
 
   // VTK output.
-  if (VTK_VISUALIZATION) 
+  if (VTK_VISUALIZATION)
   {
     // Output solution in VTK format.
     Linearizer lin(FileExport);
@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
   }
 
   // Visualize the solution.
-  if (HERMES_VISUALIZATION) 
+  if (HERMES_VISUALIZATION)
   {
     ScalarView view("Solution", new WinGeom(0, 0, 440, 350));
     // See the Doxygen documentation for explanation.
@@ -115,4 +115,3 @@ int main(int argc, char* argv[])
 
   return 0;
 }
-

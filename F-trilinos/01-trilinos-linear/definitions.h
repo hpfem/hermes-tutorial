@@ -10,9 +10,9 @@ class CustomExactSolution : public ExactSolutionScalar<double>
 public:
   CustomExactSolution(MeshSharedPtr mesh) : ExactSolutionScalar<double>(mesh) {};
 
-  virtual double value (double x, double y) const;
+  virtual double value(double x, double y) const;
 
-  virtual void derivatives (double x, double y, double& dx, double& dy) const;
+  virtual void derivatives(double x, double y, double& dx, double& dy) const;
 
   virtual Ord ord(double x, double y) const;
 };
@@ -24,4 +24,3 @@ class CustomWeakFormPoisson : public WeakForm<double>
 public:
   CustomWeakFormPoisson(bool is_matfree = false);
 };
-

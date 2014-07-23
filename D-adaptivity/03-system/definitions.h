@@ -14,9 +14,9 @@ public:
   CustomExactFunction1() {};
 
   double val(double x);
-  
+
   double dx(double x);
-  
+
   double ddxx(double x);
 };
 
@@ -26,9 +26,9 @@ public:
   CustomExactFunction2(double K) : K(K) {};
 
   double val(double x);
-  
+
   double dx(double x);
-  
+
   double ddxx(double x);
 
   double K;
@@ -36,7 +36,7 @@ public:
 
 /* Right-hand side */
 
-class CustomRightHandSide1: public Hermes2DFunction<double>
+class CustomRightHandSide1 : public Hermes2DFunction<double>
 {
 public:
   CustomRightHandSide1(double K, double d_u, double sigma);
@@ -52,7 +52,7 @@ public:
   double d_u, sigma;
 };
 
-class CustomRightHandSide2: public Hermes2DFunction<double>
+class CustomRightHandSide2 : public Hermes2DFunction<double>
 {
 public:
   CustomRightHandSide2(double K, double d_v);
@@ -82,8 +82,8 @@ public:
   virtual Ord ord(double x, double y) const;
 
   ~ExactSolutionFitzHughNagumo1();
-	
-	virtual MeshFunction<double>* clone() const;
+
+  virtual MeshFunction<double>* clone() const;
 
   CustomExactFunction1* cef1;
 };
@@ -99,12 +99,12 @@ public:
 
   virtual Ord ord(double x, double y) const;
 
-	virtual MeshFunction<double>* clone() const;
+  virtual MeshFunction<double>* clone() const;
 
   ~ExactSolutionFitzHughNagumo2();
 
   CustomExactFunction2* cef2;
-	double K;
+  double K;
 };
 
 /* Weak forms */
@@ -116,10 +116,10 @@ public:
     : VectorFormVol<double>(0), d_u(d_u), sigma(sigma), g1(g1) {};
 
   virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v,
-                       GeomVol<double> *e, Func<double> **ext) const;
+    GeomVol<double> *e, Func<double> **ext) const;
 
   virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
-                  GeomVol<Ord> *e, Func<Ord> **ext) const;
+    GeomVol<Ord> *e, Func<Ord> **ext) const;
 
   virtual VectorFormVol<double>* clone() const;
 
@@ -136,13 +136,13 @@ public:
     : VectorFormVol<double>(1), d_v(d_v), g2(g2) {};
 
   virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v,
-                       GeomVol<double> *e, Func<double> **ext) const;
-  
+    GeomVol<double> *e, Func<double> **ext) const;
+
   virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
-                  GeomVol<Ord> *e, Func<Ord> **ext) const;
-  
+    GeomVol<Ord> *e, Func<Ord> **ext) const;
+
   virtual VectorFormVol<double>* clone() const;
-  
+
 private:
   double d_v;
   CustomRightHandSide2* g2;

@@ -7,7 +7,7 @@
 //  Domain: Square (0, 1) x (0, 1).
 //
 //  BC:	Dirichlet, u = 1 where \Beta(x) \cdot n(x) < 0, that is on [0,0.5] x {0}, and g = 0 anywhere else.
-//				
+//
 //  The following parameters can be changed:
 
 // Number of initial uniform mesh refinements.
@@ -29,9 +29,9 @@ const std::string BDY_BOTTOM_LEFT = "1";
 
 int criterion(Element * e)
 {
-  if(std::abs(e->vn[0]->x * e->vn[0]->x + e->vn[0]->y * e->vn[0]->y - 0.25) < INIT_REF_DIST)
+  if (std::abs(e->vn[0]->x * e->vn[0]->x + e->vn[0]->y * e->vn[0]->y - 0.25) < INIT_REF_DIST)
     return 0;
-  if(std::abs(e->vn[2]->x * e->vn[2]->x + e->vn[2]->y * e->vn[2]->y - 0.25) < INIT_REF_DIST)
+  if (std::abs(e->vn[2]->x * e->vn[2]->x + e->vn[2]->y * e->vn[2]->y - 0.25) < INIT_REF_DIST)
     return 0;
   return -1;
 }
@@ -47,7 +47,7 @@ int main(int argc, char* args[])
   mloader.load("square.mesh", mesh);
 
   // Perform initial mesh refinement.
-  for (int i=0; i<INIT_REF; i++) 
+  for (int i = 0; i < INIT_REF; i++)
     mesh->refine_all_elements();
 
   mesh->refine_by_criterion(criterion, INIT_REF_CRITERION);
@@ -55,7 +55,7 @@ int main(int argc, char* args[])
   ScalarView view1("Solution - Discontinuous Galerkin FEM", new WinGeom(900, 0, 450, 350));
   ScalarView view2("Solution - Standard continuous FEM", new WinGeom(900, 400, 450, 350));
 
-  if(WANT_DG)
+  if (WANT_DG)
   {
     // Create an L2 space.
     SpaceSharedPtr<double> space_l2(new L2Space<double>(mesh, P_INIT));
@@ -76,8 +76,8 @@ int main(int argc, char* args[])
     try
     {
       linear_solver.solve();
-      if(DG_SHOCK_CAPTURING)
-      {      
+      if (DG_SHOCK_CAPTURING)
+      {
         FluxLimiter flux_limiter(FluxLimiter::Kuzmin, linear_solver.get_sln_vector(), space_l2, true);
 
         flux_limiter.limit_second_orders_according_to_detector();
@@ -94,12 +94,12 @@ int main(int argc, char* args[])
       // View the solution.
       view1.show(sln_l2);
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
       std::cout << e.what();
-}
+    }
   }
-  if(WANT_FEM)
+  if (WANT_FEM)
   {
     // Create an H1 space.
     SpaceSharedPtr<double> space_h1(new H1Space<double>(mesh, P_INIT));
@@ -125,7 +125,7 @@ int main(int argc, char* args[])
       // View the solution.
       view2.show(sln_h1);
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
       std::cout << e.what();
     }

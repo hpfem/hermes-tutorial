@@ -11,6 +11,6 @@ class CustomWeakFormPoisson : public WeakForm<double>
 {
 public:
   CustomWeakFormPoisson(std::string mat_al, Hermes1DFunction<double>* lambda_al,
-                        std::string mat_cu, Hermes1DFunction<double>* lambda_cu,
-                        Hermes2DFunction<double>* src_term);
+    std::string mat_cu, Hermes1DFunction<double>* lambda_cu,
+    Hermes2DFunction<double>* src_term);
 };
