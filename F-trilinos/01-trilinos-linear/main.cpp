@@ -25,7 +25,7 @@ const int P_INIT = 3;
 const bool TRILINOS_JFNK = true;
 // Preconditioning by jacobian in case of JFNK (for NOX),
 // default ML preconditioner in case of Newton.
-const bool PRECOND = true;
+const bool PRECOND = false;
 // Name of the iterative method employed by AztecOO (ignored
 // by the other solvers).
 // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
@@ -50,7 +50,7 @@ unsigned flag_relresid = 1;
 // Tolerance for relative value of the residuum.
 double rel_resid = 1.0e-2;
 // Max number of iterations.
-int max_iters = 100;
+int max_iters = 5;
 
 int main(int argc, char **argv)
 {
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
   EssentialBCs<double> bcs(&bc_essential);
 
   // Initialize the weak formulation.
-  CustomWeakFormPoisson wf1;
+  WeakFormSharedPtr<double> wf1(new CustomWeakFormPoisson);
 
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
@@ -134,7 +134,8 @@ int main(int argc, char **argv)
   // Calculate initial vector for NOX.
   Hermes::Mixins::Loggable::Static::info("Projecting to obtain initial vector for the Newton's method.");
   double* coeff_vec = new double[ndof];
-  memset(coeff_vec, 0, ndof*sizeof(double));
+  MeshFunctionSharedPtr<double> sln2_init(new ConstantSolution<double>(mesh, 123.));
+  OGProjection<double>::project_global(space, sln1, coeff_vec);
 
   // Initialize the NOX solver.
   Hermes::Mixins::Loggable::Static::info("Initializing NOX.");
@@ -182,7 +183,6 @@ int main(int argc, char **argv)
   // Show the NOX solution.
   ScalarView view2("Solution<double> 2", new WinGeom(450, 0, 460, 350));
   view2.show(sln2);
-  //view2.show(&exact);
 
   // Calculate errors.
   DefaultErrorCalculator<double, HERMES_H1_NORM> errorCalculator2(RelativeErrorToGlobalNorm, 1);

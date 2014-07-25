@@ -1,7 +1,7 @@
 #include "definitions.h"
 
 CustomWeakForm::CustomWeakForm(std::vector<std::string> newton_boundaries, double heatcap, double rho, double tau,
-  double lambda, double alpha, double temp_ext, Solution<double>* sln_prev_time, bool JFNK) : WeakForm<double>(1, JFNK)
+  double lambda, double alpha, double temp_ext, MeshFunctionSharedPtr<double> sln_prev_time, bool JFNK) : WeakForm<double>(1, JFNK)
 {
     this->set_ext(sln_prev_time);
 

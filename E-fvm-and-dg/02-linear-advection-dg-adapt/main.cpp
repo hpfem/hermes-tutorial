@@ -110,7 +110,7 @@ int main(int argc, char* args[])
 
     std::cout << "Error: " << err_est_rel << "%." << std::endl;
 
-    // If err_est_rel too large, adapt the mesh->
+    // If err_est_rel too large, adapt the mesh.
     if (err_est_rel < ERR_STOP)
       done = true;
     else

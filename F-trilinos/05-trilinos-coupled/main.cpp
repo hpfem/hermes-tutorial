@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
   // Create H1 spaces with default shapesets.
   SpaceSharedPtr<double> t_space(new H1Space<double>(mesh, &bcs_t, P_INIT));
   SpaceSharedPtr<double> c_space(new H1Space<double>(mesh, &bcs_c, P_INIT));
-  int ndof = Space<double>::get_num_dofs(std::vector<SpaceSharedPtr<double> >(t_space, c_space));
+  int ndof = Space<double>::get_num_dofs({ t_space, c_space });
   Hermes::Mixins::Loggable::Static::info("ndof = %d.", ndof);
 
   // Define initial conditions.
@@ -104,8 +104,8 @@ int main(int argc, char* argv[])
   ScalarView rview("Reaction rate", new WinGeom(0, 0, 800, 230));
 
   // Initialize weak formulation.
-  CustomWeakForm wf(Le, alpha, beta, kappa, x1, TAU, TRILINOS_JFNK, PRECOND, omega, omega_dt,
-    omega_dc, t_prev_time_1, c_prev_time_1, t_prev_time_2, c_prev_time_2);
+  WeakFormSharedPtr<double> wf(new CustomWeakForm(Le, alpha, beta, kappa, x1, TAU, TRILINOS_JFNK, PRECOND, omega, omega_dt,
+    omega_dc, t_prev_time_1, c_prev_time_1, t_prev_time_2, c_prev_time_2));
 
   // Project the functions "t_prev_time_1" and "c_prev_time_1" on the FE space
   // in order to obtain initial vector for NOX.
@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
       std::cout << e.what();
     }
 
-    Solution<double>::vector_to_solutions(solver.get_sln_vector(), { t_space, c_space }, std::vector<MeshFunctionSharedPtr<double> >(t_prev_newton, c_prev_newton));
+    Solution<double>::vector_to_solutions(solver.get_sln_vector(), { t_space, c_space }, { t_prev_newton, c_prev_newton });
 
     cpu_time.tick();
     Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)",

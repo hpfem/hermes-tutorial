@@ -85,17 +85,16 @@ int main(int argc, char* argv[])
   Hermes::Mixins::Loggable::Static::info("ndof: %d", ndof);
 
   // Define constant initial condition.
-  ConstantSolution<double> t_prev_time(mesh, TEMP_INIT);
+  MeshFunctionSharedPtr<double> t_prev_time(new ConstantSolution<double>(mesh, TEMP_INIT));
 
   // Initialize the weak formulation.
-  CustomWeakForm wf({ "Bdy_right", "Bdy_top", "Bdy_left" },
-    HEATCAP, RHO, TAU, LAMBDA, ALPHA, TEMP_EXT, &t_prev_time, TRILINOS_JFNK);
+  WeakFormSharedPtr<double> wf(new CustomWeakForm({ "Bdy_right", "Bdy_top", "Bdy_left" }, HEATCAP, RHO, TAU, LAMBDA, ALPHA, TEMP_EXT, t_prev_time, TRILINOS_JFNK));
 
   // Project the function "t_prev_time" on the FE space
   // in order to obtain initial vector for NOX.
-  Hermes::Mixins::Loggable::Static::info("Projecting initial solution on the FE mesh->");
+  Hermes::Mixins::Loggable::Static::info("Projecting initial solution on the FE mesh.");
   double* coeff_vec = new double[ndof];
-  OGProjection<double>::project_global(space, &t_prev_time, coeff_vec);
+  OGProjection<double>::project_global(space, t_prev_time, coeff_vec);
 
   // Initialize the NOX solver.
   Hermes::Mixins::Loggable::Static::info("Initializing NOX.");
@@ -139,10 +138,10 @@ int main(int argc, char* argv[])
       std::cout << e.what();
     }
 
-    Solution<double>::vector_to_solution(solver_nox.get_sln_vector(), space, &t_prev_time);
+    Solution<double>::vector_to_solution(solver_nox.get_sln_vector(), space, t_prev_time);
 
     // Show the new solution.
-    Tview.show(&t_prev_time);
+    Tview.show(t_prev_time);
 
     Hermes::Mixins::Loggable::Static::info("Number of nonlin iterations: %d (norm of residual: %g)",
       solver_nox.get_num_iters(), solver_nox.get_residual());

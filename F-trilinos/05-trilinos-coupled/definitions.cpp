@@ -4,7 +4,7 @@ CustomWeakForm::CustomWeakForm(double Le, double alpha, double beta, double kapp
   Hermes::Hermes2D::MeshFunctionSharedPtr<double>  omega, Hermes::Hermes2D::MeshFunctionSharedPtr<double>  omega_dt, Hermes::Hermes2D::MeshFunctionSharedPtr<double>  omega_dc,
   MeshFunctionSharedPtr<double>  t_prev_time_1, MeshFunctionSharedPtr<double>  c_prev_time_1, MeshFunctionSharedPtr<double>  t_prev_time_2, MeshFunctionSharedPtr<double>  c_prev_time_2) : WeakForm<double>(2, JFNK ? true : false), Le(Le), alpha(alpha), beta(beta), kappa(kappa), x1(x1)
 {
-    this->set_ext(std::vector<MeshFunctionSharedPtr<double> >(omega_dt, omega_dc, t_prev_time_1, t_prev_time_2, c_prev_time_1, c_prev_time_2, omega));
+  this->set_ext({ omega_dt, omega_dc, t_prev_time_1, t_prev_time_2, c_prev_time_1, c_prev_time_2, omega });
 
     if (!JFNK || (JFNK && PRECOND == 1))
     {

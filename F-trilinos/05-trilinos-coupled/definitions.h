@@ -240,7 +240,7 @@ public:
 class CustomFilter : public Hermes::Hermes2D::DXDYFilter<double>
 {
 public:
-  CustomFilter({ solutions }, Le(Le), alpha(alpha), beta(beta), kappa(kappa), x1(x1), tau(tau)
+  CustomFilter(std::vector<MeshFunctionSharedPtr<double> > solutions, double Le, double alpha, double beta, double kappa, double x1, double tau) : Hermes::Hermes2D::DXDYFilter<double>(solutions), Le(Le), alpha(alpha), beta(beta), kappa(kappa), x1(x1), tau(tau)
   {
   }
 
@@ -270,7 +270,7 @@ private:
 class CustomFilterDc : public Hermes::Hermes2D::DXDYFilter<double>
 {
 public:
-  CustomFilterDc({ solutions }, Le(Le), alpha(alpha), beta(beta), kappa(kappa), x1(x1), tau(tau)
+  CustomFilterDc(std::vector<MeshFunctionSharedPtr<double> > solutions, double Le, double alpha, double beta, double kappa, double x1, double tau) : Hermes::Hermes2D::DXDYFilter<double>(solutions), Le(Le), alpha(alpha), beta(beta), kappa(kappa), x1(x1), tau(tau)
   {
   }
 
@@ -300,7 +300,7 @@ private:
 class CustomFilterDt : public Hermes::Hermes2D::DXDYFilter<double>
 {
 public:
-  CustomFilterDt({ solutions }, Le(Le), alpha(alpha), beta(beta), kappa(kappa), x1(x1), tau(tau)
+  CustomFilterDt(std::vector<MeshFunctionSharedPtr<double> > solutions, double Le, double alpha, double beta, double kappa, double x1, double tau) : Hermes::Hermes2D::DXDYFilter<double>(solutions), Le(Le), alpha(alpha), beta(beta), kappa(kappa), x1(x1), tau(tau)
   {
   }
   virtual MeshFunction<double>* clone() const

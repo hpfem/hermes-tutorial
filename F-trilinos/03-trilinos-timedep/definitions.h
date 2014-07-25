@@ -9,7 +9,7 @@ class CustomWeakForm : public WeakForm<double>
 public:
   CustomWeakForm(std::vector<std::string> newton_boundaries, double heatcap,
     double rho, double tau, double lambda, double alpha, double temp_ext,
-    Solution<double>* sln_prev_time, bool JFNK = false);
+    MeshFunctionSharedPtr<double> sln_prev_time, bool JFNK = false);
 
   ~CustomWeakForm() {};
 

@@ -15,6 +15,10 @@ public:
   virtual void derivatives(double x, double y, double& dx, double& dy) const;
 
   virtual Ord ord(double x, double y) const;
+
+  virtual ExactSolutionScalar<double>* clone() const {
+    return new CustomExactSolution(mesh);
+  }
 };
 
 /* Weak forms */
