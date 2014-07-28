@@ -33,7 +33,7 @@ const double THRESHOLD = 0.3;
 const CandList CAND_LIST = H2D_HP_ANISO_H;
 // Stopping criterion for adaptivity (rel. error tolerance between the
 // fine mesh and coarse mesh solution in percent).
-const double ERR_STOP = 26.0;
+const double ERR_STOP = 5.0;
 
 // Error calculation & adaptivity.
 DefaultErrorCalculator<double, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
@@ -106,6 +106,7 @@ int main(int argc, char* argv[])
 
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  adaptivity.set_space(space);
 
   // Initialize refinement selector.
   H1ProjBasedSelector<double> selector(CAND_LIST);
@@ -146,10 +147,6 @@ int main(int argc, char* argv[])
     // Time measurement.
     cpu_time.tick();
 
-    // Initial coefficient vector for the Newton's method.
-    double* coeff_vec = new double[ndof_ref];
-    memset(coeff_vec, 0, ndof_ref * sizeof(double));
-
     // Initialize NOX solver.
     NewtonSolverNOX<double> solver(wf, ref_space);
     solver.set_output_flags(message_type);
@@ -176,7 +173,7 @@ int main(int argc, char* argv[])
     Hermes::Mixins::Loggable::Static::info("Assembling by DiscreteProblem, solving by NOX.");
     try
     {
-      solver.solve(coeff_vec);
+      solver.solve();
     }
     catch (std::exception& e)
     {
@@ -229,13 +226,12 @@ int main(int argc, char* argv[])
     {
       Hermes::Mixins::Loggable::Static::info("Adapting coarse mesh.");
       done = adaptivity.adapt(&selector);
+      Hermes::Mixins::Loggable::Static::info("Done adapting.");
 
       // Increase the counter of adaptivity steps.
       if (!done)  as++;
     }
 
-    // Clean up.
-    delete[] coeff_vec;
   } while (!done);
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());

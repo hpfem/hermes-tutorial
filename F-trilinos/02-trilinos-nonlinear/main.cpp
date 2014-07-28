@@ -39,7 +39,7 @@ MatrixSolverType matrix_solver = SOLVER_UMFPACK;
 // NOX parameters.
 // true = jacobian-free method,
 // false = Newton.
-const bool TRILINOS_JFNK = false;
+const bool TRILINOS_JFNK = true;
 // Preconditioning by jacobian (1) or approximation of jacobian (2)
 // in case of JFNK,
 // Default ML proconditioner in case of Newton.
@@ -59,11 +59,11 @@ unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::Ou
 // Tolerance for linear system.
 double ls_tolerance = 1e-5;
 // Flag for absolute value of the residuum.
-unsigned flag_absresid = 0;
+unsigned flag_absresid = 1;
 // Tolerance for absolute value of the residuum.
 double abs_resid = 1.0e-8;
 // Flag for relative value of the residuum.
-unsigned flag_relresid = 1;
+unsigned flag_relresid = 0;
 // Tolerance for relative value of the residuum.
 double rel_resid = 1.0e-8;
 // Max number of iterations.

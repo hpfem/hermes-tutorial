@@ -25,7 +25,7 @@ const int P_INIT = 3;
 const bool TRILINOS_JFNK = true;
 // Preconditioning by jacobian in case of JFNK (for NOX),
 // default ML preconditioner in case of Newton.
-const bool PRECOND = false;
+const bool PRECOND = true;
 // Name of the iterative method employed by AztecOO (ignored
 // by the other solvers).
 // Possibilities: gmres, cg, cgs, tfqmr, bicgstab.
@@ -42,15 +42,15 @@ unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::Ou
 // Tolerance for linear system.
 double ls_tolerance = 1e-5;
 // Flag for absolute value of the residuum.
-unsigned flag_absresid = 0;
+unsigned flag_absresid = 1;
 // Tolerance for absolute value of the residuum.
-double abs_resid = 1.0e-3;
+double abs_resid = 1.0e-8;
 // Flag for relative value of the residuum.
-unsigned flag_relresid = 1;
+unsigned flag_relresid = 0;
 // Tolerance for relative value of the residuum.
 double rel_resid = 1.0e-2;
 // Max number of iterations.
-int max_iters = 5;
+int max_iters = 50;
 
 int main(int argc, char **argv)
 {
@@ -181,7 +181,7 @@ int main(int argc, char **argv)
   time = cpu_time.tick().last();
 
   // Show the NOX solution.
-  ScalarView view2("Solution<double> 2", new WinGeom(450, 0, 460, 350));
+  ScalarView view2("Solution 2 (Trilinos)", new WinGeom(450, 0, 460, 350));
   view2.show(sln2);
 
   // Calculate errors.

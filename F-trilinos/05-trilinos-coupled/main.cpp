@@ -14,7 +14,7 @@ const int INIT_REF_NUM = 2;
 // Initial polynomial degree of all mesh elements.
 const int P_INIT = 1;
 // Time step.
-const double TAU = 0.5;
+const double TAU = 0.05;
 // Time interval length.
 const double T_FINAL = 60.0;
 
@@ -30,7 +30,7 @@ const double x1 = 9.0;
 const bool TRILINOS_OUTPUT = true;
 // true = Jacobian-free method (for NOX),
 // false = Newton (for NOX).
-const bool TRILINOS_JFNK = false;
+const bool TRILINOS_JFNK = true;
 // Preconditioning by jacobian (1) (less GMRES iterations, more time to create precond)
 // or by approximation of jacobian (2) (less time for precond creation, more GMRES iters).
 // in case of jfnk, default Ifpack proconditioner in case of Newton.
@@ -43,18 +43,18 @@ const char* iterative_method = "GMRES";
 // "AztecOO" - AztecOO internal preconditioner.
 // "New Ifpack" - Ifpack internal preconditioner.
 // "ML" - Multi level preconditione
-const char* preconditioner = "ML";
+const char* preconditioner = "AztecOO";
 // NOX error messages, see NOX_Utils.h.
 unsigned message_type = NOX::Utils::Error | NOX::Utils::Warning | NOX::Utils::OuterIteration | NOX::Utils::InnerIteration | NOX::Utils::Parameters | NOX::Utils::LinearSolverDetails;
 
 // Tolerance for linear system.
-double ls_tolerance = 1e-2;
+double ls_tolerance = 1e-6;
 // Flag for absolute value of the residuum.
-unsigned flag_absresid = 0;
+unsigned flag_absresid = 1;
 // Tolerance for absolute value of the residuum.
-double abs_resid = 1.0e-3;
+double abs_resid = 1.0e-4;
 // Flag for relative value of the residuum.
-unsigned flag_relresid = 1;
+unsigned flag_relresid = 0;
 // Tolerance for relative value of the residuum.
 double rel_resid = 1.0e-2;
 // Max number of iterations.
@@ -72,7 +72,8 @@ int main(int argc, char* argv[])
   mloader.load("domain.mesh", mesh);
 
   // Perform initial mesh refinemets.
-  for (int i = 0; i < INIT_REF_NUM; i++)  mesh->refine_all_elements();
+  for (int i = 0; i < INIT_REF_NUM; i++)
+    mesh->refine_all_elements();
 
   // Initialize boundary conditions.
   DefaultEssentialBCConst<double> left_t("Left", 1.0);
@@ -120,6 +121,11 @@ int main(int argc, char* argv[])
 
   // Initialize NOX solver and preconditioner.
   NewtonSolverNOX<double> solver(wf, { t_space, c_space });
+  solver.set_verbose_output(true);
+  solver.set_output_flags(message_type);
+  solver.set_ls_tolerance(ls_tolerance);
+  solver.set_conv_abs_resid(abs_resid);
+  solver.set_conv_iters(max_iters);
   MlPrecond<double> pc("sa");
   if (PRECOND)
   {
@@ -129,9 +135,7 @@ int main(int argc, char* argv[])
       solver.set_precond("New Ifpack");
   }
   if (TRILINOS_OUTPUT)
-    solver.set_output_flags(NOX::Utils::Error | NOX::Utils::OuterIteration |
-    NOX::Utils::OuterIterationStatusTest |
-    NOX::Utils::LinearSolverDetails);
+    solver.set_output_flags(NOX::Utils::Error | NOX::Utils::OuterIteration | NOX::Utils::OuterIterationStatusTest | NOX::Utils::LinearSolverDetails);
 
   // Time stepping loop:
   double total_time = 0.0;
@@ -143,7 +147,7 @@ int main(int argc, char* argv[])
     cpu_time.tick();
     try
     {
-      solver.solve(coeff_vec);
+      solver.solve();
     }
     catch (std::exception& e)
     {

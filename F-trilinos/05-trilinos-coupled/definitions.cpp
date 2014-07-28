@@ -10,7 +10,7 @@ CustomWeakForm::CustomWeakForm(double Le, double alpha, double beta, double kapp
     {
       MatrixFormVol<double>* mfv = new JacobianFormVol_0_0(tau);
       add_matrix_form(mfv);
-      MatrixFormSurf<double>* mfs = new JacobianFormSurf_0_0("Outer", kappa);
+      MatrixFormSurf<double>* mfs = new JacobianFormSurf_0_0("Neumann", kappa);
       add_matrix_form_surf(mfs);
       mfv = new JacobianFormVol_0_1(tau);
       add_matrix_form(mfv);
@@ -29,7 +29,7 @@ CustomWeakForm::CustomWeakForm(double Le, double alpha, double beta, double kapp
 
     VectorFormVol<double>* vfv = new ResidualFormVol_0(tau);
     add_vector_form(vfv);
-    VectorFormSurf<double>* vfs = new ResidualFormSurf_0("Outer", kappa);
+    VectorFormSurf<double>* vfs = new ResidualFormSurf_0("Neumann", kappa);
     add_vector_form_surf(vfs);
     vfv = new ResidualFormVol_1(tau, Le);
     add_vector_form(vfv);
