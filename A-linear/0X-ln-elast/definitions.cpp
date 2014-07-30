@@ -3,20 +3,20 @@
 CustomWeakFormLinearElasticity::CustomWeakFormLinearElasticity(double E, double nu, Hermes2DFunction<double>* lambdaF, Hermes2DFunction<double>* muF, double rho_g,
   std::string surface_force_bdy, double f0, double f1) : WeakForm<double>(2)
 {
-    double lambda = (E * nu) / ((1 + nu) * (1 - 2 * nu));
-    double mu = E / (2 * (1 + nu));
+  double lambda = (E * nu) / ((1 + nu) * (1 - 2 * nu));
+  double mu = E / (2 * (1 + nu));
 
-    // SINGLE-COMPONENT FORMS. USEFUL FOR MULTIMESH, DO NOT REMOVE.
-    // Jacobian.
-    add_matrix_form(new CustomJacobianElast00(0, 0, lambda, mu, lambdaF, muF));
-    add_matrix_form(new CustomJacobianElast01(0, 1, lambda, mu, lambdaF, muF));
-    add_matrix_form(new CustomJacobianElast10(1, 0, lambda, mu, lambdaF, muF));
-    add_matrix_form(new CustomJacobianElast11(1, 1, lambda, mu, lambdaF, muF));
+  // SINGLE-COMPONENT FORMS. USEFUL FOR MULTIMESH, DO NOT REMOVE.
+  // Jacobian.
+  add_matrix_form(new CustomJacobianElast00(0, 0, lambda, mu, lambdaF, muF));
+  add_matrix_form(new CustomJacobianElast01(0, 1, lambda, mu, lambdaF, muF));
+  add_matrix_form(new CustomJacobianElast10(1, 0, lambda, mu, lambdaF, muF));
+  add_matrix_form(new CustomJacobianElast11(1, 1, lambda, mu, lambdaF, muF));
 
-    //Residuals
-    add_vector_form(new CustomVectorRes0(0, lambda, mu, lambdaF, muF));
-    add_vector_form(new CustomVectorRes1(1, lambda, mu, lambdaF, muF));
-  }
+  //Residuals
+  add_vector_form(new CustomVectorRes0(0, lambda, mu, lambdaF, muF));
+  add_vector_form(new CustomVectorRes1(1, lambda, mu, lambdaF, muF));
+}
 
 // Jacobian lin elast 0-0
 double CustomWeakFormLinearElasticity::CustomJacobianElast00::value(int n, double *wt, Func<double> *u_ext[],
@@ -244,7 +244,7 @@ double CustomExactFunctionMu::ddxx(double x, double y)
 
 // Lambda Hermes2DFunction
 CustomLambda::CustomLambda(double E, double nu)
-: Hermes2DFunction<double>(), E(E), nu(nu)
+  : Hermes2DFunction<double>(), E(E), nu(nu)
 {
   cefLam = new CustomExactFunctionLambda(E, nu);
 }
@@ -263,7 +263,7 @@ CustomLambda::~CustomLambda()
 
 // Mu Hermes2DFunction
 CustomMu::CustomMu(double E, double nu)
-: Hermes2DFunction<double>(), E(E), nu(nu)
+  : Hermes2DFunction<double>(), E(E), nu(nu)
 {
   cefMu = new CustomExactFunctionMu(E, nu);
 }
@@ -282,7 +282,7 @@ CustomMu::~CustomMu()
 
 // Exact solution lambda
 ExactSolutionLambda::ExactSolutionLambda(MeshSharedPtr mesh, double E, double nu)
-: ExactSolutionScalar<double>(mesh), E(E), nu(nu)
+  : ExactSolutionScalar<double>(mesh), E(E), nu(nu)
 {
   cefLam = new CustomExactFunctionLambda(E, nu);
 }
@@ -310,7 +310,7 @@ MeshFunction<double>* ExactSolutionLambda::clone() const
 
 // Exact solution mu
 ExactSolutionMu::ExactSolutionMu(MeshSharedPtr mesh, double E, double nu)
-: ExactSolutionScalar<double>(mesh), E(E), nu(nu)
+  : ExactSolutionScalar<double>(mesh), E(E), nu(nu)
 {
   cefMu = new CustomExactFunctionMu(E, nu);
 }

@@ -6,7 +6,7 @@ using namespace Hermes::Hermes2D::Views;
 
 /* Nonlinearity lambda(u) = pow(u, alpha) */
 
-class CustomNonlinearity : public Hermes1DFunction<double>
+class CustomNonlinearity : public Hermes1DFunction < double >
 {
 public:
   CustomNonlinearity(double alpha);
@@ -25,7 +25,7 @@ protected:
 
 /* Essential boundary condition */
 
-class EssentialBCNonConst : public EssentialBoundaryCondition<double>
+class EssentialBCNonConst : public EssentialBoundaryCondition < double >
 {
 public:
   EssentialBCNonConst(std::string marker);
@@ -37,7 +37,7 @@ public:
 
 /* Initial condition */
 
-class CustomInitialCondition : public ExactSolutionScalar<double>
+class CustomInitialCondition : public ExactSolutionScalar < double >
 {
 public:
   CustomInitialCondition(MeshSharedPtr mesh) : ExactSolutionScalar<double>(mesh) {};

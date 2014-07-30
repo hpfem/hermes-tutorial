@@ -4,7 +4,7 @@ using namespace Hermes;
 using namespace Hermes::Hermes2D;
 
 // Exact solution.
-class CustomExactSolution : public ExactSolutionScalar<double>
+class CustomExactSolution : public ExactSolutionScalar < double >
 {
 public:
   CustomExactSolution(MeshSharedPtr mesh) : ExactSolutionScalar<double>(mesh) {};

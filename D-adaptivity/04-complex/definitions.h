@@ -5,7 +5,7 @@ using namespace Hermes::Hermes2D;
 
 /* Weak forms */
 
-class CustomWeakForm : public WeakForm<std::complex<double> >
+class CustomWeakForm : public WeakForm < std::complex<double> >
 {
 public:
   CustomWeakForm(std::string mat_air, double mu_air,

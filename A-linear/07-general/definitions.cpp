@@ -35,7 +35,7 @@ double a_0(double x, double y)
 /* Custom non-constant Dirichlet condition */
 
 CustomEssentialBCNonConst::CustomEssentialBCNonConst(std::string marker)
-: EssentialBoundaryCondition<double>(marker) { }
+  : EssentialBoundaryCondition<double>(marker) { }
 
 inline EssentialBoundaryCondition<double>::EssentialBCValueType CustomEssentialBCNonConst::get_value_type() const
 {
@@ -62,7 +62,7 @@ CustomWeakFormGeneral::CustomWeakFormGeneral(std::string bdy_vertical) : WeakFor
 }
 
 CustomWeakFormGeneral::MatrixFormVolGeneral::MatrixFormVolGeneral(int i, int j)
-: MatrixFormVol<double>(i, j)
+  : MatrixFormVol<double>(i, j)
 {
   this->setSymFlag(HERMES_SYM);
 }
@@ -138,7 +138,7 @@ double CustomWeakFormGeneral::VectorFormVolGeneral::rhs(double x, double y) cons
 }
 
 CustomWeakFormGeneral::VectorFormSurfGeneral::VectorFormSurfGeneral(int i, std::string area)
-: VectorFormSurf<double>(i)
+  : VectorFormSurf<double>(i)
 {
   this->set_area(area);
 }

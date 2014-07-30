@@ -3,7 +3,7 @@
 using namespace Hermes;
 using namespace Hermes::Hermes2D;
 
-class ExactSolutionCustom : public ExactSolutionScalar<double>
+class ExactSolutionCustom : public ExactSolutionScalar < double >
 {
 public:
   ExactSolutionCustom(MeshSharedPtr mesh) : ExactSolutionScalar<double>(mesh) {};

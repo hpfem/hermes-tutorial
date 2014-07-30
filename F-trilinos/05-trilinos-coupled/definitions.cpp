@@ -6,34 +6,34 @@ CustomWeakForm::CustomWeakForm(double Le, double alpha, double beta, double kapp
 {
   this->set_ext({ omega_dt, omega_dc, t_prev_time_1, t_prev_time_2, c_prev_time_1, c_prev_time_2, omega });
 
-    if (!JFNK || (JFNK && PRECOND == 1))
-    {
-      MatrixFormVol<double>* mfv = new JacobianFormVol_0_0(tau);
-      add_matrix_form(mfv);
-      MatrixFormSurf<double>* mfs = new JacobianFormSurf_0_0("Neumann", kappa);
-      add_matrix_form_surf(mfs);
-      mfv = new JacobianFormVol_0_1(tau);
-      add_matrix_form(mfv);
-      mfv = new JacobianFormVol_1_0(tau);
-      add_matrix_form(mfv);
-      mfv = new JacobianFormVol_1_1(tau, Le);
-      add_matrix_form(mfv);
-    }
-    else if (PRECOND == 2)
-    {
-      MatrixFormVol<double>* mfv = new PreconditionerForm_0(tau, Le);
-      add_matrix_form(mfv);
-      mfv = new PreconditionerForm_1(tau, Le);
-      add_matrix_form(mfv);
-    }
-
-    VectorFormVol<double>* vfv = new ResidualFormVol_0(tau);
-    add_vector_form(vfv);
-    VectorFormSurf<double>* vfs = new ResidualFormSurf_0("Neumann", kappa);
-    add_vector_form_surf(vfs);
-    vfv = new ResidualFormVol_1(tau, Le);
-    add_vector_form(vfv);
+  if (!JFNK || (JFNK && PRECOND == 1))
+  {
+    MatrixFormVol<double>* mfv = new JacobianFormVol_0_0(tau);
+    add_matrix_form(mfv);
+    MatrixFormSurf<double>* mfs = new JacobianFormSurf_0_0("Neumann", kappa);
+    add_matrix_form_surf(mfs);
+    mfv = new JacobianFormVol_0_1(tau);
+    add_matrix_form(mfv);
+    mfv = new JacobianFormVol_1_0(tau);
+    add_matrix_form(mfv);
+    mfv = new JacobianFormVol_1_1(tau, Le);
+    add_matrix_form(mfv);
   }
+  else if (PRECOND == 2)
+  {
+    MatrixFormVol<double>* mfv = new PreconditionerForm_0(tau, Le);
+    add_matrix_form(mfv);
+    mfv = new PreconditionerForm_1(tau, Le);
+    add_matrix_form(mfv);
+  }
+
+  VectorFormVol<double>* vfv = new ResidualFormVol_0(tau);
+  add_vector_form(vfv);
+  VectorFormSurf<double>* vfs = new ResidualFormSurf_0("Neumann", kappa);
+  add_vector_form_surf(vfs);
+  vfv = new ResidualFormVol_1(tau, Le);
+  add_vector_form(vfv);
+}
 
 double CustomWeakForm::JacobianFormVol_0_0::value(int n, double *wt, Func<double> *u_ext[],
   Func<double> *vj, Func<double> *vi, GeomVol<double> *e, Func<double> **ext) const

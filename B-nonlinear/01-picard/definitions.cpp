@@ -21,14 +21,14 @@ CustomWeakFormPicard::CustomWeakFormPicard(MeshFunctionSharedPtr<double> prev_it
   Hermes2DFunction<double>* f)
   : WeakForm<double>(1)
 {
-    // Jacobian.
-    CustomJacobian* matrix_form = new CustomJacobian(0, 0, lambda);
-    add_matrix_form(matrix_form);
+  // Jacobian.
+  CustomJacobian* matrix_form = new CustomJacobian(0, 0, lambda);
+  add_matrix_form(matrix_form);
 
-    // Residual.
-    CustomResidual* vector_form = new CustomResidual(0, lambda, f);
-    add_vector_form(vector_form);
-  }
+  // Residual.
+  CustomResidual* vector_form = new CustomResidual(0, lambda, f);
+  add_vector_form(vector_form);
+}
 
 double CustomWeakFormPicard::CustomJacobian::value(int n, double *wt, Func<double> *u_ext[],
   Func<double> *u, Func<double> *v,

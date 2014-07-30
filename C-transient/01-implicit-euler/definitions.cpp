@@ -4,29 +4,29 @@ CustomWeakFormHeatRK1::CustomWeakFormHeatRK1(std::string bdy_air, double alpha, 
   double time_step, double* current_time_ptr, double temp_init, double t_final,
   MeshFunctionSharedPtr<double> prev_time_sln) : WeakForm<double>(1)
 {
-    this->set_ext(prev_time_sln);
+  this->set_ext(prev_time_sln);
 
-    /* Jacobian */
-    // Contribution of the time derivative term.
-    add_matrix_form(new DefaultMatrixFormVol<double>(0, 0, HERMES_ANY, new Hermes2DFunction<double>(1.0 / time_step)));
-    // Contribution of the diffusion term.
-    add_matrix_form(new DefaultJacobianDiffusion<double>(0, 0, HERMES_ANY, new Hermes1DFunction<double>(lambda / (rho * heatcap))));
-    // Contribution of the Newton boundary condition.
-    add_matrix_form_surf(new DefaultMatrixFormSurf<double>(0, 0, bdy_air, new Hermes2DFunction<double>(alpha / (rho * heatcap))));
+  /* Jacobian */
+  // Contribution of the time derivative term.
+  add_matrix_form(new DefaultMatrixFormVol<double>(0, 0, HERMES_ANY, new Hermes2DFunction<double>(1.0 / time_step)));
+  // Contribution of the diffusion term.
+  add_matrix_form(new DefaultJacobianDiffusion<double>(0, 0, HERMES_ANY, new Hermes1DFunction<double>(lambda / (rho * heatcap))));
+  // Contribution of the Newton boundary condition.
+  add_matrix_form_surf(new DefaultMatrixFormSurf<double>(0, 0, bdy_air, new Hermes2DFunction<double>(alpha / (rho * heatcap))));
 
-    /* Residual */
-    // Contribution of the time derivative term.
-    add_vector_form(new DefaultResidualVol<double>(0, HERMES_ANY, new Hermes2DFunction<double>(1.0 / time_step)));
-    // Contribution of the diffusion term.
-    add_vector_form(new DefaultResidualDiffusion<double>(0, HERMES_ANY, new Hermes1DFunction<double>(lambda / (rho * heatcap))));
-    CustomVectorFormVol* vec_form_vol = new CustomVectorFormVol(0, time_step);
-    add_vector_form(vec_form_vol);
-    // Contribution of the Newton boundary condition.
-    add_vector_form_surf(new DefaultResidualSurf<double>(0, bdy_air, new Hermes2DFunction<double>(alpha / (rho * heatcap))));
-    // Contribution of the Newton boundary condition.
-    add_vector_form_surf(new CustomVectorFormSurf(0, bdy_air, alpha, rho, heatcap,
-      time_step, current_time_ptr, temp_init, t_final));
-  }
+  /* Residual */
+  // Contribution of the time derivative term.
+  add_vector_form(new DefaultResidualVol<double>(0, HERMES_ANY, new Hermes2DFunction<double>(1.0 / time_step)));
+  // Contribution of the diffusion term.
+  add_vector_form(new DefaultResidualDiffusion<double>(0, HERMES_ANY, new Hermes1DFunction<double>(lambda / (rho * heatcap))));
+  CustomVectorFormVol* vec_form_vol = new CustomVectorFormVol(0, time_step);
+  add_vector_form(vec_form_vol);
+  // Contribution of the Newton boundary condition.
+  add_vector_form_surf(new DefaultResidualSurf<double>(0, bdy_air, new Hermes2DFunction<double>(alpha / (rho * heatcap))));
+  // Contribution of the Newton boundary condition.
+  add_vector_form_surf(new CustomVectorFormSurf(0, bdy_air, alpha, rho, heatcap,
+    time_step, current_time_ptr, temp_init, t_final));
+}
 
 double CustomWeakFormHeatRK1::CustomVectorFormVol::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, GeomVol<double> *e, Func<double> **ext) const
 {

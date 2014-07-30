@@ -3,21 +3,21 @@
 CustomWeakForm::CustomWeakForm(std::vector<std::string> newton_boundaries, double heatcap, double rho, double tau,
   double lambda, double alpha, double temp_ext, MeshFunctionSharedPtr<double> sln_prev_time, bool JFNK) : WeakForm<double>(1, JFNK)
 {
-    this->set_ext(sln_prev_time);
+  this->set_ext(sln_prev_time);
 
-    // Jacobian forms - volumetric.
-    add_matrix_form(new JacobianFormVol(0, 0, heatcap, rho, lambda, tau));
+  // Jacobian forms - volumetric.
+  add_matrix_form(new JacobianFormVol(0, 0, heatcap, rho, lambda, tau));
 
-    // Jacobian forms - surface.
-    add_matrix_form_surf(new JacobianFormSurf(0, 0, newton_boundaries, alpha, lambda));
+  // Jacobian forms - surface.
+  add_matrix_form_surf(new JacobianFormSurf(0, 0, newton_boundaries, alpha, lambda));
 
-    // Residual forms - volumetric.
-    ResidualFormVol* res_form = new ResidualFormVol(0, heatcap, rho, lambda, tau);
-    add_vector_form(res_form);
+  // Residual forms - volumetric.
+  ResidualFormVol* res_form = new ResidualFormVol(0, heatcap, rho, lambda, tau);
+  add_vector_form(res_form);
 
-    // Residual forms - surface.
-    add_vector_form_surf(new ResidualFormSurf(0, newton_boundaries, alpha, lambda, temp_ext));
-  }
+  // Residual forms - surface.
+  add_vector_form_surf(new ResidualFormSurf(0, newton_boundaries, alpha, lambda, temp_ext));
+}
 
 double CustomWeakForm::JacobianFormVol::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
   Func<double> *v, GeomVol<double> *e, Func<double> **ext) const
