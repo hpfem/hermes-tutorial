@@ -258,7 +258,7 @@ Ord CustomWeakForm::PreconditionerForm_1::ord(int n, double *wt, Func<Ord>* u_ex
   return vj->val[0] * vi->val[0] + vj->dx[0] * vi->dx[0] + vj->dy[0] * vi->dy[0];
 }
 
-void CustomFilter::filter_fn(int n, double* x, double* y, std::vector<const double*> values, std::vector<const double*> dx, std::vector<const double*> dy,
+void CustomFilter::filter_fn(int n, double* x, double* y, const std::vector<const double *>& values, const std::vector<const double *>& dx, const std::vector<const double *>& dy,
   double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)
@@ -274,7 +274,7 @@ void CustomFilter::filter_fn(int n, double* x, double* y, std::vector<const doub
   }
 }
 
-void CustomFilterDt::filter_fn(int n, double* x, double* y, std::vector<const double*> values, std::vector<const double*> dx, std::vector<const double*> dy,
+void CustomFilterDt::filter_fn(int n, double* x, double* y, const std::vector<const double *>& values, const std::vector<const double *>& dx, const std::vector<const double *>& dy,
   double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)
@@ -290,7 +290,7 @@ void CustomFilterDt::filter_fn(int n, double* x, double* y, std::vector<const do
   }
 }
 
-void CustomFilterDc::filter_fn(int n, double* x, double* y, std::vector<const double*> values, std::vector<const double*> dx, std::vector<const double*> dy,
+void CustomFilterDc::filter_fn(int n, double* x, double* y, const std::vector<const double *>& values, const std::vector<const double *>& dx, const std::vector<const double *>& dy,
   double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)

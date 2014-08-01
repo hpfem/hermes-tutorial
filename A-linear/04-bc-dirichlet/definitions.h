@@ -22,7 +22,7 @@ class CustomDirichletCondition : public EssentialBoundaryCondition<double>
 public:
   CustomDirichletCondition(std::vector<std::string> markers, double A, double B, double C);
 
-  virtual EssentialBoundaryCondition<double>::EssentialBCValueType get_value_type() const;
+  virtual EssentialBCValueType get_value_type() const;
 
   virtual double value(double x, double y) const;
 

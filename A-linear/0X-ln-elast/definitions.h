@@ -201,13 +201,13 @@ public:
   virtual MeshFunction<double>* clone() const
   {
     std::vector<MeshFunctionSharedPtr<double> > slns;
-    for (int i = 0; i < this->num; i++)
-      slns.push_back(this->sln[i]->clone());
+    for (int i = 0; i < this->solutions.size(); i++)
+      slns.push_back(this->solutions[i]->clone());
     CustomFilterS11* filter = new CustomFilterS11(slns, mu, lambda);
     return filter;
   }
 private:
-  virtual void filter_fn(int n, double* x, double* y, std::vector<const double *> values, std::vector<const double *> dx, std::vector<const double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
+  virtual void filter_fn(int n, double* x, double* y, const std::vector<const double *>& values, const std::vector<const double *>& dx, const std::vector<const double *>& dy, double* rslt, double* rslt_dx, double* rslt_dy);
   CustomMu* mu;
   CustomLambda* lambda;
 };
@@ -222,13 +222,13 @@ public:
   virtual MeshFunction<double>* clone() const
   {
     std::vector<MeshFunctionSharedPtr<double> > slns;
-    for (int i = 0; i < this->num; i++)
-      slns.push_back(this->sln[i]->clone());
+    for (int i = 0; i < this->solutions.size(); i++)
+      slns.push_back(this->solutions[i]->clone());
     CustomFilterS12* filter = new CustomFilterS12(slns, mu);
     return filter;
   }
 private:
-  virtual void filter_fn(int n, double* x, double* y, std::vector<const double *> values, std::vector<const double *> dx, std::vector<const double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
+  virtual void filter_fn(int n, double* x, double* y, const std::vector<const double *>& values, const std::vector<const double *>& dx, const std::vector<const double *>& dy, double* rslt, double* rslt_dx, double* rslt_dy);
   double mu;
 };
 
@@ -242,13 +242,13 @@ public:
   virtual MeshFunction<double>* clone() const
   {
     std::vector<MeshFunctionSharedPtr<double> > slns;
-    for (int i = 0; i < this->num; i++)
-      slns.push_back(this->sln[i]->clone());
+    for (int i = 0; i < this->solutions.size(); i++)
+      slns.push_back(this->solutions[i]->clone());
     CustomFilterS22* filter = new CustomFilterS22(slns, mu, lambda);
     return filter;
   }
 private:
-  virtual void filter_fn(int n, double* x, double* y, std::vector<const double *> values, std::vector<const double *> dx, std::vector<const double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
+  virtual void filter_fn(int n, double* x, double* y, const std::vector<const double *>& values, const std::vector<const double *>& dx, const std::vector<const double *>& dy, double* rslt, double* rslt_dx, double* rslt_dy);
   double mu;
   double lambda;
 };

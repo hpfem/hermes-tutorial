@@ -337,7 +337,7 @@ MeshFunction<double>* ExactSolutionMu::clone() const
 }
 
 // Custom filter S11
-void CustomFilterS11::filter_fn(int n, double* x, double* y, std::vector<const double*> values, std::vector<const double*> dx, std::vector<const double*> dy,
+void CustomFilterS11::filter_fn(int n, double* x, double* y, const std::vector<const double *>& values, const std::vector<const double *>& dx, const std::vector<const double *>& dy,
   double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)
@@ -349,7 +349,7 @@ void CustomFilterS11::filter_fn(int n, double* x, double* y, std::vector<const d
 }
 
 // Custom filter S12
-void CustomFilterS12::filter_fn(int n, double* x, double* y, std::vector<const double*> values, std::vector<const double*> dx, std::vector<const double*> dy,
+void CustomFilterS12::filter_fn(int n, double* x, double* y, const std::vector<const double *>& values, const std::vector<const double *>& dx, const std::vector<const double *>& dy,
   double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)
@@ -361,7 +361,7 @@ void CustomFilterS12::filter_fn(int n, double* x, double* y, std::vector<const d
 }
 
 // Custom filter S22
-void CustomFilterS22::filter_fn(int n, double* x, double* y, std::vector<const double*> values, std::vector<const double*> dx, std::vector<const double*> dy,
+void CustomFilterS22::filter_fn(int n, double* x, double* y, const std::vector<const double *>& values, const std::vector<const double *>& dx, const std::vector<const double *>& dy,
   double* out, double* outdx, double* outdy)
 {
   for (int i = 0; i < n; i++)

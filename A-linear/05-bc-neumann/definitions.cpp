@@ -28,9 +28,9 @@ CustomDirichletCondition::CustomDirichletCondition(std::vector<std::string> mark
 {
 }
 
-EssentialBoundaryCondition<double>::EssentialBCValueType CustomDirichletCondition::get_value_type() const
+EssentialBCValueType CustomDirichletCondition::get_value_type() const
 {
-  return EssentialBoundaryCondition<double>::BC_FUNCTION;
+  return BC_FUNCTION;
 }
 
 double CustomDirichletCondition::value(double x, double y) const

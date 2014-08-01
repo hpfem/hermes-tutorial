@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_essential_out("Outer", 0.0);
   DefaultEssentialBCConst<double> bc_essential_stator("Stator", VOLTAGE);
-  EssentialBCs<double> bcs(std::vector<EssentialBoundaryCondition<double> *>(&bc_essential_out, &bc_essential_stator));
+  EssentialBCs<double> bcs(std::vector<EssentialBoundaryCondition<double> *>({ &bc_essential_out, &bc_essential_stator }));
 
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));

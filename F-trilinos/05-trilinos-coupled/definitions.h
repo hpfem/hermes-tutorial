@@ -248,16 +248,16 @@ public:
   {
     std::vector<MeshFunctionSharedPtr<double> > slns;
     std::vector<int> items;
-    for (int i = 0; i < this->num; i++)
+    for (int i = 0; i < this->solutions.size(); i++)
     {
-      slns.push_back(dynamic_cast<Solution<double>*>(this->sln[i]->clone()));
+      slns.push_back(dynamic_cast<Solution<double>*>(this->solutions[i]->clone()));
     }
     CustomFilter* filter = new CustomFilter(slns, Le, alpha, beta, kappa, x1, tau);
     return filter;
   }
 
 private:
-  virtual void filter_fn(int n, double* x, double* y, std::vector<const double *> values, std::vector<const double *> dx, std::vector<const double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
+  virtual void filter_fn(int n, double* x, double* y, const std::vector<const double *>& values, const std::vector<const double *>& dx, const std::vector<const double *>& dy, double* rslt, double* rslt_dx, double* rslt_dy);
 
   double Le;
   double alpha;
@@ -278,16 +278,16 @@ public:
   {
     std::vector<MeshFunctionSharedPtr<double> > slns;
     std::vector<int> items;
-    for (int i = 0; i < this->num; i++)
+    for (int i = 0; i < this->solutions.size(); i++)
     {
-      slns.push_back(dynamic_cast<Solution<double>*>(this->sln[i]->clone()));
+      slns.push_back(dynamic_cast<Solution<double>*>(this->solutions[i]->clone()));
     }
     CustomFilterDc* filter = new CustomFilterDc(slns, Le, alpha, beta, kappa, x1, tau);
     return filter;
   }
 
 private:
-  virtual void filter_fn(int n, double* x, double* y, std::vector<const double *> values, std::vector<const double *> dx, std::vector<const double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
+  virtual void filter_fn(int n, double* x, double* y, const std::vector<const double *>& values, const std::vector<const double *>& dx, const std::vector<const double *>& dy, double* rslt, double* rslt_dx, double* rslt_dy);
 
   double Le;
   double alpha;
@@ -307,16 +307,16 @@ public:
   {
     std::vector<MeshFunctionSharedPtr<double> > slns;
     std::vector<int> items;
-    for (int i = 0; i < this->num; i++)
+    for (int i = 0; i < this->solutions.size(); i++)
     {
-      slns.push_back(dynamic_cast<Solution<double>*>(this->sln[i]->clone()));
+      slns.push_back(dynamic_cast<Solution<double>*>(this->solutions[i]->clone()));
     }
     CustomFilterDt* filter = new CustomFilterDt(slns, Le, alpha, beta, kappa, x1, tau);
     return filter;
   }
 
 private:
-  virtual void filter_fn(int n, double* x, double* y, std::vector<const double *> values, std::vector<const double *> dx, std::vector<const double *> dy, double* rslt, double* rslt_dx, double* rslt_dy);
+  virtual void filter_fn(int n, double* x, double* y, const std::vector<const double *>& values, const std::vector<const double *>& dx, const std::vector<const double *>& dy, double* rslt, double* rslt_dx, double* rslt_dy);
 
   double Le;
   double alpha;
