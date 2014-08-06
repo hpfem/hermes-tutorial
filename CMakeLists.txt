@@ -43,8 +43,7 @@ project(hermes-tutorial)
   include("CMake.vars.default.Linux" OPTIONAL)
   include(CMake.vars OPTIONAL RESULT_VARIABLE CMAKE_VARS_LOADED)
   if(${CMAKE_VARS_LOADED} MATCHES "NOTFOUND")
-    message(FATAL_ERROR "You need to have a CMake.vars file - see the documentation and the example
-CMake.vars.example.Windows|Linux files for instructions.")
+    message(FATAL_ERROR "You need to have a CMake.vars file - see the documentation and the example CMake.vars.example.Windows|Linux files for instructions.")
   endif()
 
   if(DEFINED HERMES_CMAKE_VARS_FILE_LOCATION)
