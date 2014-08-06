@@ -40,9 +40,27 @@ project(hermes-tutorial)
   set(HERMES_SOURCE_DIRECTORY ~/hermes)
 
   # Allow to override the default values in CMake.vars:
-  include(".CMake.vars.default.Linux" OPTIONAL)
-  include(CMake.vars OPTIONAL)
-  include(${HERMES_CMAKE_VARS_FILE_LOCATION} OPTIONAL)
+  include("CMake.vars.default.Linux" OPTIONAL)
+  include(CMake.vars OPTIONAL RESULT_VARIABLE CMAKE_VARS_LOADED)
+  if(${CMAKE_VARS_LOADED} MATCHES "NOTFOUND")
+    message(FATAL_ERROR "You need to have a CMake.vars file - see the documentation and the example
+CMake.vars.example.Windows|Linux files for instructions.")
+  endif()
+
+  if(DEFINED HERMES_CMAKE_VARS_FILE_LOCATION)
+    if(NOT ${HERMES_CMAKE_VARS_FILE_LOCATION} STREQUAL "")
+      include(${HERMES_CMAKE_VARS_FILE_LOCATION} OPTIONAL RESULT_VARIABLE HERMES_CMAKE_VARS_LOADED)
+      if(${HERMES_CMAKE_VARS_LOADED} MATCHES "NOTFOUND")
+        message(FATAL_ERROR "Your specification of HERMES_CMAKE_VARS_FILE_LOCATION in your CMake.vars file is wrong.")
+      endif()
+    endif()
+  endif()
+
+  message(${HERMES_STATIC_LIBS})
+
+  if(NOT DEFINED HERMES_STATIC_LIBS)
+      message(FATAL_ERROR "You must either set HERMES_CMAKE_VARS_FILE_LOCATION in your CMake.vars file, or use a CMake.vars file according to the instructions in the debian package if you installed Hermes using that package.")
+  endif()
 
   if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		# Disable all warnings and turn on only important ones:
